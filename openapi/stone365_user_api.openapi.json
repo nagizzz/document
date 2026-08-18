@@ -9,7 +9,7 @@
     "/collect/admin/import": {
       "post": {
         "tags": [
-          "采集导入控制器"
+          "collect/admin"
         ],
         "summary": "采集数据导入",
         "description": "将外部采集的企业数据导入系统，自动创建用户账号、企业信息、权重、附件及供应产品。\n\n## 请求规则\n1. UI_Name 为唯一必填字段。\n2. PickTime 不传默认当前时间，同时用于 U_RegDate、UI_UpdateTime、i_supply.CreateTime、i_supply_product.SD_PublishDate。\n3. UI_Moblie、UI_LinkMan、UI_Area、U_PType 会先将中文逗号转为英文逗号，再按现有规则入库。\n4. Area_ID 允许传省份文字，例如 浙江 或 浙江省，后端会换算为地区 CODE。\n\n## 成功返回说明\n1. Data.U_ID 为导入后对应的用户 ID。\n2. 企业已存在时，也返回已有 U_ID，不会报错中断。",
@@ -145,7 +145,7 @@
           }
         },
         "tags": [
-          "媒体视频控制器"
+          "media"
         ]
       }
     },
@@ -209,7 +209,7 @@
           }
         },
         "tags": [
-          "媒体视频控制器"
+          "media"
         ]
       }
     },
@@ -248,7 +248,7 @@
           }
         },
         "tags": [
-          "媒体视频控制器"
+          "media"
         ]
       }
     },
@@ -292,14 +292,14 @@
           }
         },
         "tags": [
-          "媒体视频控制器"
+          "media"
         ]
       }
     },
     "/notifications/client/counts": {
       "get": {
         "tags": [
-          "通知控制器"
+          "notification/member"
         ],
         "summary": "未读通知统计（GET 兼容）",
         "description": "与 POST 版规则一致，用于兼容旧调用方式。",
@@ -311,7 +311,7 @@
       },
       "post": {
         "tags": [
-          "通知控制器"
+          "notification/member"
         ],
         "summary": "未读通知统计",
         "description": "统计当前终端未读通知数。\n\n## 规则\n1. 未传参数时，返回全部未读数。\n2. 小写 type 表示从未读统计里排除对应 Type。\n3. 大写 Type 表示兼容旧逻辑，仅统计指定 Type。\n4. 两个参数同时传入时，先按 Type 精确筛选，再按 type 排除。",
@@ -364,7 +364,7 @@
     "/notifications/client/list": {
       "post": {
         "tags": [
-          "通知控制器"
+          "notification/member"
         ],
         "summary": "通知列表",
         "description": "返回当前用户通知分页列表。\n\n## 默认筛选规则\n1. 未传 type 时，默认排除 Type=20。\n2. 传入 type 时，仅返回对应 type 的数据；支持单个值与逗号分隔值。\n\n## Type=20 特殊处理\n1. Title 改写为：客户{用户名}通过{端口}访问了您的店铺，并拨打了店铺电话，请及时跟进客户需求。\n2. 用户名来源于 u_notification_messages.Data.username。\n3. 端口映射：Data.type=app 时显示 石图APP，其余值统一显示 中国石材网stone365。\n4. Data 原始结构仍保留返回，前端如需更多信息可继续读取。",
@@ -455,7 +455,7 @@
     "/notifications/client/markallread": {
       "post": {
         "tags": [
-          "通知控制器"
+          "notification/member"
         ],
         "summary": "全部标记已读",
         "description": "将当前终端未读通知批量标记为已读。\n\n## 规则\n1. 未传参数时，将当前终端全部未读通知标记已读。\n2. 大写 Type 表示只处理指定 Type。\n3. 小写 type 或 ExcludeType 表示排除对应 Type，不做已读处理。\n4. 两套参数同时传时，先按 Type 缩小范围，再按 type 排除。",
@@ -503,7 +503,7 @@
     "/operationlog/admin/shopVisits": {
       "get": {
         "tags": [
-          "店铺访问记录控制器"
+          "operationlog/admin"
         ],
         "summary": "店铺访问记录分页列表",
         "description": "为 chengstone_web 后台 /Vip/shopVisitRecord 页面返回分页数据。\n\n## 查询规则\n1. UName 按 u_behavior_record.log_u_name 做 LIKE 模糊搜索。\n2. UIName 通过 log_company_u_id 关联 u_userinfo 后按 UI_Name 做 LIKE 模糊搜索。\n3. 地址字段在服务层按 log_province、log_city、log_district 拼接；三段都为空时统一返回 未知。\n4. 返回结构保留 PageCounts、Counts、PageIndex、PageSize、DataList，方便旧后台项目直接消费。",
@@ -583,7 +583,7 @@
     "/order/virtual-pay/createOrder": {
       "post": {
         "tags": [
-          "虚拟支付控制器"
+          "order/client"
         ],
         "summary": "已登录用户建单",
         "description": "已登录用户创建矿通虚拟支付本地订单。接口要求 utoken 能解析出真实登录用户。\n\n## 请求规则\n1. productId 必填。\n2. openid 必填，用于后续微信支付与 queryOrder 查询微信订单。\n3. env 不传默认 0；0=现网，1=沙箱，建单、签名、查单必须保持同一环境。\n4. utoken 必填，用于识别真实登录用户。\n5. requestSource 建议沿用当前前端请求来源值，便于日志和兼容链路排查。\n\n## 支持的商品 ID（productId 取值）\n| productId | 权益标识 pro_id | 时长 | 价格 |\n|---|---|---|---|\n| calciumsvip_1year | calcium_svip | 1 年 | 588 |\n| calciumsvip_3year | calcium_svip | 3 年 | 1288 |\n| goldsvip_1year | gold_svip | 1 年 | 888 |\n| goldsvip_3year | gold_svip | 3 年 | 1888 |\n| phosphatesvip_1year | phosphate_svip | 1 年 | 888 |\n| phosphatesvip_3year | phosphate_svip | 3 年 | 1888 |\n| magnesitesvip_1year | magnesite_svip | 1 年 | 688 |\n| magnesitesvip_3year | magnesite_svip | 3 年 | 1388 |\n| bauxitesvip_1year | bauxite_svip | 1 年 | 888 |\n| bauxitesvip_3year | bauxite_svip | 3 年 | 1888 |\n| coalsvip_1year | coal_svip | 1 年 | 888 |\n| coalsvip_3year | coal_svip | 3 年 | 1888 |\n| sandsvip_1year | sand_svip | 1 年 | 588 |\n| sandsvip_3year | sand_svip | 3 年 | 1288 |\n| minesvip_1year | mine_svip | 1 年 | 688 |\n| minesvip_3year | mine_svip | 3 年 | 1388 |\n| graphitesvip_1year | graphite_svip | 1 年 | 588 |\n| graphitesvip_3year | graphite_svip | 3 年 | 1288 |\n| quartzsvip_1year | quartz_svip | 1 年 | 588 |\n| quartzsvip_3year | quartz_svip | 3 年 | 1288 |\n| ironsvip_1year | iron_svip | 1 年 | 888 |\n| ironsvip_3year | iron_svip | 3 年 | 1888 |\n| coppersvip_1year | copper_svip | 1 年 | 888 |\n| coppersvip_3year | copper_svip | 3 年 | 1888 |\n| silversvip_1year | silver_svip | 1 年 | 888 |\n| silversvip_3year | silver_svip | 3 年 | 1888 |\n| fluoritesvip_1year | fluorite_svip | 1 年 | 888 |\n| fluoritesvip_3year | fluorite_svip | 3 年 | 1888 |\n\n## 成功返回说明\n1. order_sn 为本地订单号，后续前端通常作为 outTradeNo 使用。\n2. order_amount 为本地订单金额，单位元。\n3. offer_id 与 product_id 直接回传给前端，便于拼接微信虚拟支付参数。",
@@ -718,7 +718,7 @@
     "/order/virtual-pay/createVisitorOrder": {
       "post": {
         "tags": [
-          "虚拟支付控制器"
+          "order/client"
         ],
         "summary": "游客建单",
         "description": "未登录用户自动创建或复用游客账号后建单。写法对齐 ccement_user_api 的预创建订单（访客模式），前端应直接按下方字段树理解入参和出参。\n\n## 请求规则\n1. productId、openid 必填。\n2. unionid 有值时，优先按 unionid + openid 查找或创建游客账号。\n3. unionid 为空时，必须同时传 device_type 和 device_num，作为游客识别兜底。\n4. 返回中的 uid 必须由前端留存；后续 getPaySig 直接使用该 uid。\n5. openid、productId、env 会随订单一起保存，供 queryOrder 和后续支付链路复用。\n6. 当前支持的 productId 取值与 createOrder 完全一致，详见 createOrder 接口上方商品表。",
@@ -865,7 +865,7 @@
     "/order/virtual-pay/getPaySig": {
       "post": {
         "tags": [
-          "虚拟支付控制器"
+          "order/client"
         ],
         "summary": "获取支付签名",
         "description": "根据前端传入的 signData 生成微信虚拟支付 paySig。\n\n## 请求规则\n1. signData 必填，必须是前端最终发给微信虚拟支付的 JSON 字符串，并且必须包含 productId。\n2. 游客场景必须传 createVisitorOrder 返回的 uid；已登录场景若 utoken 能识别用户，可不传 uid。\n3. env 不传默认 0；应与建单接口保持一致。\n4. 返回中的 paySig 直接用于前端发起微信虚拟支付。",
@@ -923,7 +923,7 @@
     "/order/virtual-pay/queryOrder": {
       "post": {
         "tags": [
-          "虚拟支付控制器"
+          "order/client"
         ],
         "summary": "查询微信订单",
         "description": "查询微信虚拟支付订单状态，游客也可直接调用。\n\n## 请求规则\n1. productId 必填，用于选择商品映射和对应微信配置。\n2. outTradeNo 与 wxOrderId 二选一；推荐优先传 outTradeNo。\n3. openid 在本地订单已保存时可不传，但联调排障时建议前端显式传值。\n4. 当前查询结果分两层：wx_errcode、wx_errmsg、wx_order 表示微信侧结果；order 表示本地订单兜底信息。",
@@ -989,7 +989,7 @@
     "/supply/admin/batch-update-fields": {
       "post": {
         "tags": [
-          "供应信息控制器"
+          "supply/admin"
         ],
         "summary": "批量修改供应信息状态字段",
         "description": "按后台选中的供求信息 ID，批量修改是否发布、信息类型、是否有图、审核状态。\n\n## 字段口径\n1. SD_IsSupply：是否发布；1 表示发布中，0 表示取消发布。\n2. SD_Flag：信息类型；1=供应，2=求购，3=快速求购。\n3. IsHasImage：是否有图；1=有图，0=无图。该字段用于后台筛选与展示口径，不会自动补传附件。\n4. AuditingState：审核状态；1=审核中，2=审核通过，3=审核未通过。\n\n## 边界条件\n1. 只传 IDs 不传任何修改字段时返回失败。\n2. IDs 中不存在任何有效供求信息时返回失败。\n3. 传入非法枚举值时直接返回失败，不执行部分更新。",
@@ -1048,7 +1048,7 @@
     "/user/admin/detail/{U_ID}": {
       "get": {
         "tags": [
-          "后台用户控制器"
+          "user/admin"
         ],
         "summary": "后台用户详情",
         "description": "读取后台企业会员详情，返回结果中直接包含 Showable。当前接口由 chengstone_web 后台会员详情页 /Vip/detail 消费。",
@@ -1095,7 +1095,7 @@
     "/user/admin/updateUserInfo": {
       "post": {
         "tags": [
-          "后台用户控制器"
+          "user/admin"
         ],
         "summary": "后台更新用户信息",
         "description": "更新后台企业会员信息，当前重点是 Showable 字段已纳入白名单。\n\n## 关键规则\n1. updateUserInfo 会先校验 U_ID 与并发字段 UI_UpdateTime。\n2. Showable 为可选字段，1=是，0=否。\n3. 若同时带 U_ProducingAreaIds，会额外同步用户产区映射表；Showable 本身不涉及额外联表写入。\n4. 若页面提交成功但前台仍不展示，应继续排查 refreshUserInfoShowable 相关刷新链路。",
@@ -1143,7 +1143,7 @@
     "/user/client/customerFootprint/add": {
       "post": {
         "tags": [
-          "客户足迹控制器"
+          "user/client"
         ],
         "summary": "新增客户足迹",
         "description": "前端主动写入一条真实客户足迹记录。\n\n## 关键规则\n1. 接口免登录，支持游客访问。\n2. log_company_u_id 必填，表示被访问的店铺用户 ID。\n3. log_u_id 可为空，游客访问时无访客 ID。\n4. log_data_source 默认写 1，log_indate 默认写当前时间。",
@@ -1217,7 +1217,7 @@
     "/user/client/customerFootprint/list": {
       "post": {
         "tags": [
-          "客户足迹控制器"
+          "user/client"
         ],
         "summary": "客户足迹列表",
         "description": "店铺会员查看最近 31 天内的客户访问店铺记录。\n\n## 查询规则\n1. 只查询当前登录用户 own 店铺数据，条件字段为 u_behavior_record.log_company_u_id = 当前用户 U_ID。\n2. 仅查询最近 31 天数据。\n3. 地址字段由 log_province、log_city、log_district 组合，缺失时返回 未知。\n4. 结果增加 5 分钟缓存，缓存键按 U_ID + PageIndex + PageSize 隔离。\n\n## 权限规则\n1. 当前登录用户必须具备 G014、G015、G016 中任一有效会员。\n2. 非会员返回 Code=402。",
@@ -1307,7 +1307,7 @@
     "/user/client/customerFootprint/mock": {
       "post": {
         "tags": [
-          "客户足迹控制器"
+          "user/client"
         ],
         "summary": "批量造假客户足迹",
         "description": "为今天没有足迹数据的目标店铺批量补造 mock 足迹。\n\n## 关键规则\n1. 接口免登录、免权限。\n2. 接收 mock 的目标店铺仍要求具备 G014、G015、G016 任意有效会员，且已审核、未注销。\n3. 候选模板来自前一天全局访问记录池，不要求目标店铺自己前一天有模板。\n4. 每个用户随机复制 1 到 5 条，仅复制有地址且用户名不是手机号的数据。\n5. 新增记录固定写入 log_data_source=2。\n6. 若某用户今日已有任意足迹，则直接跳过并返回跳过原因。",
@@ -1370,7 +1370,7 @@
     "/user/client/customerFootprint/summary": {
       "post": {
         "tags": [
-          "客户足迹控制器"
+          "user/client"
         ],
         "summary": "客户足迹 31 天汇总",
         "description": "返回最近 31 天客户访问次数、真实/造假拆分、电话拨打通知统计及每日趋势数组。\n\n## 关键规则\n1. VisitTotal 包含真实与造假访问总数。\n2. CallTotal 与 CallCountList 来源于 u_notifications.Type=20。\n3. ServicePhone 查询规则：uid -> u_user.U_ServiceName -> stonedb.admin_list(chinese).phone；查不到手机号时回退 0571-85871531。\n4. 结果增加 5 分钟缓存，缓存键按 U_ID 隔离。",
@@ -1453,36 +1453,36 @@
   },
   "tags": [
     {
-      "name": "采集导入控制器",
-      "description": "控制器：app\\controller\\collect\\admin\\IndexController"
+      "name": "collect/admin",
+      "description": "控制器目录：app/controller/collect/admin"
     },
     {
-      "name": "媒体视频控制器",
-      "description": "控制器：app\\controller\\media\\VideoController"
+      "name": "media",
+      "description": "控制器目录：app/controller/media"
     },
     {
-      "name": "通知控制器",
-      "description": "控制器：app\\controller\\notification\\member\\NotificationController"
+      "name": "notification/member",
+      "description": "控制器目录：app/controller/notification/member"
     },
     {
-      "name": "店铺访问记录控制器",
-      "description": "控制器：app\\controller\\operationlog\\admin\\ShopVisitRecordController"
+      "name": "operationlog/admin",
+      "description": "控制器目录：app/controller/operationlog/admin"
     },
     {
-      "name": "虚拟支付控制器",
-      "description": "控制器：app\\controller\\order\\client\\VirtualPayController"
+      "name": "order/client",
+      "description": "控制器目录：app/controller/order/client"
     },
     {
-      "name": "供应信息控制器",
-      "description": "控制器：app\\controller\\supply\\admin\\SupplyController"
+      "name": "supply/admin",
+      "description": "控制器目录：app/controller/supply/admin"
     },
     {
-      "name": "后台用户控制器",
-      "description": "控制器：app\\controller\\user\\admin\\IndexController"
+      "name": "user/admin",
+      "description": "控制器目录：app/controller/user/admin"
     },
     {
-      "name": "客户足迹控制器",
-      "description": "控制器：app\\controller\\user\\client\\FootprintController"
+      "name": "user/client",
+      "description": "控制器目录：app/controller/user/client"
     }
   ],
   "components": {

@@ -57,6 +57,21 @@ def controller_directory(document: dict, source: Path) -> Path:
     return relative.parent
 
 
+def set_controller_tag(document: dict, controller_directory_path: Path) -> None:
+    """Keep source docs and APIPOST aggregation grouped by controller path."""
+    tag_name = controller_directory_path.as_posix()
+    document["tags"] = [{
+        "name": tag_name,
+        "description": f"控制器目录：app/controller/{tag_name}",
+    }]
+    for path_item in document.get("paths", {}).values():
+        if not isinstance(path_item, dict):
+            continue
+        for method, operation in path_item.items():
+            if method.lower() in METHODS and isinstance(operation, dict):
+                operation["tags"] = [tag_name]
+
+
 def organize() -> list[dict[str, str]]:
     source_files = sorted(DOC_DIR.rglob("*.openapi.json"))
     records: list[tuple[Path, dict, Path, str, str]] = []
@@ -78,7 +93,10 @@ def organize() -> list[dict[str, str]]:
     if len(set(targets)) != len(targets):
         raise ValueError("Duplicate target filename")
 
-    for source, target, _, _ in planned:
+    for source, target, controller, _ in planned:
+        document = json.loads(source.read_text(encoding="utf-8-sig"))
+        set_controller_tag(document, Path(controller))
+        source.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         target.parent.mkdir(parents=True, exist_ok=True)
         if source.resolve() != target.resolve():
             shutil.move(str(source), str(target))
