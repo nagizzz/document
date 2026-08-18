@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{ccement_user_behavior_api}}/admin/defineevent/statistics": {
+    "/admin/defineevent/statistics": {
       "post": {
         "tags": [
           "自定义事件统计"
@@ -107,7 +107,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/defineeventconfig/index": {
+    "/admin/defineeventconfig/index": {
       "post": {
         "tags": [
           "自定义事件配置"
@@ -162,7 +162,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/defineeventconfig/store": {
+    "/admin/defineeventconfig/store": {
       "post": {
         "tags": [
           "自定义事件配置"
@@ -234,7 +234,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/defineeventconfig/update": {
+    "/admin/defineeventconfig/update": {
       "post": {
         "tags": [
           "自定义事件配置"
@@ -306,7 +306,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/index": {
+    "/admin/pagedescribe/index": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -351,7 +351,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/store": {
+    "/admin/pagedescribe/store": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -417,7 +417,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/update": {
+    "/admin/pagedescribe/update": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -473,7 +473,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/access": {
+    "/admin/pagedescribe/access": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -502,7 +502,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/source": {
+    "/admin/pagedescribe/source": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -531,7 +531,7 @@
         }
       }
     },
-    "{{ccement_user_behavior_api}}/admin/pagedescribe/destination": {
+    "/admin/pagedescribe/destination": {
       "post": {
         "tags": [
           "页面描述管理"
@@ -561,16 +561,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{ccement_user_behavior_api}}",
-      "description": "用户行为分析项目变量。当前已知联调地址：http://analysis.api.ccement.com。当前文档的 paths 键已直接写成 {{ccement_user_behavior_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL；后续如补充测试或正式环境，也继续在变量中切换。"
-    },
-    {
-      "url": "{{ccement_user_behavior_api}}",
-      "description": "用户行为分析项目变量。当前已知联调地址：http://analysis.api.ccement.com。paths 键已直接写成 {{ccement_user_behavior_api}}/接口路径，导入 APIPOST 后应显示完整 URL。"
-    }
-  ],
   "tags": [
     {
       "name": "自定义事件统计",

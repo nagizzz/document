@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{ccement_enterprise_api}}/home/outside/openSearchPriceCement": {
+    "/home/outside/openSearchPriceCement": {
       "post": {
         "tags": [
           "水泥模块"
@@ -83,7 +83,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/pricecement/priceDetail": {
+    "/home/pricecement/priceDetail": {
       "post": {
         "tags": [
           "水泥模块"
@@ -144,7 +144,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/outside/updownBulkValue": {
+    "/home/outside/updownBulkValue": {
       "post": {
         "tags": [
           "水泥模块"
@@ -205,7 +205,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/concrete/PriceConcreteList": {
+    "/home/concrete/PriceConcreteList": {
       "post": {
         "tags": [
           "混凝土模块"
@@ -268,7 +268,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/concrete/priceDetail": {
+    "/home/concrete/priceDetail": {
       "post": {
         "tags": [
           "混凝土模块"
@@ -326,7 +326,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/powder/getPowderPriceList": {
+    "/home/powder/getPowderPriceList": {
       "post": {
         "tags": [
           "矿粉模块"
@@ -389,7 +389,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/powder/pricePowderDetail": {
+    "/home/powder/pricePowderDetail": {
       "post": {
         "tags": [
           "矿粉模块"
@@ -450,7 +450,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/aggregate/fetchAggregatePriceList": {
+    "/home/aggregate/fetchAggregatePriceList": {
       "post": {
         "tags": [
           "砂石骨料模块"
@@ -517,7 +517,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/priceaggregate/priceAggregateDetail": {
+    "/home/priceaggregate/priceAggregateDetail": {
       "post": {
         "tags": [
           "砂石骨料模块"
@@ -574,7 +574,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/outside/openSearchPriceCementOptional": {
+    "/home/outside/openSearchPriceCementOptional": {
       "post": {
         "tags": [
           "水泥熟料自选列表"
@@ -678,7 +678,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/concrete/PriceConcreteListOptional": {
+    "/home/concrete/PriceConcreteListOptional": {
       "post": {
         "tags": [
           "混凝土自选列表"
@@ -770,7 +770,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/powder/getPowderPriceListOptional": {
+    "/home/powder/getPowderPriceListOptional": {
       "post": {
         "tags": [
           "矿粉自选列表"
@@ -858,7 +858,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/aggregate/fetchAggregatePriceListOptional": {
+    "/home/aggregate/fetchAggregatePriceListOptional": {
       "post": {
         "tags": [
           "砂石自选列表"
@@ -939,7 +939,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/mortar/getMortarPriceListOptional": {
+    "/home/mortar/getMortarPriceListOptional": {
       "post": {
         "tags": [
           "砂浆自选列表"
@@ -1020,7 +1020,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/grainslag/grainprice/indexHomeOptional": {
+    "/grainslag/grainprice/indexHomeOptional": {
       "post": {
         "tags": [
           "水渣自选列表"
@@ -1110,7 +1110,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/flyash/priceListForFlyashOptional": {
+    "/home/flyash/priceListForFlyashOptional": {
       "post": {
         "tags": [
           "粉煤灰自选列表"
@@ -1199,7 +1199,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/dingproccess/Processinstance/initiateProcessInstance": {
+    "/dingproccess/Processinstance/initiateProcessInstance": {
       "post": {
         "tags": [
           "行情通产品修改审批"
@@ -1472,7 +1472,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/procement/Procementlog/getLogList": {
+    "/procement/Procementlog/getLogList": {
       "post": {
         "tags": [
           "行情通产品修改审批"
@@ -1606,7 +1606,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/powder/Powder/fetchProductDetail": {
+    "/powder/Powder/fetchProductDetail": {
       "post": {
         "tags": [
           "矿粉详情"
@@ -1686,7 +1686,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/aggregate/Aggregate/fetchProductDetail": {
+    "/aggregate/Aggregate/fetchProductDetail": {
       "post": {
         "tags": [
           "砂石骨料详情"
@@ -1765,7 +1765,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/mortar/Mortar/fetchProductDetail": {
+    "/mortar/Mortar/fetchProductDetail": {
       "post": {
         "tags": [
           "砂浆详情"
@@ -1846,7 +1846,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/grainslag/Grainslagproduct/show": {
+    "/grainslag/Grainslagproduct/show": {
       "get": {
         "tags": [
           "水渣详情"
@@ -1920,7 +1920,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/flyash/Procement/fetchProductDetail": {
+    "/flyash/Procement/fetchProductDetail": {
       "post": {
         "tags": [
           "粉煤灰详情"
@@ -1998,7 +1998,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/priceoptional/add": {
+    "/home/priceoptional/add": {
       "post": {
         "tags": [
           "行情通自选产品"
@@ -2147,7 +2147,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/priceoptional/delete": {
+    "/home/priceoptional/delete": {
       "post": {
         "tags": [
           "行情通自选产品"
@@ -2256,7 +2256,7 @@
         }
       }
     },
-    "{{ccement_enterprise_api}}/home/priceoptional/index": {
+    "/home/priceoptional/index": {
       "post": {
         "tags": [
           "行情通自选产品"
@@ -2328,16 +2328,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{ccement_enterprise_api}}",
-      "description": "企业接口项目变量。测试环境：http://enterprise.test.cbmnet.cn；正式环境：http://enterprise.cbmnet.cn。当前文档的 paths 键已直接写成 {{ccement_enterprise_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL。"
-    },
-    {
-      "url": "{{ccement_enterprise_api}}",
-      "description": "企业接口项目变量。测试环境：http://enterprise.test.cbmnet.cn；正式环境：http://enterprise.cbmnet.cn。paths 键已直接写成 {{ccement_enterprise_api}}/接口路径，导入 APIPOST 后即可显示完整 URL。"
-    }
-  ],
   "tags": [
     {
       "name": "水泥模块",

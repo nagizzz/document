@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{cbmnet_api}}/video/supply/token": {
+    "/video/supply/token": {
       "post": {
         "summary": "获取七牛直传凭证",
         "description": "返回短期上传 token 与指定 key。客户端使用七牛 SDK 直传，不得持有 AK/SK。供应产品视频上传凭证内置 100MB 文件大小上限，直传端不可绕过。",
@@ -53,7 +53,7 @@
         }
       }
     },
-    "{{cbmnet_api}}/video/supply/save": {
+    "/video/supply/save": {
       "post": {
         "summary": "绑定视频至供应产品",
         "description": "一个产品仅允许一个未删除视频。产品先保存或七牛回调先到均可处理；供应视频只在转码完成后发起内容审核。",
@@ -103,7 +103,7 @@
         }
       }
     },
-    "{{cbmnet_api}}/video/supply/status": {
+    "/video/supply/status": {
       "post": {
         "summary": "查询产品视频绑定状态",
         "description": "处理、审核失败的视频同样返回 has_video=true，用于禁止重复上传。",
@@ -151,7 +151,7 @@
         }
       }
     },
-    "{{cbmnet_api}}/video/supply/delete": {
+    "/video/supply/delete": {
       "post": {
         "summary": "删除产品视频",
         "description": "软删除视频记录，之后可重新上传；不物理删除七牛文件，避免影响异步转码或审核任务。",
@@ -187,7 +187,7 @@
         }
       }
     },
-    "{{cbmnet_api}}/video/supply/batch": {
+    "/video/supply/batch": {
       "post": {
         "summary": "批量获取可播放视频地址",
         "description": "仅返回转码成功、七牛审核通过且未删除的视频，Data 为 产品ID到视频 URL 的映射。",
@@ -236,7 +236,7 @@
         }
       }
     },
-    "{{cbmnet_api}}/token/wechat": {
+    "/token/wechat": {
       "post": {
         "tags": [
           "凭证认证类接口"
@@ -362,11 +362,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{cbmnet_api}}"
-    }
-  ],
   "tags": [
     {
       "name": "凭证认证类接口"

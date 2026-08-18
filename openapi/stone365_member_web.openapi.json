@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{stone365_member_web}}/member/admin/adminLogin": {
+    "/member/admin/adminLogin": {
       "post": {
         "tags": [
           "会话与首页"
@@ -53,7 +53,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/index/getSystemInit": {
+    "/member/index/getSystemInit": {
       "get": {
         "tags": [
           "会话与首页"
@@ -101,7 +101,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/list": {
+    "/member/supply/list": {
       "get": {
         "tags": [
           "供应管理"
@@ -211,7 +211,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/addConfirm": {
+    "/member/supply/addConfirm": {
       "post": {
         "tags": [
           "供应管理"
@@ -297,7 +297,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/editConfirm": {
+    "/member/supply/editConfirm": {
       "post": {
         "tags": [
           "供应管理"
@@ -369,7 +369,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/supplyVideoToken": {
+    "/member/supply/supplyVideoToken": {
       "post": {
         "tags": [
           "供应管理"
@@ -440,7 +440,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/supplyVideoStatus": {
+    "/member/supply/supplyVideoStatus": {
       "post": {
         "tags": [
           "供应管理"
@@ -520,7 +520,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/supply/deleteSupplyVideo": {
+    "/member/supply/deleteSupplyVideo": {
       "post": {
         "tags": [
           "供应管理"
@@ -576,7 +576,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/spot/list": {
+    "/member/spot/list": {
       "get": {
         "tags": [
           "其他模块"
@@ -590,7 +590,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/album/pic_list": {
+    "/member/album/pic_list": {
       "post": {
         "tags": [
           "其他模块"
@@ -604,7 +604,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/notifications/list": {
+    "/member/notifications/list": {
       "get": {
         "tags": [
           "其他模块"
@@ -618,7 +618,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/order/query": {
+    "/member/order/query": {
       "post": {
         "tags": [
           "其他模块"
@@ -647,7 +647,7 @@
         }
       }
     },
-    "{{stone365_member_web}}/member/common/getqiniutoken": {
+    "/member/common/getqiniutoken": {
       "get": {
         "tags": [
           "其他模块"
@@ -662,12 +662,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{stone365_member_web}}",
-      "description": "会员中心项目环境变量；默认前缀为 /member。"
-    }
-  ],
   "tags": [
     {
       "name": "会话与首页",

@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{stone365_user_api}}/media/admin/video/token": {
+    "/media/admin/video/token": {
       "post": {
         "summary": "获取供应视频上传凭证",
         "description": "校验用户为诚石通、石图宝或小程序会员后转发视频中心。供应产品视频凭证内置 100MB 文件大小上限；客户端还应限制视频时长不超过 30 秒。",
@@ -47,7 +47,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/media/admin/video/supplyStatus": {
+    "/media/admin/video/supplyStatus": {
       "post": {
         "summary": "查询产品视频状态",
         "description": "供编辑页判断是否显示上传或删除入口。处理中、审核失败均视为已有视频。",
@@ -83,7 +83,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/media/admin/video/saveSupply": {
+    "/media/admin/video/saveSupply": {
       "post": {
         "summary": "绑定已直传的供应视频",
         "description": "仅在七牛直传成功后调用。接口校验产品归属和供应视频 key 格式，随后创建 icbm_videos 记录并触发既有的转码、封面与内容审核回调链路；一个产品存在未删除视频时不能再次绑定。",
@@ -144,7 +144,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/media/admin/video/deleteSupply": {
+    "/media/admin/video/deleteSupply": {
       "post": {
         "summary": "删除供应产品视频",
         "description": "校验产品属于传入用户后软删除视频记录，删除成功可重新上传。",
@@ -185,7 +185,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/supply/admin/batch-update-fields": {
+    "/supply/admin/batch-update-fields": {
       "post": {
         "tags": [
           "后台供应信息管理"
@@ -244,7 +244,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/admin/detail/{U_ID}": {
+    "/user/admin/detail/{U_ID}": {
       "get": {
         "tags": [
           "后台会员详情"
@@ -291,7 +291,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/admin/updateUserInfo": {
+    "/user/admin/updateUserInfo": {
       "post": {
         "tags": [
           "后台会员详情"
@@ -339,7 +339,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/client/customerFootprint/list": {
+    "/user/client/customerFootprint/list": {
       "post": {
         "tags": [
           "客户足迹-查询"
@@ -429,7 +429,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/client/customerFootprint/summary": {
+    "/user/client/customerFootprint/summary": {
       "post": {
         "tags": [
           "客户足迹-查询"
@@ -512,7 +512,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/client/customerFootprint/mock": {
+    "/user/client/customerFootprint/mock": {
       "post": {
         "tags": [
           "客户足迹-写入"
@@ -575,7 +575,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/user/client/customerFootprint/add": {
+    "/user/client/customerFootprint/add": {
       "post": {
         "tags": [
           "客户足迹-写入"
@@ -649,7 +649,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/operationlog/admin/shopVisits": {
+    "/operationlog/admin/shopVisits": {
       "get": {
         "tags": [
           "后台日志"
@@ -729,7 +729,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/order/virtual-pay/createOrder": {
+    "/order/virtual-pay/createOrder": {
       "post": {
         "tags": [
           "矿通虚拟支付-建单"
@@ -864,7 +864,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/order/virtual-pay/createVisitorOrder": {
+    "/order/virtual-pay/createVisitorOrder": {
       "post": {
         "tags": [
           "矿通虚拟支付-建单"
@@ -1011,7 +1011,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/order/virtual-pay/getPaySig": {
+    "/order/virtual-pay/getPaySig": {
       "post": {
         "tags": [
           "矿通虚拟支付-签名与查询"
@@ -1069,7 +1069,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/order/virtual-pay/queryOrder": {
+    "/order/virtual-pay/queryOrder": {
       "post": {
         "tags": [
           "矿通虚拟支付-签名与查询"
@@ -1135,7 +1135,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/notifications/client/list": {
+    "/notifications/client/list": {
       "post": {
         "tags": [
           "通知列表"
@@ -1226,7 +1226,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/notifications/client/counts": {
+    "/notifications/client/counts": {
       "post": {
         "tags": [
           "通知列表"
@@ -1291,7 +1291,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/notifications/client/markallread": {
+    "/notifications/client/markallread": {
       "post": {
         "tags": [
           "通知列表"
@@ -1339,7 +1339,7 @@
         }
       }
     },
-    "{{stone365_user_api}}/collect/admin/import": {
+    "/collect/admin/import": {
       "post": {
         "tags": [
           "采集导入"
@@ -1439,23 +1439,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{stone365_user_api}}"
-    },
-    {
-      "url": "{{stone365_user_api}}",
-      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。"
-    },
-    {
-      "url": "{{stone365_user_api}}",
-      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。导入 APIPOST 后应直接显示 {{stone365_user_api}}/接口路径。"
-    },
-    {
-      "url": "{{stone365_user_api}}",
-      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。当前文档的 paths 键已直接写成 {{stone365_user_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL。"
-    }
-  ],
   "tags": [
     {
       "name": "后台供应信息管理",

@@ -24,6 +24,7 @@ SOURCE_ROOT = Path(r"D:\Code Repositories")
 OUTPUT_ROOT = Path(__file__).resolve().parent.parent / "openapi"
 COMPONENT_REF = re.compile(r"^#/components/([^/]+)/(.+)$")
 PRIVATE_IP = re.compile(r"\b(?:10(?:\.\d{1,3}){3}|127(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})\b")
+APIPOST_PATH_PREFIX = re.compile(r"^\{\{[^{}]+\}\}")
 LOCK = threading.Lock()
 LAST_FINGERPRINT: tuple[tuple[str, int, int], ...] | None = None
 
@@ -66,6 +67,12 @@ def redact_public_values(value: object) -> object:
     return value
 
 
+def normalize_openapi_path(path_name: str) -> str:
+    """Turn APIPOST-style {{environment}}/path keys into standard OpenAPI paths."""
+    normalized = APIPOST_PATH_PREFIX.sub("", path_name)
+    return normalized if normalized.startswith("/") else f"/{normalized.lstrip('/')}"
+
+
 def clean_name(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "_", name)
 
@@ -100,6 +107,10 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
 
         rewritten = redact_public_values(deep_rewrite_refs(copy.deepcopy(source), reference_map))
         for server in rewritten.get("servers", []):
+            if isinstance(server, dict) and "{{" in str(server.get("url", "")):
+                # Keep environment variables in the source document, but omit them from
+                # the public strict-OpenAPI export. APIPOST can configure its own env.
+                continue
             signature = json.dumps(server, ensure_ascii=False, sort_keys=True)
             if signature not in server_signatures:
                 servers.append(server)
@@ -130,6 +141,7 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
             warnings.append(f"Skipped invalid paths object: {document_path.name}")
             continue
         for path_name, path_item in paths.items():
+            path_name = normalize_openapi_path(path_name)
             if path_name not in merged_paths:
                 merged_paths[path_name] = path_item
                 continue

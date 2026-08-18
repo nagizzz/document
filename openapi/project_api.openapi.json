@@ -6,7 +6,7 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "{{project_api}}/bids/admin/power-station-weekly-report-generate": {
+    "/bids/admin/power-station-weekly-report-generate": {
       "post": {
         "tags": [
           "光伏电站周报"
@@ -978,7 +978,7 @@
         }
       }
     },
-    "{{project_api}}/bids/admin/power-station-weekly-report-list": {
+    "/bids/admin/power-station-weekly-report-list": {
       "post": {
         "tags": [
           "光伏电站周报"
@@ -1198,7 +1198,7 @@
         }
       }
     },
-    "{{project_api}}/bids/admin/power-station-weekly-report-detail": {
+    "/bids/admin/power-station-weekly-report-detail": {
       "post": {
         "tags": [
           "光伏电站周报"
@@ -1338,7 +1338,7 @@
         }
       }
     },
-    "{{project_api}}/news/autocreate/power-station-weekly": {
+    "/news/autocreate/power-station-weekly": {
       "post": {
         "tags": [
           "新闻周报"
@@ -1471,7 +1471,7 @@
         }
       }
     },
-    "http://powerstation.test.databm.com/weeklyrpt": {
+    "/http://powerstation.test.databm.com/weeklyrpt": {
       "get": {
         "tags": [
           "前台专题页"
@@ -1480,7 +1480,7 @@
         "description": "powerstation 前台周报专题列表页。页面展示历史周报列表，页面数据来源为 /bids/admin/power-station-weekly-report-list 的分页结果。列表卡片常用字段为 id、detail_id、title、week_start、week_end、create_time、update_time。"
       }
     },
-    "http://powerstation.test.databm.com/weeklyrpt/{detail_id}.html": {
+    "/http://powerstation.test.databm.com/weeklyrpt/{detail_id}.html": {
       "get": {
         "tags": [
           "前台专题页"
@@ -1501,7 +1501,7 @@
         ]
       }
     },
-    "{{project_api}}/approval/admin/project-list": {
+    "/approval/admin/project-list": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -2153,7 +2153,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-detail": {
+    "/approval/admin/project-detail": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -2635,7 +2635,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-configs": {
+    "/approval/admin/project-configs": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -2924,7 +2924,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-search-name": {
+    "/approval/admin/project-search-name": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -3049,7 +3049,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-label-sorts-relation": {
+    "/approval/admin/project-label-sorts-relation": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -3165,7 +3165,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-add": {
+    "/approval/admin/project-add": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -3502,7 +3502,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-update": {
+    "/approval/admin/project-update": {
       "post": {
         "tags": [
           "审批项目中台管理"
@@ -3888,7 +3888,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project/key-materials": {
+    "/approval/front/project/key-materials": {
       "post": {
         "tags": [
           "审批项目前台统计"
@@ -3947,7 +3947,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project/home-stages": {
+    "/approval/front/project/home-stages": {
       "post": {
         "tags": [
           "审批项目前台统计"
@@ -4006,7 +4006,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project/monthly-total-fund": {
+    "/approval/front/project/monthly-total-fund": {
       "post": {
         "tags": [
           "审批项目前台统计"
@@ -4032,7 +4032,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project/monthly-cement-dosage": {
+    "/approval/front/project/monthly-cement-dosage": {
       "post": {
         "tags": [
           "审批项目前台统计"
@@ -4058,7 +4058,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project/list": {
+    "/approval/front/project/list": {
       "post": {
         "tags": [
           "审批项目前台列表"
@@ -4120,7 +4120,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project-section/list": {
+    "/approval/front/project-section/list": {
       "post": {
         "tags": [
           "审批项目前台项目标段合集"
@@ -4165,7 +4165,7 @@
         }
       }
     },
-    "{{project_api}}/approval/front/project-section/overview": {
+    "/approval/front/project-section/overview": {
       "post": {
         "tags": [
           "审批项目前台项目标段合集"
@@ -4191,7 +4191,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-label-sorts-sync-prepare": {
+    "/approval/admin/project-label-sorts-sync-prepare": {
       "post": {
         "tags": [
           "审批项目标签AI同步"
@@ -4260,7 +4260,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-label-sorts-sync": {
+    "/approval/admin/project-label-sorts-sync": {
       "post": {
         "tags": [
           "审批项目标签AI同步"
@@ -4316,7 +4316,7 @@
         }
       }
     },
-    "{{project_api}}/approval/admin/project-label-sorts-sync-progress": {
+    "/approval/admin/project-label-sorts-sync-progress": {
       "post": {
         "tags": [
           "审批项目标签AI同步"
@@ -4417,7 +4417,7 @@
         }
       }
     },
-    "{{project_api}}/bids/front/detail": {
+    "/bids/front/detail": {
       "post": {
         "tags": [
           "招中标前台详情"
@@ -4945,7 +4945,7 @@
         }
       }
     },
-    "{{project_api}}/bids/front/list": {
+    "/bids/front/list": {
       "post": {
         "tags": [
           "招中标前台列表"
@@ -5235,7 +5235,7 @@
         }
       }
     },
-    "{{project_api}}/bids/admin/power-station-stats": {
+    "/bids/admin/power-station-stats": {
       "post": {
         "tags": [
           "招中标电站统计"
@@ -5712,7 +5712,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/front/project-push-detail": {
+    "/subscribe/front/project-push-detail": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -5795,7 +5795,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/front/project-push-save": {
+    "/subscribe/front/project-push-save": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -5863,7 +5863,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/project-receive-events": {
+    "/subscribe/project-receive-events": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -5950,7 +5950,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/project-set-menu": {
+    "/subscribe/project-set-menu": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -6012,7 +6012,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/project-push": {
+    "/subscribe/project-push": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -6064,7 +6064,7 @@
         }
       }
     },
-    "{{project_api}}/subscribe/project-push-concerned": {
+    "/subscribe/project-push-concerned": {
       "post": {
         "tags": [
           "项目通公众号推送"
@@ -6117,32 +6117,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{project_api}}",
-      "description": "项目级环境变量占位符。测试环境可配置为 http://project.api.test.cbmnet.cn。"
-    },
-    {
-      "url": "{{project_api}}",
-      "description": "项目级环境变量占位符。测试环境：http://project.api.test.cbmnet.cn；正式环境请按实际项目地址配置。"
-    },
-    {
-      "url": "{{project_api}}",
-      "description": "项目级环境变量占位符。当前文档按 APIPOST 导入习惯保留占位符。测试联调请把 project_api 明确设置为 http://project.api.test.cbmnet.cn。该测试域名当前走 HTTP 80 端口，不是 HTTPS。"
-    },
-    {
-      "url": "{{project_api}}",
-      "description": "项目级环境变量占位符。测试联调请把 project_api 设置为 http://project.api.test.cbmnet.cn。当前测试环境走 HTTP 80 端口，不是 HTTPS。"
-    },
-    {
-      "url": "{{project_api}}",
-      "description": "项目级环境变量占位符。测试联调请把 project_api 设置为 http://project.api.test.cbmnet.cn。"
-    },
-    {
-      "url": "{{project_api}}",
-      "description": "项目 API 环境占位符；测试环境通常配置为 project.api.test.cbmnet.cn。"
-    }
-  ],
   "tags": [
     {
       "name": "光伏电站周报",
