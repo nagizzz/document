@@ -1,0 +1,2436 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "stone365_user_api - APIPOST 聚合接口文档",
+    "version": "2026.08.18",
+    "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
+  },
+  "paths": {
+    "{{stone365_user_api}}/media/admin/video/token": {
+      "post": {
+        "summary": "获取供应视频上传凭证",
+        "description": "校验用户为诚石通、石图宝或小程序会员后转发视频中心。供应产品视频凭证内置 100MB 文件大小上限；客户端还应限制视频时长不超过 30 秒。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "U_ID",
+                  "Extension"
+                ],
+                "properties": {
+                  "U_ID": {
+                    "type": "integer",
+                    "example": 746675
+                  },
+                  "Extension": {
+                    "type": "string",
+                    "example": "mp4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/media/admin/video/supplyStatus": {
+      "post": {
+        "summary": "查询产品视频状态",
+        "description": "供编辑页判断是否显示上传或删除入口。处理中、审核失败均视为已有视频。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "SD_ID"
+                ],
+                "properties": {
+                  "SD_ID": {
+                    "type": "integer",
+                    "example": 10001
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/media/admin/video/saveSupply": {
+      "post": {
+        "summary": "绑定已直传的供应视频",
+        "description": "仅在七牛直传成功后调用。接口校验产品归属和供应视频 key 格式，随后创建 icbm_videos 记录并触发既有的转码、封面与内容审核回调链路；一个产品存在未删除视频时不能再次绑定。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "U_ID",
+                  "SD_ID",
+                  "VideoKey"
+                ],
+                "properties": {
+                  "U_ID": {
+                    "type": "integer",
+                    "description": "当前登录用户 ID",
+                    "example": 746675
+                  },
+                  "SD_ID": {
+                    "type": "integer",
+                    "description": "supply/client/add 成功后返回的产品 ID",
+                    "example": 10001
+                  },
+                  "VideoKey": {
+                    "type": "string",
+                    "description": "token 接口返回的 key；必须原样回传",
+                    "example": "supply-video/20260817/0123456789abcdef0123456789abcdef.mp4"
+                  },
+                  "Title": {
+                    "type": "string",
+                    "description": "可选的视频标题",
+                    "example": "白玉兰荒料探板"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功，Data.id 为视频记录 ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
+                },
+                "example": {
+                  "Code": 200,
+                  "Msg": "成功",
+                  "Data": {
+                    "id": 3456
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/media/admin/video/deleteSupply": {
+      "post": {
+        "summary": "删除供应产品视频",
+        "description": "校验产品属于传入用户后软删除视频记录，删除成功可重新上传。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "U_ID",
+                  "SD_ID"
+                ],
+                "properties": {
+                  "U_ID": {
+                    "type": "integer",
+                    "example": 746675
+                  },
+                  "SD_ID": {
+                    "type": "integer",
+                    "example": 10001
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/supply/admin/batch-update-fields": {
+      "post": {
+        "tags": [
+          "后台供应信息管理"
+        ],
+        "summary": "批量修改供应信息状态字段",
+        "description": "按后台选中的供求信息 ID，批量修改是否发布、信息类型、是否有图、审核状态。\n\n## 字段口径\n1. SD_IsSupply：是否发布；1 表示发布中，0 表示取消发布。\n2. SD_Flag：信息类型；1=供应，2=求购，3=快速求购。\n3. IsHasImage：是否有图；1=有图，0=无图。该字段用于后台筛选与展示口径，不会自动补传附件。\n4. AuditingState：审核状态；1=审核中，2=审核通过，3=审核未通过。\n\n## 边界条件\n1. 只传 IDs 不传任何修改字段时返回失败。\n2. IDs 中不存在任何有效供求信息时返回失败。\n3. 传入非法枚举值时直接返回失败，不执行部分更新。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02____________________openapi__SupplyBatchUpdateRequest"
+              },
+              "examples": {
+                "publishAndAudit": {
+                  "summary": "批量改为已发布且审核通过",
+                  "value": {
+                    "IDs": "1001,1002,1003",
+                    "SD_IsSupply": 1,
+                    "AuditingState": 2
+                  }
+                },
+                "changeFlagAndImage": {
+                  "summary": "批量改信息类型和有图状态",
+                  "value": {
+                    "IDs": "2008,2010",
+                    "SD_Flag": 2,
+                    "IsHasImage": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "处理成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02____________________openapi__SupplyBatchUpdateResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "批量修改成功",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/admin/detail/{U_ID}": {
+      "get": {
+        "tags": [
+          "后台会员详情"
+        ],
+        "summary": "后台用户详情",
+        "description": "读取后台企业会员详情，返回结果中直接包含 Showable。当前接口由 chengstone_web 后台会员详情页 /Vip/detail 消费。",
+        "parameters": [
+          {
+            "name": "U_ID",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "用户 ID。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03_______Showable_______openapi__UserDetailResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "详情返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "U_ID": 843388,
+                        "Showable": 1,
+                        "IsOfficial": 0,
+                        "UI_SeePhone": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/admin/updateUserInfo": {
+      "post": {
+        "tags": [
+          "后台会员详情"
+        ],
+        "summary": "后台更新用户信息",
+        "description": "更新后台企业会员信息，当前重点是 Showable 字段已纳入白名单。\n\n## 关键规则\n1. updateUserInfo 会先校验 U_ID 与并发字段 UI_UpdateTime。\n2. Showable 为可选字段，1=是，0=否。\n3. 若同时带 U_ProducingAreaIds，会额外同步用户产区映射表；Showable 本身不涉及额外联表写入。\n4. 若页面提交成功但前台仍不展示，应继续排查 refreshUserInfoShowable 相关刷新链路。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03_______Showable_______openapi__UpdateUserInfoRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "更新 Showable",
+                  "value": {
+                    "U_ID": 843388,
+                    "UI_UpdateTime": "2026-04-23 10:21:08",
+                    "Showable": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "更新成功示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/client/customerFootprint/list": {
+      "post": {
+        "tags": [
+          "客户足迹-查询"
+        ],
+        "summary": "客户足迹列表",
+        "description": "店铺会员查看最近 31 天内的客户访问店铺记录。\n\n## 查询规则\n1. 只查询当前登录用户 own 店铺数据，条件字段为 u_behavior_record.log_company_u_id = 当前用户 U_ID。\n2. 仅查询最近 31 天数据。\n3. 地址字段由 log_province、log_city、log_district 组合，缺失时返回 未知。\n4. 结果增加 5 分钟缓存，缓存键按 U_ID + PageIndex + PageSize 隔离。\n\n## 权限规则\n1. 当前登录用户必须具备 G014、G015、G016 中任一有效会员。\n2. 非会员返回 Code=402。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintListRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "列表查询示例",
+                  "value": {
+                    "PageIndex": 1,
+                    "PageSize": 20,
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintListResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "列表返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "PageCounts": 12,
+                        "Counts": 59,
+                        "PageIndex": 1,
+                        "PageSize": 5,
+                        "StartDate": "2026-03-02",
+                        "EndDate": "2026-04-01",
+                        "DataList": [
+                          {
+                            "Id": 3323,
+                            "VisitTime": "2026-03-31 10:34",
+                            "Title": "刚刚有客户（13603351263）访问了您的店铺。",
+                            "IP": "60.7.180.86",
+                            "Address": "未知",
+                            "Content": "具体信息如下：\n\nIP：60.7.180.86\n\n地址：未知",
+                            "VisitorUserId": "824654",
+                            "VisitorUserName": "13603351263",
+                            "DataSource": 1,
+                            "DataSourceName": "真实",
+                            "IsMock": false
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "非会员不可用",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "notMember": {
+                    "summary": "无会员权限",
+                    "value": {
+                      "Msg": "该功能暂不对非会员开放，请开通诚石通会员/石图宝会员/小程序会员！",
+                      "Code": 402
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/client/customerFootprint/summary": {
+      "post": {
+        "tags": [
+          "客户足迹-查询"
+        ],
+        "summary": "客户足迹 31 天汇总",
+        "description": "返回最近 31 天客户访问次数、真实/造假拆分、电话拨打通知统计及每日趋势数组。\n\n## 关键规则\n1. VisitTotal 包含真实与造假访问总数。\n2. CallTotal 与 CallCountList 来源于 u_notifications.Type=20。\n3. ServicePhone 查询规则：uid -> u_user.U_ServiceName -> stonedb.admin_list(chinese).phone；查不到手机号时回退 0571-85871531。\n4. 结果增加 5 分钟缓存，缓存键按 U_ID 隔离。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintSummaryRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "汇总查询示例",
+                  "value": {
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintSummaryResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "汇总返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "StartDate": "2026-03-02",
+                        "EndDate": "2026-04-01",
+                        "ServicePhone": "13738027832",
+                        "VisitTotal": 17,
+                        "RealVisitTotal": 16,
+                        "MockVisitTotal": 1,
+                        "CallTotal": 0,
+                        "DateList": [
+                          "03-02",
+                          "03-03",
+                          "03-04"
+                        ],
+                        "VisitCountList": [
+                          0,
+                          0,
+                          2
+                        ],
+                        "RealVisitCountList": [
+                          0,
+                          0,
+                          2
+                        ],
+                        "MockVisitCountList": [
+                          0,
+                          0,
+                          0
+                        ],
+                        "CallCountList": [
+                          0,
+                          0,
+                          0
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/client/customerFootprint/mock": {
+      "post": {
+        "tags": [
+          "客户足迹-写入"
+        ],
+        "summary": "批量造假客户足迹",
+        "description": "为今天没有足迹数据的目标店铺批量补造 mock 足迹。\n\n## 关键规则\n1. 接口免登录、免权限。\n2. 接收 mock 的目标店铺仍要求具备 G014、G015、G016 任意有效会员，且已审核、未注销。\n3. 候选模板来自前一天全局访问记录池，不要求目标店铺自己前一天有模板。\n4. 每个用户随机复制 1 到 5 条，仅复制有地址且用户名不是手机号的数据。\n5. 新增记录固定写入 log_data_source=2。\n6. 若某用户今日已有任意足迹，则直接跳过并返回跳过原因。",
+        "responses": {
+          "200": {
+            "description": "执行成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintMockResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "批量 mock 返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "EligibleUserCount": 316,
+                        "CandidateUserCount": 45,
+                        "InsertedUserCount": 316,
+                        "SkippedUserCount": 0,
+                        "InsertedCount": 923,
+                        "InsertedUserList": [
+                          {
+                            "U_ID": 1600,
+                            "InsertedCount": 3
+                          },
+                          {
+                            "U_ID": 6783,
+                            "InsertedCount": 5
+                          }
+                        ],
+                        "SkippedUserList": [],
+                        "SampleDataList": [
+                          {
+                            "Id": 0,
+                            "VisitTime": "2026-04-16 10:13",
+                            "Title": "刚刚有客户（leiyuansc）访问了您的店铺。",
+                            "IP": "2409:894d:c49a:f5c:29fc:3f6e:aa38:d596",
+                            "Address": "湖北省-随州市-随县",
+                            "Content": "具体信息如下：\n\nIP：2409:894d:c49a:f5c:29fc:3f6e:aa38:d596\n\n地址：湖北省-随州市-随县",
+                            "VisitorUserId": "824518",
+                            "VisitorUserName": "leiyuansc",
+                            "DataSource": 2,
+                            "DataSourceName": "造假",
+                            "IsMock": true
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/user/client/customerFootprint/add": {
+      "post": {
+        "tags": [
+          "客户足迹-写入"
+        ],
+        "summary": "新增客户足迹",
+        "description": "前端主动写入一条真实客户足迹记录。\n\n## 关键规则\n1. 接口免登录，支持游客访问。\n2. log_company_u_id 必填，表示被访问的店铺用户 ID。\n3. log_u_id 可为空，游客访问时无访客 ID。\n4. log_data_source 默认写 1，log_indate 默认写当前时间。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintAddRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "新增足迹示例",
+                  "value": {
+                    "log_company_u_id": 843388,
+                    "log_u_id": 824654,
+                    "log_u_name": "13603351263",
+                    "log_ip_address": "60.7.180.86",
+                    "log_province": "浙江",
+                    "log_city": "杭州",
+                    "log_district": "西湖区"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "新增成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintAddResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "新增成功示例",
+                    "value": {
+                      "Msg": "添加成功",
+                      "Code": 200,
+                      "Data": {
+                        "id": 3325
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingCompanyUid": {
+                    "summary": "缺少被访问店铺用户 ID",
+                    "value": {
+                      "Msg": "log_company_u_id 不能为空",
+                      "Code": 400,
+                      "Data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/operationlog/admin/shopVisits": {
+      "get": {
+        "tags": [
+          "后台日志"
+        ],
+        "summary": "店铺访问记录分页列表",
+        "description": "为 chengstone_web 后台 /Vip/shopVisitRecord 页面返回分页数据。\n\n## 查询规则\n1. UName 按 u_behavior_record.log_u_name 做 LIKE 模糊搜索。\n2. UIName 通过 log_company_u_id 关联 u_userinfo 后按 UI_Name 做 LIKE 模糊搜索。\n3. 地址字段在服务层按 log_province、log_city、log_district 拼接；三段都为空时统一返回 未知。\n4. 返回结构保留 PageCounts、Counts、PageIndex、PageSize、DataList，方便旧后台项目直接消费。",
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "页码，默认 1。"
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "每页条数，默认 20。"
+          },
+          {
+            "name": "UName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "按客户足迹表中的 log_u_name 模糊搜索。"
+          },
+          {
+            "name": "UIName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "按企业名称模糊搜索，通过 log_company_u_id 关联 u_userinfo.UI_Name。"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc05______________openapi__ShopVisitRecordResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "后台列表返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "PageCounts": 15,
+                        "Counts": 289,
+                        "PageIndex": 1,
+                        "PageSize": 20,
+                        "DataList": [
+                          {
+                            "Id": 3801,
+                            "UName": "zhangsan",
+                            "UIName": "杭州某某石材有限公司",
+                            "IP": "60.7.180.86",
+                            "Address": "浙江-杭州-西湖区",
+                            "InDate": "2026-04-17 09:18:22"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/order/virtual-pay/createOrder": {
+      "post": {
+        "tags": [
+          "矿通虚拟支付-建单"
+        ],
+        "summary": "已登录用户建单",
+        "description": "已登录用户创建矿通虚拟支付本地订单。接口要求 utoken 能解析出真实登录用户。\n\n## 请求规则\n1. productId 必填。\n2. openid 必填，用于后续微信支付与 queryOrder 查询微信订单。\n3. env 不传默认 0；0=现网，1=沙箱，建单、签名、查单必须保持同一环境。\n4. utoken 必填，用于识别真实登录用户。\n5. requestSource 建议沿用当前前端请求来源值，便于日志和兼容链路排查。\n\n## 支持的商品 ID（productId 取值）\n| productId | 权益标识 pro_id | 时长 | 价格 |\n|---|---|---|---|\n| calciumsvip_1year | calcium_svip | 1 年 | 588 |\n| calciumsvip_3year | calcium_svip | 3 年 | 1288 |\n| goldsvip_1year | gold_svip | 1 年 | 888 |\n| goldsvip_3year | gold_svip | 3 年 | 1888 |\n| phosphatesvip_1year | phosphate_svip | 1 年 | 888 |\n| phosphatesvip_3year | phosphate_svip | 3 年 | 1888 |\n| magnesitesvip_1year | magnesite_svip | 1 年 | 688 |\n| magnesitesvip_3year | magnesite_svip | 3 年 | 1388 |\n| bauxitesvip_1year | bauxite_svip | 1 年 | 888 |\n| bauxitesvip_3year | bauxite_svip | 3 年 | 1888 |\n| coalsvip_1year | coal_svip | 1 年 | 888 |\n| coalsvip_3year | coal_svip | 3 年 | 1888 |\n| sandsvip_1year | sand_svip | 1 年 | 588 |\n| sandsvip_3year | sand_svip | 3 年 | 1288 |\n| minesvip_1year | mine_svip | 1 年 | 688 |\n| minesvip_3year | mine_svip | 3 年 | 1388 |\n| graphitesvip_1year | graphite_svip | 1 年 | 588 |\n| graphitesvip_3year | graphite_svip | 3 年 | 1288 |\n| quartzsvip_1year | quartz_svip | 1 年 | 588 |\n| quartzsvip_3year | quartz_svip | 3 年 | 1288 |\n| ironsvip_1year | iron_svip | 1 年 | 888 |\n| ironsvip_3year | iron_svip | 3 年 | 1888 |\n| coppersvip_1year | copper_svip | 1 年 | 888 |\n| coppersvip_3year | copper_svip | 3 年 | 1888 |\n| silversvip_1year | silver_svip | 1 年 | 888 |\n| silversvip_3year | silver_svip | 3 年 | 1888 |\n| fluoritesvip_1year | fluorite_svip | 1 年 | 888 |\n| fluoritesvip_3year | fluorite_svip | 3 年 | 1888 |\n\n## 成功返回说明\n1. order_sn 为本地订单号，后续前端通常作为 outTradeNo 使用。\n2. order_amount 为本地订单金额，单位元。\n3. offer_id 与 product_id 直接回传给前端，便于拼接微信虚拟支付参数。",
+        "operationId": "virtualPayCreateOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId",
+                  "openid",
+                  "utoken"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "description": "虚拟支付商品 ID。必须是上方商品表中的一个有效值，例如 minesvip_1year。"
+                  },
+                  "openid": {
+                    "type": "string",
+                    "description": "微信小程序 openid。后端会随订单保存，供 queryOrder 和后续回调链路使用。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "环境值。0=现网，1=沙箱；默认 0。"
+                  },
+                  "utoken": {
+                    "type": "string",
+                    "description": "登录 token。必须能解析出真实登录用户。"
+                  },
+                  "requestSource": {
+                    "type": "integer",
+                    "description": "请求来源，建议沿用前端现有来源值。"
+                  }
+                }
+              },
+              "example": {
+                "productId": "minesvip_1year",
+                "openid": "vp_login_openid_20260608140201",
+                "env": 0,
+                "utoken": "<USER_TOKEN>",
+                "requestSource": 6
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "建单成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "业务提示文案，成功时通常为 成功。"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码，200 表示成功。"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "order_sn": {
+                          "type": "string",
+                          "description": "本地订单号。后续通常作为微信虚拟支付的 outTradeNo 使用。"
+                        },
+                        "order_id": {
+                          "type": "integer",
+                          "description": "本地订单主键 ID。"
+                        },
+                        "order_amount": {
+                          "type": "number",
+                          "description": "订单金额，单位元。"
+                        },
+                        "product_name": {
+                          "type": "string",
+                          "description": "商品名称，前端可直接展示在支付确认页。"
+                        },
+                        "offer_id": {
+                          "type": "string",
+                          "description": "微信虚拟支付 offer_id。前端发起支付时会使用。"
+                        },
+                        "product_id": {
+                          "type": "string",
+                          "description": "回显当前商品 ID，便于和本地商品列表项对应。"
+                        },
+                        "env": {
+                          "type": "integer",
+                          "description": "回显当前环境值。"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Msg": "成功",
+                  "Code": 200,
+                  "Data": {
+                    "order_sn": "20260608140202825766",
+                    "order_id": 26677,
+                    "order_amount": 688,
+                    "product_name": "石矿通svip",
+                    "offer_id": "1450545483",
+                    "product_id": "minesvip_1year",
+                    "env": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误或商品配置错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Msg": "productId不能为空",
+                  "Code": 400,
+                  "Data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/order/virtual-pay/createVisitorOrder": {
+      "post": {
+        "tags": [
+          "矿通虚拟支付-建单"
+        ],
+        "summary": "游客建单",
+        "description": "未登录用户自动创建或复用游客账号后建单。写法对齐 ccement_user_api 的预创建订单（访客模式），前端应直接按下方字段树理解入参和出参。\n\n## 请求规则\n1. productId、openid 必填。\n2. unionid 有值时，优先按 unionid + openid 查找或创建游客账号。\n3. unionid 为空时，必须同时传 device_type 和 device_num，作为游客识别兜底。\n4. 返回中的 uid 必须由前端留存；后续 getPaySig 直接使用该 uid。\n5. openid、productId、env 会随订单一起保存，供 queryOrder 和后续支付链路复用。\n6. 当前支持的 productId 取值与 createOrder 完全一致，详见 createOrder 接口上方商品表。",
+        "operationId": "virtualPayCreateVisitorOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId",
+                  "openid"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "description": "虚拟支付商品 ID。必须是 createOrder 商品表中的一个有效值，例如 minesvip_1year。"
+                  },
+                  "openid": {
+                    "type": "string",
+                    "description": "微信小程序 openid。游客建单时用于定位或创建游客账号。"
+                  },
+                  "unionid": {
+                    "type": "string",
+                    "description": "游客识别优先参数。有值时优先按 unionid + openid 查找或复用游客账号。"
+                  },
+                  "device_type": {
+                    "type": "string",
+                    "description": "unionid 为空时必传，例如 ios、android。用于游客识别兜底。"
+                  },
+                  "device_num": {
+                    "type": "string",
+                    "description": "unionid 为空时必传，设备唯一标识。与 device_type 配合用于创建或复用游客账号。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "环境值。0=现网，1=沙箱；默认 0。后续 getPaySig、queryOrder 和前端支付请求都应保持一致。"
+                  },
+                  "requestSource": {
+                    "type": "integer",
+                    "description": "请求来源，建议沿用当前前端来源值。"
+                  }
+                }
+              },
+              "example": {
+                "productId": "minesvip_1year",
+                "openid": "vp_guest_openid_20260608153001",
+                "unionid": "vp_guest_unionid_20260608153001",
+                "env": 0,
+                "requestSource": 6
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "建单成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "业务提示文案，成功时通常为 成功。"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码，200 表示成功。"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "uid": {
+                          "type": "integer",
+                          "description": "游客用户 ID。前端必须保存；后续 getPaySig 需要继续传这个 uid。"
+                        },
+                        "order_sn": {
+                          "type": "string",
+                          "description": "本地订单号。后续通常作为微信虚拟支付的 outTradeNo 使用。"
+                        },
+                        "order_id": {
+                          "type": "integer",
+                          "description": "本地订单主键 ID。"
+                        },
+                        "order_amount": {
+                          "type": "number",
+                          "description": "订单金额，单位元。"
+                        },
+                        "product_name": {
+                          "type": "string",
+                          "description": "商品名称，前端可直接展示在支付确认页。"
+                        },
+                        "offer_id": {
+                          "type": "string",
+                          "description": "微信虚拟支付 offer_id。前端发起支付时会使用。"
+                        },
+                        "product_id": {
+                          "type": "string",
+                          "description": "回显当前商品 ID，便于和本地商品列表项对应。"
+                        },
+                        "env": {
+                          "type": "integer",
+                          "description": "回显当前环境值。"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Msg": "成功",
+                  "Code": 200,
+                  "Data": {
+                    "uid": 1012405,
+                    "order_sn": "20260608141601788976",
+                    "order_id": 26678,
+                    "order_amount": 688,
+                    "product_name": "石矿通svip",
+                    "offer_id": "1450545483",
+                    "product_id": "minesvip_1year",
+                    "env": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "游客识别参数不完整",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Msg": "unionid为空时必须同时传device_type和device_num",
+                  "Code": 400,
+                  "Data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/order/virtual-pay/getPaySig": {
+      "post": {
+        "tags": [
+          "矿通虚拟支付-签名与查询"
+        ],
+        "summary": "获取支付签名",
+        "description": "根据前端传入的 signData 生成微信虚拟支付 paySig。\n\n## 请求规则\n1. signData 必填，必须是前端最终发给微信虚拟支付的 JSON 字符串，并且必须包含 productId。\n2. 游客场景必须传 createVisitorOrder 返回的 uid；已登录场景若 utoken 能识别用户，可不传 uid。\n3. env 不传默认 0；应与建单接口保持一致。\n4. 返回中的 paySig 直接用于前端发起微信虚拟支付。",
+        "operationId": "virtualPayGetPaySig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc06______________openapi__VirtualPayGetPaySigRequest"
+              },
+              "example": {
+                "uid": 1012405,
+                "signData": "{\"mode\":\"env\",\"buyQuantity\":1,\"currencyType\":\"CNY\",\"productId\":\"minesvip_1year\"}",
+                "env": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "签名生成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc06______________openapi__VirtualPayGetPaySigResponse"
+                },
+                "example": {
+                  "Msg": "成功",
+                  "Code": 200,
+                  "Data": {
+                    "paySig": "d66e726169e462b68f21bfb1d8b1357815ef313d0ca6f5c1835232da8b173834",
+                    "offer_id": "1450545483",
+                    "product_id": "minesvip_1year"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Msg": "signData不能为空",
+                  "Code": 400,
+                  "Data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/order/virtual-pay/queryOrder": {
+      "post": {
+        "tags": [
+          "矿通虚拟支付-签名与查询"
+        ],
+        "summary": "查询微信订单",
+        "description": "查询微信虚拟支付订单状态，游客也可直接调用。\n\n## 请求规则\n1. productId 必填，用于选择商品映射和对应微信配置。\n2. outTradeNo 与 wxOrderId 二选一；推荐优先传 outTradeNo。\n3. openid 在本地订单已保存时可不传，但联调排障时建议前端显式传值。\n4. 当前查询结果分两层：wx_errcode、wx_errmsg、wx_order 表示微信侧结果；order 表示本地订单兜底信息。",
+        "operationId": "virtualPayQueryOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc06______________openapi__VirtualPayQueryOrderRequest"
+              },
+              "example": {
+                "productId": "minesvip_1year",
+                "outTradeNo": "20260608141601788976",
+                "openid": "vp_guest_openid_20260608153001",
+                "env": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc06______________openapi__VirtualPayQueryOrderResponse"
+                },
+                "example": {
+                  "Msg": "成功",
+                  "Code": 200,
+                  "Data": {
+                    "wx_errcode": 268490001,
+                    "wx_errmsg": "openid错误 rid: 6a265f45-6b77a076-2b4f4daa",
+                    "wx_order": null,
+                    "order": {
+                      "O_ID": 26678,
+                      "O_Code": "20260608141601788976",
+                      "O_PayStatus": 1,
+                      "O_PayType": 2,
+                      "PRO_ID": "mine_svip"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Msg": "outTradeNo和wxOrderId不能同时为空",
+                  "Code": 400,
+                  "Data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/notifications/client/list": {
+      "post": {
+        "tags": [
+          "通知列表"
+        ],
+        "summary": "通知列表",
+        "description": "返回当前用户通知分页列表。\n\n## 默认筛选规则\n1. 未传 type 时，默认排除 Type=20。\n2. 传入 type 时，仅返回对应 type 的数据；支持单个值与逗号分隔值。\n\n## Type=20 特殊处理\n1. Title 改写为：客户{用户名}通过{端口}访问了您的店铺，并拨打了店铺电话，请及时跟进客户需求。\n2. 用户名来源于 u_notification_messages.Data.username。\n3. 端口映射：Data.type=app 时显示 石图APP，其余值统一显示 中国石材网stone365。\n4. Data 原始结构仍保留返回，前端如需更多信息可继续读取。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc07____________openapi__NotificationListRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "默认列表查询",
+                  "value": {
+                    "PageSize": 10,
+                    "PageIndex": 1,
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                },
+                "type20": {
+                  "summary": "查询电话通知",
+                  "value": {
+                    "PageSize": 10,
+                    "PageIndex": 1,
+                    "type": 20,
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc07____________openapi__NotificationListResponse"
+                },
+                "examples": {
+                  "type20": {
+                    "summary": "Type=20 返回示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "PageCounts": 3,
+                        "Counts": 11,
+                        "PageIndex": 1,
+                        "PageSize": 5,
+                        "DataList": [
+                          {
+                            "Id": 992789,
+                            "Title": "客户20250628f4efef0通过石图APP访问了您的店铺，并拨打了店铺电话，请及时跟进客户需求。",
+                            "Type": 20,
+                            "TypeName": "拨打电话",
+                            "ReadTime": null,
+                            "DataType": null,
+                            "NotifiedTime": "2026-03-26 12:21:42",
+                            "CreateTime": "2026-03-26 12:21:43",
+                            "DataId": null,
+                            "DataTitle": "",
+                            "DataTypeName": "",
+                            "Data": {
+                              "ip": "112.49.74.82",
+                              "uid": "1001585",
+                              "shop": "店铺-辉县市金都石材厂",
+                              "type": "app",
+                              "phone": "13837339548",
+                              "username": "20250628f4efef0"
+                            },
+                            "CustomerMobile": "13489903011"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/notifications/client/counts": {
+      "post": {
+        "tags": [
+          "通知列表"
+        ],
+        "summary": "未读通知统计",
+        "description": "统计当前终端未读通知数。\n\n## 规则\n1. 未传参数时，返回全部未读数。\n2. 小写 type 表示从未读统计里排除对应 Type。\n3. 大写 Type 表示兼容旧逻辑，仅统计指定 Type。\n4. 两个参数同时传入时，先按 Type 精确筛选，再按 type 排除。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc07____________openapi__NotificationFilterRequest"
+              },
+              "examples": {
+                "exclude20": {
+                  "summary": "统计时排除 Type=20",
+                  "value": {
+                    "type": 20,
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "统计成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc07____________openapi__NotificationCountResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "未读统计示例",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": {
+                        "Unread": 12
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "通知列表"
+        ],
+        "summary": "未读通知统计（GET 兼容）",
+        "description": "与 POST 版规则一致，用于兼容旧调用方式。",
+        "responses": {
+          "200": {
+            "description": "统计成功"
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/notifications/client/markallread": {
+      "post": {
+        "tags": [
+          "通知列表"
+        ],
+        "summary": "全部标记已读",
+        "description": "将当前终端未读通知批量标记为已读。\n\n## 规则\n1. 未传参数时，将当前终端全部未读通知标记已读。\n2. 大写 Type 表示只处理指定 Type。\n3. 小写 type 或 ExcludeType 表示排除对应 Type，不做已读处理。\n4. 两套参数同时传时，先按 Type 缩小范围，再按 type 排除。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc07____________openapi__NotificationFilterRequest"
+              },
+              "examples": {
+                "only20": {
+                  "summary": "仅标记 Type=20 为已读",
+                  "value": {
+                    "Type": 20,
+                    "utoken": "<USER_TOKEN>",
+                    "requestSource": 2
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "处理成功",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "summary": "标记成功",
+                    "value": {
+                      "Msg": "成功",
+                      "Code": 200,
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_user_api}}/collect/admin/import": {
+      "post": {
+        "tags": [
+          "采集导入"
+        ],
+        "summary": "采集数据导入",
+        "description": "将外部采集的企业数据导入系统，自动创建用户账号、企业信息、权重、附件及供应产品。\n\n## 请求规则\n1. UI_Name 为唯一必填字段。\n2. PickTime 不传默认当前时间，同时用于 U_RegDate、UI_UpdateTime、i_supply.CreateTime、i_supply_product.SD_PublishDate。\n3. UI_Moblie、UI_LinkMan、UI_Area、U_PType 会先将中文逗号转为英文逗号，再按现有规则入库。\n4. Area_ID 允许传省份文字，例如 浙江 或 浙江省，后端会换算为地区 CODE。\n\n## 成功返回说明\n1. Data.U_ID 为导入后对应的用户 ID。\n2. 企业已存在时，也返回已有 U_ID，不会报错中断。",
+        "operationId": "collectImport",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc08____________openapi__CollectImportRequest"
+              },
+              "examples": {
+                "default": {
+                  "summary": "完整导入示例",
+                  "value": {
+                    "UI_Name": "杭州某某石材有限公司",
+                    "PickTime": "2026-04-14 10:00:00",
+                    "UI_Moblie": "13800001111,13800002222",
+                    "UI_LinkMan": "张三,李四",
+                    "Area_ID": "浙江",
+                    "UI_Area": "杭州,宁波",
+                    "U_Address": "杭州市某某路123号",
+                    "U_PType": "大理石,花岗岩",
+                    "UI_Synopsis": "专业石材加工企业",
+                    "UI_logo": "https://example.com/logo1.jpg|https://example.com/logo2.jpg|https://example.com/logo3.jpg",
+                    "UI_banner": "https://example.com/banner1.jpg|https://example.com/banner2.jpg|https://example.com/banner3.jpg",
+                    "ProductList": [
+                      {
+                        "SD_Title": "芝麻灰",
+                        "ThumbnailImg": "https://example.com/p1.jpg"
+                      },
+                      {
+                        "SD_Title": "芝麻白",
+                        "ThumbnailImg": "https://example.com/p2.jpg"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "导入成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc08____________openapi__CollectImportSuccessResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "新建企业导入成功",
+                    "value": {
+                      "Msg": "采集导入成功",
+                      "Code": 200,
+                      "Data": {
+                        "U_ID": 1234567
+                      }
+                    }
+                  },
+                  "reuseExisting": {
+                    "summary": "命中已有企业并继续补数据",
+                    "value": {
+                      "Msg": "采集导入成功",
+                      "Code": 200,
+                      "Data": {
+                        "U_ID": 843388
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingName": {
+                    "summary": "企业名称为空",
+                    "value": {
+                      "Msg": "企业名称不能为空",
+                      "Code": 400,
+                      "Data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "{{stone365_user_api}}"
+    },
+    {
+      "url": "{{stone365_user_api}}",
+      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。"
+    },
+    {
+      "url": "{{stone365_user_api}}",
+      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。导入 APIPOST 后应直接显示 {{stone365_user_api}}/接口路径。"
+    },
+    {
+      "url": "{{stone365_user_api}}",
+      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。当前文档的 paths 键已直接写成 {{stone365_user_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL。"
+    }
+  ],
+  "tags": [
+    {
+      "name": "后台供应信息管理",
+      "description": "后台供应信息列表的批量状态调整接口。"
+    },
+    {
+      "name": "后台会员详情",
+      "description": "后台会员详情查询与更新"
+    },
+    {
+      "name": "客户足迹-查询",
+      "description": "会员列表与月汇总"
+    },
+    {
+      "name": "客户足迹-写入",
+      "description": "mock 造假数据与手动新增足迹"
+    },
+    {
+      "name": "后台日志",
+      "description": "后台店铺访问记录分页查询"
+    },
+    {
+      "name": "矿通虚拟支付-建单",
+      "description": "已登录与游客建单"
+    },
+    {
+      "name": "矿通虚拟支付-签名与查询",
+      "description": "支付签名与微信订单查询"
+    },
+    {
+      "name": "通知列表",
+      "description": "列表查询、未读统计、全部已读"
+    },
+    {
+      "name": "采集导入",
+      "description": "企业采集数据导入、附件同步与供应产品落库"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "doc01____________openapi__Envelope": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "description": "接口数据"
+          }
+        }
+      },
+      "doc02____________________openapi__SupplyBatchUpdateRequest": {
+        "type": "object",
+        "required": [
+          "IDs"
+        ],
+        "properties": {
+          "IDs": {
+            "type": "string",
+            "description": "必填。供求信息 ID 列表，多个 ID 用英文逗号分隔，例如 1001,1002。"
+          },
+          "SD_IsSupply": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "选填。是否发布；1=是，0=否。"
+          },
+          "SD_Flag": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "description": "选填。信息类型；1=供应，2=求购，3=快速求购。"
+          },
+          "IsHasImage": {
+            "type": "integer",
+            "enum": [
+              0,
+              1
+            ],
+            "description": "选填。是否有图；1=是，0=否。仅修改该业务标记，不会自动同步附件。"
+          },
+          "AuditingState": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "description": "选填。审核状态；1=审核中，2=审核通过，3=审核未通过。"
+          }
+        },
+        "description": "四个业务字段至少传一个，未传的字段保持原值。"
+      },
+      "doc02____________________openapi__SupplyBatchUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string",
+            "description": "处理结果说明。"
+          },
+          "Code": {
+            "type": "integer",
+            "description": "状态码；200 表示成功。"
+          },
+          "Data": {
+            "type": "array",
+            "items": {},
+            "description": "当前接口成功时返回空数组。"
+          }
+        }
+      },
+      "doc03_______Showable_______openapi__UserDetailResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "Showable": {
+                "type": "integer",
+                "description": "是否前台展示，1=是，0=否。字段来自 u_userinfo。"
+              },
+              "IsOfficial": {
+                "type": "integer",
+                "description": "是否官网显示。"
+              },
+              "UI_SeePhone": {
+                "type": "integer",
+                "description": "是否显示手机号。"
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "doc03_______Showable_______openapi__UpdateUserInfoRequest": {
+        "type": "object",
+        "required": [
+          "U_ID",
+          "UI_UpdateTime"
+        ],
+        "properties": {
+          "U_ID": {
+            "type": "integer",
+            "description": "用户 ID。"
+          },
+          "UI_UpdateTime": {
+            "type": "string",
+            "description": "并发控制字段。提交时应带当前详情接口返回的更新时间。"
+          },
+          "Showable": {
+            "type": "integer",
+            "description": "是否前台展示，1=是，0=否。"
+          }
+        },
+        "additionalProperties": true
+      },
+      "doc04____________openapi__CustomerFootprintListRequest": {
+        "type": "object",
+        "required": [
+          "utoken"
+        ],
+        "properties": {
+          "PageIndex": {
+            "type": "integer",
+            "description": "页码，默认 1。"
+          },
+          "PageSize": {
+            "type": "integer",
+            "description": "每页条数，默认 20。"
+          },
+          "utoken": {
+            "type": "string",
+            "description": "用户登录 token。list 与 summary 必填。"
+          },
+          "requestSource": {
+            "type": "integer",
+            "description": "请求来源，App 场景通常传 2。"
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintListItem": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "足迹记录 ID。"
+          },
+          "VisitTime": {
+            "type": "string",
+            "description": "访问时间，格式 Y-m-d H:i。"
+          },
+          "Title": {
+            "type": "string",
+            "description": "前端可直接展示的标题。"
+          },
+          "IP": {
+            "type": "string",
+            "description": "访问 IP。"
+          },
+          "Address": {
+            "type": "string",
+            "description": "地址。按省、市、区拼接，空时为 未知。"
+          },
+          "Content": {
+            "type": "string",
+            "description": "前端可直接展示的完整内容文案。"
+          },
+          "VisitorUserId": {
+            "type": "string",
+            "description": "访客用户 ID。"
+          },
+          "VisitorUserName": {
+            "type": "string",
+            "description": "访客用户名。"
+          },
+          "DataSource": {
+            "type": "integer",
+            "description": "数据来源，1=真实，2=造假。"
+          },
+          "DataSourceName": {
+            "type": "string",
+            "description": "数据来源文案，真实 或 造假。"
+          },
+          "IsMock": {
+            "type": "boolean",
+            "description": "是否为造假数据。"
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintListResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "PageCounts": {
+                "type": "integer"
+              },
+              "Counts": {
+                "type": "integer"
+              },
+              "PageIndex": {
+                "type": "integer"
+              },
+              "PageSize": {
+                "type": "integer"
+              },
+              "StartDate": {
+                "type": "string",
+                "description": "最近 31 天开始日期。"
+              },
+              "EndDate": {
+                "type": "string",
+                "description": "最近 31 天结束日期。"
+              },
+              "DataList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintSummaryRequest": {
+        "type": "object",
+        "required": [
+          "utoken"
+        ],
+        "properties": {
+          "utoken": {
+            "type": "string"
+          },
+          "requestSource": {
+            "type": "integer"
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintSummaryResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "StartDate": {
+                "type": "string"
+              },
+              "EndDate": {
+                "type": "string"
+              },
+              "ServicePhone": {
+                "type": "string",
+                "description": "用户专属客服电话；查不到时回退 0571-85871531。"
+              },
+              "VisitTotal": {
+                "type": "integer",
+                "description": "最近 31 天访问总数，包含真实与造假。"
+              },
+              "RealVisitTotal": {
+                "type": "integer",
+                "description": "最近 31 天真实访问总数。"
+              },
+              "MockVisitTotal": {
+                "type": "integer",
+                "description": "最近 31 天造假访问总数。"
+              },
+              "CallTotal": {
+                "type": "integer",
+                "description": "最近 31 天拨打电话总数。"
+              },
+              "DateList": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "最近 31 天日期列表，格式 m-d。"
+              },
+              "VisitCountList": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "RealVisitCountList": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "MockVisitCountList": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "CallCountList": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintMockResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "EligibleUserCount": {
+                "type": "integer",
+                "description": "允许接收 mock 足迹的目标店铺数。"
+              },
+              "CandidateUserCount": {
+                "type": "integer",
+                "description": "前一天全局候选模板来源店铺数。"
+              },
+              "InsertedUserCount": {
+                "type": "integer"
+              },
+              "SkippedUserCount": {
+                "type": "integer"
+              },
+              "InsertedCount": {
+                "type": "integer"
+              },
+              "InsertedUserList": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "SkippedUserList": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "SampleDataList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc04____________openapi__CustomerFootprintListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintAddRequest": {
+        "type": "object",
+        "required": [
+          "log_company_u_id"
+        ],
+        "properties": {
+          "log_company_u_id": {
+            "type": "integer",
+            "description": "被访问的店铺用户 ID，必填。"
+          },
+          "log_u_id": {
+            "type": "integer",
+            "description": "访客用户 ID。游客访问可为空。"
+          },
+          "log_u_name": {
+            "type": "string",
+            "description": "访客用户名。"
+          },
+          "log_ip_address": {
+            "type": "string",
+            "description": "访客 IP 地址。"
+          },
+          "log_province": {
+            "type": "string",
+            "description": "省份。"
+          },
+          "log_city": {
+            "type": "string",
+            "description": "城市。"
+          },
+          "log_district": {
+            "type": "string",
+            "description": "区县。"
+          }
+        }
+      },
+      "doc04____________openapi__CustomerFootprintAddResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "新写入的 u_behavior_record 主键 ID。"
+              }
+            }
+          }
+        }
+      },
+      "doc05______________openapi__ShopVisitRecordItem": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "访问记录 ID。"
+          },
+          "UName": {
+            "type": "string",
+            "description": "用户名，来自 log_u_name。"
+          },
+          "UIName": {
+            "type": "string",
+            "description": "企业名称，来自 u_userinfo.UI_Name。历史足迹若缺少 log_company_u_id，对应 UIName 可能为空。"
+          },
+          "IP": {
+            "type": "string",
+            "description": "访问 IP，来自 log_ip_address。"
+          },
+          "Address": {
+            "type": "string",
+            "description": "由省、市、区拼接而成；三段都为空时返回 未知。"
+          },
+          "InDate": {
+            "type": "string",
+            "description": "访问时间，来自 log_indate。"
+          }
+        }
+      },
+      "doc05______________openapi__ShopVisitRecordResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "PageCounts": {
+                "type": "integer",
+                "description": "总页数。"
+              },
+              "Counts": {
+                "type": "integer",
+                "description": "总条数。"
+              },
+              "PageIndex": {
+                "type": "integer",
+                "description": "当前页码。"
+              },
+              "PageSize": {
+                "type": "integer",
+                "description": "每页条数。"
+              },
+              "DataList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc05______________openapi__ShopVisitRecordItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc06______________openapi__VirtualPayGetPaySigRequest": {
+        "type": "object",
+        "required": [
+          "signData"
+        ],
+        "properties": {
+          "uid": {
+            "type": "integer",
+            "description": "游客下单返回的 uid。游客场景必传；已登录场景带 utoken 时可不传。"
+          },
+          "signData": {
+            "type": "string",
+            "description": "前端按微信虚拟支付要求拼出的 JSON 字符串，必须与最终发给微信的内容一致，且必须包含 productId。"
+          },
+          "env": {
+            "type": "integer",
+            "description": "环境值，0=现网，1=沙箱。默认 0。"
+          },
+          "utoken": {
+            "type": "string",
+            "description": "已登录场景可传，用于识别当前用户。"
+          }
+        }
+      },
+      "doc06______________openapi__VirtualPayGetPaySigResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "paySig": {
+                "type": "string",
+                "description": "微信虚拟支付签名。前端直接回填到 wx.requestVirtualPayment 的 paySig。"
+              },
+              "offer_id": {
+                "type": "string",
+                "description": "商品所属的微信 offer_id。"
+              },
+              "product_id": {
+                "type": "string",
+                "description": "回显当前商品 ID。"
+              }
+            }
+          }
+        }
+      },
+      "doc06______________openapi__VirtualPayQueryOrderRequest": {
+        "type": "object",
+        "required": [
+          "productId"
+        ],
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "虚拟支付商品 ID。"
+          },
+          "outTradeNo": {
+            "type": "string",
+            "description": "本地订单号。与 wxOrderId 二选一，推荐优先传此字段。"
+          },
+          "wxOrderId": {
+            "type": "string",
+            "description": "微信订单号。与 outTradeNo 二选一。"
+          },
+          "openid": {
+            "type": "string",
+            "description": "用户 openid。若本地订单已保存 openid，可不传；联调排障时建议显式传值。"
+          },
+          "env": {
+            "type": "integer",
+            "description": "环境值，0=现网，1=沙箱。"
+          }
+        }
+      },
+      "doc06______________openapi__VirtualPayQueryOrderResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "wx_errcode": {
+                "type": "integer",
+                "nullable": true,
+                "description": "微信侧错误码。0 或 null 表示无微信错误；268490001 表示 openid 错误。"
+              },
+              "wx_errmsg": {
+                "type": "string",
+                "nullable": true,
+                "description": "微信侧错误文案。"
+              },
+              "wx_order": {
+                "type": "object",
+                "nullable": true,
+                "description": "微信侧订单明细。当前测试 openid 查单失败时会返回 null。"
+              },
+              "order": {
+                "type": "object",
+                "properties": {
+                  "O_ID": {
+                    "type": "integer",
+                    "description": "本地订单主键。"
+                  },
+                  "O_Code": {
+                    "type": "string",
+                    "description": "本地订单号。"
+                  },
+                  "O_PayStatus": {
+                    "type": "integer",
+                    "description": "本地支付状态。当前联调样例中 1 表示已进入支付成功后的本地状态。"
+                  },
+                  "O_PayType": {
+                    "type": "integer",
+                    "description": "本地支付方式。当前虚拟支付样例中 2 表示微信支付。"
+                  },
+                  "PRO_ID": {
+                    "type": "string",
+                    "description": "本地权益或产品标识，例如 mine_svip。"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc07____________openapi__NotificationListRequest": {
+        "type": "object",
+        "required": [
+          "PageIndex",
+          "PageSize",
+          "utoken"
+        ],
+        "properties": {
+          "PageIndex": {
+            "type": "integer",
+            "description": "页码，从 1 开始。"
+          },
+          "PageSize": {
+            "type": "integer",
+            "description": "每页条数。"
+          },
+          "type": {
+            "type": "integer",
+            "description": "通知类型筛选，对应 u_notifications.Type。未传时默认排除 Type=20。"
+          },
+          "utoken": {
+            "type": "string",
+            "description": "用户登录 token。"
+          },
+          "requestSource": {
+            "type": "integer",
+            "description": "请求来源。"
+          }
+        }
+      },
+      "doc07____________openapi__NotificationListItem": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer",
+            "description": "通知 ID。"
+          },
+          "Title": {
+            "type": "string",
+            "description": "通知标题。Type=20 时为重写后的电话通知标题。"
+          },
+          "Type": {
+            "type": "integer",
+            "description": "通知类型。"
+          },
+          "TypeName": {
+            "type": "string",
+            "description": "通知类型名称。"
+          },
+          "ReadTime": {
+            "type": "string",
+            "nullable": true,
+            "description": "阅读时间，未读时可能为 null。"
+          },
+          "DataType": {
+            "type": "string",
+            "nullable": true
+          },
+          "NotifiedTime": {
+            "type": "string",
+            "description": "通知发送时间。"
+          },
+          "CreateTime": {
+            "type": "string",
+            "description": "通知创建时间。"
+          },
+          "DataId": {
+            "type": "string",
+            "nullable": true
+          },
+          "DataTitle": {
+            "type": "string"
+          },
+          "DataTypeName": {
+            "type": "string"
+          },
+          "Data": {
+            "type": "object",
+            "description": "原始通知扩展数据。Type=20 场景下仍保留原样返回。"
+          },
+          "CustomerMobile": {
+            "type": "string",
+            "nullable": true,
+            "description": "客户手机号，仅 Type=20 场景有业务意义。"
+          }
+        }
+      },
+      "doc07____________openapi__NotificationListResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "PageCounts": {
+                "type": "integer"
+              },
+              "Counts": {
+                "type": "integer"
+              },
+              "PageIndex": {
+                "type": "integer"
+              },
+              "PageSize": {
+                "type": "integer"
+              },
+              "DataList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc07____________openapi__NotificationListItem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc07____________openapi__NotificationFilterRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "排除指定 Type，支持单值或逗号分隔。"
+          },
+          "Type": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "兼容旧逻辑，仅处理或统计指定 Type。"
+          },
+          "ExcludeType": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "description": "type 的兼容别名。"
+          },
+          "utoken": {
+            "type": "string"
+          },
+          "requestSource": {
+            "type": "integer"
+          }
+        }
+      },
+      "doc07____________openapi__NotificationCountResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "integer"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "Unread": {
+                "type": "integer",
+                "description": "未读通知数。"
+              }
+            }
+          }
+        }
+      },
+      "doc08____________openapi__CollectImportProduct": {
+        "type": "object",
+        "required": [
+          "SD_Title",
+          "ThumbnailImg"
+        ],
+        "properties": {
+          "SD_Title": {
+            "type": "string",
+            "description": "产品名称，写入 i_supply.SD_Title。同一用户下若 SD_Title 重复，则该条产品不再重复插入。"
+          },
+          "ThumbnailImg": {
+            "type": "string",
+            "description": "产品图片地址，写入 i_supply_product.ThumbnailImg。为空时该条产品直接跳过。"
+          }
+        }
+      },
+      "doc08____________openapi__CollectImportRequest": {
+        "type": "object",
+        "required": [
+          "UI_Name"
+        ],
+        "properties": {
+          "UI_Name": {
+            "type": "string",
+            "description": "企业名称，与 u_userinfo.UI_Name 对比判重。"
+          },
+          "PickTime": {
+            "type": "string",
+            "description": "采集时间，格式 Y-m-d H:i:s。默认当前时间。"
+          },
+          "UI_Moblie": {
+            "type": "string",
+            "description": "联系手机号，多个值用英文逗号隔开，入库到 UI_Mobil。"
+          },
+          "UI_LinkMan": {
+            "type": "string",
+            "description": "联系人，多个值用英文逗号隔开。"
+          },
+          "Area_ID": {
+            "type": "string",
+            "description": "地区省份文字，例如 浙江 或 浙江省。后端会查询地区表转换为实际 Area_ID。"
+          },
+          "UI_Area": {
+            "type": "string",
+            "description": "店铺地区，多个值用英文逗号隔开，并会按拆分结果精准匹配 u_market.Address。"
+          },
+          "U_Address": {
+            "type": "string",
+            "description": "店铺地址。"
+          },
+          "U_PType": {
+            "type": "string",
+            "description": "主营石材，多个值用英文逗号隔开。"
+          },
+          "UI_Synopsis": {
+            "type": "string",
+            "description": "企业简介。"
+          },
+          "UI_logo": {
+            "type": "string",
+            "description": "Logo 图片地址。单图直接传 URL，多图按 | 分隔，最多入库前 3 张。"
+          },
+          "UI_banner": {
+            "type": "string",
+            "description": "Banner 图片地址。单图直接传 URL，多图按 | 分隔，最多入库前 3 张。Banner 同时会复制一份到 u_banner_wap。"
+          },
+          "ProductList": {
+            "oneOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc08____________openapi__CollectImportProduct"
+                }
+              },
+              {
+                "type": "string",
+                "description": "也支持传 JSON 字符串格式的产品数组。"
+              }
+            ],
+            "description": "产品列表，支持对象数组或 JSON 字符串。"
+          }
+        }
+      },
+      "doc08____________openapi__CollectImportSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "Msg": {
+            "type": "string",
+            "description": "业务提示文案，成功时通常为 采集导入成功。"
+          },
+          "Code": {
+            "type": "integer",
+            "description": "业务状态码，200 表示成功。"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "U_ID": {
+                "type": "integer",
+                "description": "导入后对应的用户 ID。企业已存在时返回已有 U_ID，新建时返回新用户 ID。"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

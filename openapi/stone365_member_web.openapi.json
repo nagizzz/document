@@ -1,0 +1,685 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "stone365_member_web - APIPOST 聚合接口文档",
+    "version": "2026.08.18",
+    "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
+  },
+  "paths": {
+    "{{stone365_member_web}}/member/admin/adminLogin": {
+      "post": {
+        "tags": [
+          "会话与首页"
+        ],
+        "summary": "会员后台登录",
+        "description": "调用 user_api 的 /login/admin。成功后写入 utoken、UserID、UserName Cookie（7 天），并重定向 /member。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "UserName",
+                  "Password"
+                ],
+                "properties": {
+                  "UserName": {
+                    "type": "string",
+                    "description": "登录账号",
+                    "example": "demo"
+                  },
+                  "Password": {
+                    "type": "string",
+                    "description": "登录密码",
+                    "example": "***"
+                  }
+                }
+              },
+              "example": {
+                "UserName": "demo",
+                "Password": "***"
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": {
+            "description": "登录成功后重定向"
+          },
+          "200": {
+            "description": "登录失败时输出上游错误"
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/index/getSystemInit": {
+      "get": {
+        "tags": [
+          "会话与首页"
+        ],
+        "summary": "获取会员中心菜单",
+        "description": "从 /menu/member/index 获取当前会员可见菜单，返回 LayuiMini 初始化结构。",
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "homeInfo": {
+                      "type": "object",
+                      "description": "首页配置"
+                    },
+                    "logoInfo": {
+                      "type": "object",
+                      "description": "Logo 配置"
+                    },
+                    "menuInfo": {
+                      "type": "array",
+                      "description": "上游按权限返回的菜单树",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "homeInfo": {
+                    "title": "首页",
+                    "href": "/member/index/homepage"
+                  },
+                  "logoInfo": {
+                    "image": "/member/static/images/logo.png"
+                  },
+                  "menuInfo": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/list": {
+      "get": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "已审核通过的供应列表",
+        "description": "固定追加 AuditingState=2。分页参数透传至 /supply/member/list；HasVideo 和 VideoUrl 仅代表已经转码和内容审核通过、可播放的视频。",
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "页码"
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 15
+            },
+            "description": "每页数量"
+          },
+          {
+            "name": "Keywords",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "产品名称关键词"
+          },
+          {
+            "name": "Flag",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "信息类别筛选"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "Counts": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "DataList": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "ID": {
+                                "type": "integer",
+                                "example": 10001
+                              },
+                              "Title": {
+                                "type": "string",
+                                "example": "芝麻白"
+                              },
+                              "Pic": {
+                                "type": "string",
+                                "example": "https://img.example.com/a.jpg"
+                              },
+                              "AuditingState": {
+                                "type": "integer",
+                                "description": "本接口固定为 2（审核通过）"
+                              },
+                              "HasVideo": {
+                                "type": "boolean",
+                                "description": "是否有可播放视频",
+                                "example": true
+                              },
+                              "VideoUrl": {
+                                "type": "string",
+                                "description": "HasVideo=true 时的七牛播放地址",
+                                "example": "https://video.example.com/a.mp4"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/addConfirm": {
+      "post": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "发布供应产品",
+        "description": "转发 /supply/member/add。图片列表由 ImgList 转为 Pics；VideoKey 是七牛视频直传完成后的对象键，为可选字段。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "Title",
+                  "PT_ID",
+                  "ImgList"
+                ],
+                "properties": {
+                  "Title": {
+                    "type": "string",
+                    "example": "芝麻白"
+                  },
+                  "PT_ID": {
+                    "type": "integer",
+                    "example": 101
+                  },
+                  "ImgList": {
+                    "type": "string",
+                    "description": "逗号分隔的图片 URL",
+                    "example": "https://img.example.com/a.jpg"
+                  },
+                  "Description": {
+                    "type": "string",
+                    "example": "产品介绍"
+                  },
+                  "VideoKey": {
+                    "type": "string",
+                    "description": "视频对象键；为空则不绑定视频",
+                    "example": "supply-video/20260813/example.mp4"
+                  }
+                }
+              },
+              "example": {
+                "Title": "芝麻白",
+                "PT_ID": 101,
+                "ImgList": "https://img.example.com/a.jpg",
+                "Description": "产品介绍",
+                "VideoKey": "supply-video/20260813/example.mp4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "ID": {
+                          "type": "integer",
+                          "example": 10001
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/editConfirm": {
+      "post": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "修改供应产品",
+        "description": "转发 /supply/member/update。ID 必填；已有视频时，先删除旧视频才允许提交新的 VideoKey。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ID",
+                  "Title",
+                  "PT_ID",
+                  "ImgList"
+                ],
+                "properties": {
+                  "ID": {
+                    "type": "integer",
+                    "example": 10001
+                  },
+                  "Title": {
+                    "type": "string",
+                    "example": "芝麻白"
+                  },
+                  "PT_ID": {
+                    "type": "integer",
+                    "example": 101
+                  },
+                  "ImgList": {
+                    "type": "string",
+                    "example": "https://img.example.com/a.jpg"
+                  },
+                  "VideoKey": {
+                    "type": "string",
+                    "description": "新视频对象键，可选"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/supplyVideoToken": {
+      "post": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "获取供应视频七牛上传凭证",
+        "description": "仅诚石通、石图宝、小程序会员可用。服务端取当前 Cookie 用户；凭证强制 100MB。客户端还应限制时长不超过 30 秒。支持 mp4、mov、avi、mkv、flv、wmv、webm、m4v。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "Extension"
+                ],
+                "properties": {
+                  "Extension": {
+                    "type": "string",
+                    "description": "视频扩展名",
+                    "example": "mp4"
+                  }
+                }
+              },
+              "example": {
+                "Extension": "mp4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "description": "七牛上传 token"
+                        },
+                        "key": {
+                          "type": "string",
+                          "description": "需写入 VideoKey 的对象键"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "视频访问域名"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/supplyVideoStatus": {
+      "post": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "查询供应视频状态",
+        "description": "处理中、审核失败同样 has_video=true，用于禁止重复上传；只有 v_qiniu_examine_video=3 且 v_video_url 非空时可播放。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ID"
+                ],
+                "properties": {
+                  "ID": {
+                    "type": "integer",
+                    "example": 10001
+                  }
+                }
+              },
+              "example": {
+                "ID": 10001
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "has_video": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "video": {
+                          "type": "object",
+                          "properties": {
+                            "v_id": {
+                              "type": "integer"
+                            },
+                            "v_video_url": {
+                              "type": "string"
+                            },
+                            "v_qiniu_video_type": {
+                              "type": "integer"
+                            },
+                            "v_qiniu_examine_video": {
+                              "type": "integer",
+                              "description": "3 表示七牛内容审核通过"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/supply/deleteSupplyVideo": {
+      "post": {
+        "tags": [
+          "供应管理"
+        ],
+        "summary": "删除当前产品视频",
+        "description": "服务端按当前 Cookie 用户校验产品归属后软删除视频记录；成功后可重新上传。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ID"
+                ],
+                "properties": {
+                  "ID": {
+                    "type": "integer",
+                    "example": 10001
+                  }
+                }
+              },
+              "example": {
+                "ID": 10001
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/spot/list": {
+      "get": {
+        "tags": [
+          "其他模块"
+        ],
+        "summary": "现货列表",
+        "description": "代理 /spot/member/list；可结合 PageIndex、PageSize、Keywords、AuditingState、IsExpired 等筛选。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 由上游返回分页列表"
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/album/pic_list": {
+      "post": {
+        "tags": [
+          "其他模块"
+        ],
+        "summary": "图册图片列表",
+        "description": "代理 /album/member/getAlbumnPicList，通常按图册 ID 查询。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 为图册图片数据"
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/notifications/list": {
+      "get": {
+        "tags": [
+          "其他模块"
+        ],
+        "summary": "会员通知列表",
+        "description": "代理 /notifications/member/list；支持分页参数。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 为通知分页数据"
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/order/query": {
+      "post": {
+        "tags": [
+          "其他模块"
+        ],
+        "summary": "支付宝订单查询",
+        "description": "代理 /order/member/aliPayQuery。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Order_ID": {
+                    "type": "string",
+                    "example": "202608130001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功，Data 为上游支付状态"
+          }
+        }
+      }
+    },
+    "{{stone365_member_web}}/member/common/getqiniutoken": {
+      "get": {
+        "tags": [
+          "其他模块"
+        ],
+        "summary": "获取图片七牛上传凭证",
+        "description": "Auth 白名单接口，供 miniUpload 使用。供应视频必须使用 supplyVideoToken。",
+        "responses": {
+          "200": {
+            "description": "成功，返回图片上传 token"
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "{{stone365_member_web}}",
+      "description": "会员中心项目环境变量；默认前缀为 /member。"
+    }
+  ],
+  "tags": [
+    {
+      "name": "会话与首页",
+      "description": "登录、菜单、首页。"
+    },
+    {
+      "name": "供应管理",
+      "description": "供应产品、分类和视频。"
+    },
+    {
+      "name": "其他模块",
+      "description": "现货、图册、通知、订单等常用入口。"
+    }
+  ]
+}

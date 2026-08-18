@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-08-18T16:38:09.552253+08:00",
+  "sourceRoot": "D:\\Code Repositories",
+  "repositories": [
+    {
+      "repository": "cbmnet_api",
+      "file": "cbmnet_api.openapi.json",
+      "sourceFileCount": 2,
+      "pathCount": 6,
+      "sha256": "0ab1b3de4ae87eb8fc7a5ba0abe2d9bbe1e7d9ffcc77893af0261be26794a3c5"
+    },
+    {
+      "repository": "ccement_enterprise_api",
+      "file": "ccement_enterprise_api.openapi.json",
+      "sourceFileCount": 5,
+      "pathCount": 26,
+      "sha256": "16de76cf0bbdb3a0035ebc45aa7ca13898412451cc3e419710cd62909d90661c"
+    },
+    {
+      "repository": "ccement_user_behavior_api",
+      "file": "ccement_user_behavior_api.openapi.json",
+      "sourceFileCount": 3,
+      "pathCount": 10,
+      "sha256": "0c3aa0df1a039dfe83f13f6281f00b6ce799509d74c62bb16b500fb07dba514e"
+    },
+    {
+      "repository": "project_api",
+      "file": "project_api.openapi.json",
+      "sourceFileCount": 10,
+      "pathCount": 32,
+      "sha256": "94f66c6c504983c317a46dc08cfad053aeab3720ba351e11fb80a412050c4c98"
+    },
+    {
+      "repository": "stone365_member_web",
+      "file": "stone365_member_web.openapi.json",
+      "sourceFileCount": 1,
+      "pathCount": 13,
+      "sha256": "4f9d7fb05814892239798de31d83ab7d2a62f90cb5cf7c56b6f98e1b52c15d05"
+    },
+    {
+      "repository": "stone365_user_api",
+      "file": "stone365_user_api.openapi.json",
+      "sourceFileCount": 8,
+      "pathCount": 20,
+      "sha256": "d5469459a2908b642d5678c281294a1038ce8654458fdbc3af42dee33a17eab1"
+    }
+  ],
+  "warnings": []
+}

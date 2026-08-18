@@ -1,0 +1,1286 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ccement_user_behavior_api - APIPOST 聚合接口文档",
+    "version": "2026.08.18",
+    "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
+  },
+  "paths": {
+    "{{ccement_user_behavior_api}}/admin/defineevent/statistics": {
+      "post": {
+        "tags": [
+          "自定义事件统计"
+        ],
+        "summary": "获取事件统计详情或导出结果",
+        "description": "按日期范围统计自定义事件数量。export=1 时返回 Excel Base64 字符串，导出列新增所属平台。列表与导出均会补充 platformName；所属模块 model 通过 user_defineEventConfig 表按 ev_name + ev_platform 查询，避免同一事件 ID 在多平台下共用模块信息。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc01_______________openapi__DefineEventStatisticsRequest"
+              },
+              "examples": {
+                "list": {
+                  "summary": "列表查询",
+                  "value": {
+                    "startDate": "2026-05-01",
+                    "endDate": "2026-05-08",
+                    "platform": 2,
+                    "sort": "desc"
+                  }
+                },
+                "export": {
+                  "summary": "导出 Excel",
+                  "value": {
+                    "startDate": "2026-05-01",
+                    "endDate": "2026-05-08",
+                    "platform": 2,
+                    "export": 1
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc01_______________openapi__DefineEventStatisticsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回。未导出时 Data 为统计列表；导出时 Data 为 Excel Base64 字符串。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/doc01_______________openapi__DefineEventStatisticsListResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/doc01_______________openapi__DefineEventStatisticsExportResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "list": {
+                    "summary": "列表返回",
+                    "value": {
+                      "Code": 200,
+                      "Msg": "成功",
+                      "Data": [
+                        {
+                          "defineEventName": "Price_Statistic_PageView",
+                          "defineEventDescription": "行情统计页浏览",
+                          "count": 318,
+                          "model": "行情统计",
+                          "platform": 2,
+                          "platformName": "数字新能源",
+                          "port": "app"
+                        }
+                      ]
+                    }
+                  },
+                  "export": {
+                    "summary": "导出返回",
+                    "value": {
+                      "Code": 200,
+                      "Msg": "成功",
+                      "Data": "UEsDB..."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误或业务异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc01_______________openapi__CommonErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/defineeventconfig/index": {
+      "post": {
+        "tags": [
+          "自定义事件配置"
+        ],
+        "summary": "获取事件管理列表",
+        "description": "分页查询自定义事件配置列表，支持按事件名称、事件描述、所属模块、所属平台筛选。结果按 ev_addTime 倒序返回。ev_name 不传时，模型层默认过滤 ev_name 为空字符串的记录。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigIndexRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "ev_platform": 1,
+                    "page": 1,
+                    "page_size": 10
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigIndexRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回分页列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigIndexResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "业务异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__CommonErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/defineeventconfig/store": {
+      "post": {
+        "tags": [
+          "自定义事件配置"
+        ],
+        "summary": "新增事件配置",
+        "description": "新增一条自定义事件配置。ev_platform 为必填且只允许 1/2/3/4，后端会显式写入 ev_platform，避免继续依赖 ClickHouse UInt8 默认值 0。id 由数据库生成，ev_addTime 由后端写入当前时间。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigStoreRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "ev_name": "page_view",
+                    "ev_description": "页面访问事件",
+                    "ev_model": "行为分析",
+                    "ev_platform": 1
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigStoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回本次写入的数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigStoreResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "校验失败或写入异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__CommonErrorResponse"
+                },
+                "examples": {
+                  "missingPlatform": {
+                    "value": {
+                      "Code": 400,
+                      "Msg": "所属平台必须传入",
+                      "Data": []
+                    }
+                  },
+                  "invalidPlatform": {
+                    "value": {
+                      "Code": 400,
+                      "Msg": "所属平台取值无效，仅支持：1=水泥网,2=数字新能源,3=混凝土网,4=新行情通网",
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/defineeventconfig/update": {
+      "post": {
+        "tags": [
+          "自定义事件配置"
+        ],
+        "summary": "修改事件配置",
+        "description": "根据 id 修改事件配置。当前校验场景仅强制要求 id 和 ev_platform，因此前端若只想改平台，也建议把 ev_description 和 ev_model 当前值一并回传，避免被空值覆盖。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigUpdateRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "id": "8a5de7b8-2f8d-4f23-b6c0-925f64bd3c99",
+                    "ev_description": "页面访问事件-后台修订",
+                    "ev_model": "行为分析",
+                    "ev_platform": 2
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回本次更新提交的数据",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "校验失败或更新异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__CommonErrorResponse"
+                },
+                "examples": {
+                  "missingId": {
+                    "value": {
+                      "Code": 400,
+                      "Msg": "事件ID不能为空",
+                      "Data": []
+                    }
+                  },
+                  "missingPlatform": {
+                    "value": {
+                      "Code": 400,
+                      "Msg": "所属平台必须传入",
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/index": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "获取页面描述列表",
+        "description": "分页查询页面描述，支持按 name、describe、model 模糊或精确筛选，并支持按 platform 精确过滤。platform 不传时返回全部平台数据。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeIndexRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "platform": 1,
+                    "page": 1,
+                    "page_size": 20
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeIndexRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回分页列表",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03____________openapi__PageDescribeIndexResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/store": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "新增页面描述",
+        "description": "新增一条页面描述记录。platform 当前默认为 1，但前端应显式传值，避免页面被误归到默认站点。name 必须和行为表中的 accessRoute 或事件名称完全一致，否则访问统计无法命中描述。若传入 platform，则后端仅接受 1、2、3、4。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeStoreRequest"
+              },
+              "examples": {
+                "ccement": {
+                  "value": {
+                    "platform": 1,
+                    "name": "page/home/index",
+                    "describe": "首页",
+                    "model": "首页",
+                    "userId": "10001",
+                    "u_name": "管理员"
+                  }
+                },
+                "newEnergy": {
+                  "value": {
+                    "platform": 2,
+                    "name": "page/home/index",
+                    "describe": "数字新能源首页",
+                    "model": "首页"
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeStoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回写入结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03____________openapi__PageDescribeWriteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "校验失败或写入异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03____________openapi__CommonErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/update": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "修改页面描述",
+        "description": "根据 id 修改页面描述记录。platform 可单独修改；若同一路由需要从一个站点调整到另一个站点，建议同时检查对应平台是否已存在同名页面记录，避免重复字典。若传入 platform，则后端仅接受 1、2、3、4。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeUpdateRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "id": "f2e6a728-9f4f-4b26-97c5-292bcd9812cc",
+                    "platform": 2,
+                    "describe": "数字新能源首页",
+                    "model": "首页"
+                  }
+                }
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回修改成功消息",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03____________openapi__CommonSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "校验失败或更新异常",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/doc03____________openapi__CommonErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/access": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "页面访问详情统计",
+        "description": "查询页面访问次数、访问人数、平均停留时长等指标。行为数据底层默认按 platform=1 过滤；补充页面中文描述时也只会读取同 platform 的页面字典，因此平台传错会直接导致描述缺失。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeStatisticsRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeStatisticsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回统计结果"
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/source": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "页面来源统计",
+        "description": "查询某个页面的来源页构成。accessRoute 必传。来源页中文描述按同 platform 的页面字典补充，缺失时会展示未知或退出 APP。platform 表示所属站点，不表示客户端端口。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeSourceRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeSourceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回来源统计结果"
+          }
+        }
+      }
+    },
+    "{{ccement_user_behavior_api}}/admin/pagedescribe/destination": {
+      "post": {
+        "tags": [
+          "页面描述管理"
+        ],
+        "summary": "页面去向统计",
+        "description": "查询某个页面的去向页构成。accessRoute 必传。去向页中文描述按同 platform 的页面字典补充，accessTo 为空时会展示退出 APP。platform 表示所属站点，不表示客户端端口。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeSourceRequest"
+              }
+            },
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/doc03____________openapi__PageDescribeSourceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功返回去向统计结果"
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "{{ccement_user_behavior_api}}",
+      "description": "用户行为分析项目变量。当前已知联调地址：http://analysis.api.ccement.com。当前文档的 paths 键已直接写成 {{ccement_user_behavior_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL；后续如补充测试或正式环境，也继续在变量中切换。"
+    },
+    {
+      "url": "{{ccement_user_behavior_api}}",
+      "description": "用户行为分析项目变量。当前已知联调地址：http://analysis.api.ccement.com。paths 键已直接写成 {{ccement_user_behavior_api}}/接口路径，导入 APIPOST 后应显示完整 URL。"
+    }
+  ],
+  "tags": [
+    {
+      "name": "自定义事件统计",
+      "description": "事件统计列表与导出接口"
+    },
+    {
+      "name": "自定义事件配置",
+      "description": "事件配置列表、新增、修改接口"
+    },
+    {
+      "name": "页面描述管理",
+      "description": "页面描述列表、写入和页面统计接口"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "doc01_______________openapi__DefineEventStatisticsRequest": {
+        "type": "object",
+        "description": "统计筛选参数。代码通过 Request::param() 读取，POST 表单和 JSON 都可。",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "description": "开始日期，格式 yyyy-MM-dd。不传时由底层查询逻辑按现有默认行为处理。"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "description": "结束日期，格式 yyyy-MM-dd。"
+          },
+          "model": {
+            "type": "string",
+            "description": "所属模块筛选。该筛选在控制器中对补充后的 model 字段做二次过滤，不参与底层统计 SQL。"
+          },
+          "sort": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "description": "按 defineEventName 排序，默认 desc。除 asc 之外的值都会走 desc 分支。"
+          },
+          "export": {
+            "type": "integer",
+            "description": "传 1 时返回 Excel Base64 文件内容；不传或非 1 时返回统计列表。",
+            "enum": [
+              1
+            ]
+          },
+          "platform": {
+            "type": "integer",
+            "description": "平台筛选。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。若底层统计模型支持该参数，会按平台过滤；返回中同时给出 platformName。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "port": {
+            "type": "string",
+            "description": "端口筛选，如 app、xcx、h5。该字段表示事件发生的客户端入口，不等同于 platform；是否生效取决于底层统计模型。"
+          },
+          "deviceType": {
+            "type": "string",
+            "description": "设备类型筛选。是否生效取决于底层统计模型。"
+          },
+          "defineEventName": {
+            "type": "string",
+            "description": "事件 ID 筛选，即埋点事件名/事件编码。是否生效取决于底层统计模型。"
+          }
+        }
+      },
+      "doc01_______________openapi__DefineEventStatisticsItem": {
+        "type": "object",
+        "description": "事件统计列表项。统计结果以 defineEventName、port、platform 为粒度分组，因此同一事件在不同平台或端口下会拆成多条记录。",
+        "properties": {
+          "defineEventName": {
+            "type": "string",
+            "description": "事件 ID。"
+          },
+          "defineEventDescription": {
+            "type": "string",
+            "description": "事件描述，来自统计结果自身。导出分支已不再回退旧 describe 变量。"
+          },
+          "count": {
+            "type": "integer",
+            "description": "命中次数。表示在当前日期范围、平台、端口、事件粒度下聚合后的总上报次数，不是去重用户数。"
+          },
+          "model": {
+            "type": "string",
+            "description": "所属模块。若配置表中未找到 ev_name + ev_platform 对应记录，则返回空字符串。"
+          },
+          "platform": {
+            "type": "integer",
+            "description": "所属平台原始枚举值。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "platformName": {
+            "type": "string",
+            "description": "所属平台中文名。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网；若出现历史异常值则返回空字符串。"
+          },
+          "port": {
+            "type": "string",
+            "description": "端口类型，例如 app、xcx、h5。与 platform 组合后共同决定一条统计记录的粒度。"
+          }
+        }
+      },
+      "doc01_______________openapi__DefineEventStatisticsListResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/doc01_______________openapi__DefineEventStatisticsItem"
+            }
+          }
+        }
+      },
+      "doc01_______________openapi__DefineEventStatisticsExportResponse": {
+        "type": "object",
+        "description": "导出响应。Excel 列顺序固定为事件 ID、事件描述、消息数量、所属模块、所属平台。",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "type": "string",
+            "description": "Excel 文件 Base64 内容。"
+          }
+        }
+      },
+      "doc01_______________openapi__CommonErrorResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 400
+          },
+          "Msg": {
+            "type": "string",
+            "example": "参数错误"
+          },
+          "Data": {
+            "description": "失败时通常为空数组或空字符串。"
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigIndexRequest": {
+        "type": "object",
+        "properties": {
+          "ev_name": {
+            "type": "string",
+            "description": "按事件名称模糊搜索。"
+          },
+          "ev_description": {
+            "type": "string",
+            "description": "按事件描述模糊搜索。"
+          },
+          "ev_model": {
+            "type": "string",
+            "description": "按所属模块精确匹配。"
+          },
+          "ev_platform": {
+            "type": "integer",
+            "description": "按所属平台精确匹配。当前业务枚举：1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "description": "当前页码，默认 1。"
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "每页数量，默认 10。模型层实际读取 page_size。"
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ClickHouse UUID 主键。"
+          },
+          "ev_name": {
+            "type": "string",
+            "description": "事件名称。"
+          },
+          "ev_description": {
+            "type": "string",
+            "description": "事件描述。"
+          },
+          "ev_model": {
+            "type": "string",
+            "description": "所属模块。"
+          },
+          "ev_platform": {
+            "type": "integer",
+            "description": "所属平台枚举值。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。该值与 ev_name 共同决定所属模块 model 的匹配结果。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          "ev_addTime": {
+            "type": "string",
+            "description": "新增时间，格式 yyyy-MM-dd HH:mm:ss。"
+          },
+          "ev_updateTime": {
+            "type": "string",
+            "description": "更新时间，格式 yyyy-MM-dd HH:mm:ss。"
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigIndexResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "current_page": {
+                "type": "integer"
+              },
+              "last_page": {
+                "type": "integer"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc02_______________openapi__DefineEventConfigRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigStoreRequest": {
+        "type": "object",
+        "required": [
+          "ev_name",
+          "ev_description",
+          "ev_model",
+          "ev_platform"
+        ],
+        "properties": {
+          "ev_name": {
+            "type": "string",
+            "description": "事件名称，新增必填。"
+          },
+          "ev_description": {
+            "type": "string",
+            "description": "事件描述，新增必填。"
+          },
+          "ev_model": {
+            "type": "string",
+            "description": "所属模块，新增必填。"
+          },
+          "ev_platform": {
+            "type": "integer",
+            "description": "所属平台，新增必填。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网；不允许传 0、空值或其他未定义平台编码。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigStoreResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "ev_name": {
+                "type": "string"
+              },
+              "ev_description": {
+                "type": "string"
+              },
+              "ev_model": {
+                "type": "string"
+              },
+              "ev_platform": {
+                "type": "integer",
+                "description": "所属平台原始枚举值。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。"
+              },
+              "ev_addTime": {
+                "type": "string",
+                "description": "后端生成的新增时间，格式 yyyy-MM-dd HH:mm:ss。"
+              }
+            }
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigUpdateRequest": {
+        "type": "object",
+        "required": [
+          "id",
+          "ev_platform"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "记录主键，ClickHouse UUID。"
+          },
+          "ev_description": {
+            "type": "string",
+            "nullable": true,
+            "description": "事件描述。代码未要求必填，但不传可能被写入空值，建议回传当前有效值。"
+          },
+          "ev_model": {
+            "type": "string",
+            "nullable": true,
+            "description": "所属模块。代码未要求必填，但不传可能被写入空值，建议回传当前有效值。"
+          },
+          "ev_platform": {
+            "type": "integer",
+            "description": "所属平台，修改必填。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网；更新时建议与当前事件名称、所属模块一并核对，避免跨平台串位。",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        }
+      },
+      "doc02_______________openapi__DefineEventConfigUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "成功"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "ev_description": {
+                "type": "string",
+                "nullable": true
+              },
+              "ev_model": {
+                "type": "string",
+                "nullable": true
+              },
+              "ev_platform": {
+                "type": "integer",
+                "description": "所属平台原始枚举值。1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。"
+              },
+              "ev_updateTime": {
+                "type": "string",
+                "description": "后端生成的更新时间，格式 yyyy-MM-dd HH:mm:ss。"
+              }
+            }
+          }
+        }
+      },
+      "doc02_______________openapi__CommonErrorResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 400
+          },
+          "Msg": {
+            "type": "string",
+            "example": "参数错误"
+          },
+          "Data": {
+            "description": "失败时通常为空数组或空字符串。"
+          }
+        }
+      },
+      "doc03____________openapi__PlatformField": {
+        "type": "integer",
+        "description": "所属平台。当前业务口径：1=水泥网，2=数字新能源，3=混凝土网，4=新行情通网。统计接口默认按 1 查询；传其他值会直接返回错误。",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "doc03____________openapi__PageDescribeIndexRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "按页面名称模糊搜索。"
+          },
+          "describe": {
+            "type": "string",
+            "description": "按页面描述模糊搜索。"
+          },
+          "model": {
+            "type": "string",
+            "description": "按所属模块精确匹配。"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/doc03____________openapi__PlatformField"
+          },
+          "page": {
+            "type": "integer",
+            "description": "当前页码，默认 1。"
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "每页条数，默认 100。"
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeRecord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "页面描述记录主键 UUID。"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/doc03____________openapi__PlatformField"
+          },
+          "name": {
+            "type": "string",
+            "description": "页面路由或事件名称。必须和行为表中的 accessRoute 等字段保持完全一致。"
+          },
+          "describe": {
+            "type": "string",
+            "description": "页面中文描述。"
+          },
+          "u_userid": {
+            "type": "string",
+            "description": "操作人用户 ID。"
+          },
+          "u_name": {
+            "type": "string",
+            "description": "操作人用户名。"
+          },
+          "log_id": {
+            "type": "string",
+            "description": "关联日志 ID。"
+          },
+          "model": {
+            "type": "string",
+            "description": "所属模块。"
+          },
+          "time": {
+            "type": "string",
+            "description": "列表接口返回的 addTime 别名。"
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeIndexResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "success"
+          },
+          "Data": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "per_page": {
+                "type": "integer"
+              },
+              "current_page": {
+                "type": "integer"
+              },
+              "last_page": {
+                "type": "integer"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/doc03____________openapi__PageDescribeRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeStoreRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "describe"
+        ],
+        "properties": {
+          "platform": {
+            "$ref": "#/components/schemas/doc03____________openapi__PlatformField"
+          },
+          "name": {
+            "type": "string",
+            "description": "页面名称，必填。"
+          },
+          "describe": {
+            "type": "string",
+            "description": "页面描述，必填。"
+          },
+          "model": {
+            "type": "string",
+            "description": "所属模块。"
+          },
+          "userId": {
+            "type": "string",
+            "description": "创建用户 ID。后端实际写入字段为 u_userid。"
+          },
+          "u_name": {
+            "type": "string",
+            "description": "创建用户名。"
+          },
+          "log_id": {
+            "type": "string",
+            "description": "日志 ID。"
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeUpdateRequest": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "页面 ID，必填。"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/doc03____________openapi__PlatformField"
+          },
+          "name": {
+            "type": "string",
+            "description": "页面名称。"
+          },
+          "describe": {
+            "type": "string",
+            "description": "页面描述。"
+          },
+          "model": {
+            "type": "string",
+            "description": "所属模块。"
+          },
+          "u_userid": {
+            "type": "string",
+            "description": "修改人用户 ID。"
+          },
+          "u_name": {
+            "type": "string",
+            "description": "修改人用户名。"
+          },
+          "log_id": {
+            "type": "string",
+            "description": "日志 ID。"
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeStatisticsRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "description": "开始日期，格式 YYYY-MM-DD。默认 30 天前。"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "结束日期，格式 YYYY-MM-DD。默认当天。"
+          },
+          "platform": {
+            "$ref": "#/components/schemas/doc03____________openapi__PlatformField"
+          },
+          "deviceType": {
+            "type": "string",
+            "description": "设备类型筛选。"
+          },
+          "export": {
+            "type": "integer",
+            "description": "是否导出 Excel。1=导出。"
+          }
+        }
+      },
+      "doc03____________openapi__PageDescribeSourceRequest": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/doc03____________openapi__PageDescribeStatisticsRequest"
+          },
+          {
+            "type": "object",
+            "required": [
+              "accessRoute"
+            ],
+            "properties": {
+              "accessRoute": {
+                "type": "string",
+                "description": "当前访问页面，必填。必须和页面描述表 name 及行为表 accessRoute 保持一致。"
+              }
+            }
+          }
+        ]
+      },
+      "doc03____________openapi__PageDescribeWriteResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "success"
+          },
+          "Data": {
+            "type": "boolean",
+            "description": "ThinkPHP ClickHouse insert 返回结果。"
+          }
+        }
+      },
+      "doc03____________openapi__CommonSuccessResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 200
+          },
+          "Msg": {
+            "type": "string",
+            "example": "修改成功"
+          },
+          "Data": {
+            "type": "string",
+            "example": ""
+          }
+        }
+      },
+      "doc03____________openapi__CommonErrorResponse": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "integer",
+            "example": 400
+          },
+          "Msg": {
+            "type": "string",
+            "example": "平台类型错误，仅支持：1=水泥网、2=数字新能源、3=混凝土网、4=新行情通网"
+          },
+          "Data": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      }
+    }
+  }
+}
