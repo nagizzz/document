@@ -37,9 +37,10 @@ def source_files() -> list[tuple[str, Path]]:
         if not directory.is_dir() or directory.parent.name != "项目资料库":
             continue
         repository = directory.parent.parent.name
-        for document in directory.glob("*.openapi.json"):
+        # Source documents may be organized in controller subdirectories.
+        for document in directory.rglob("*.openapi.json"):
             files.append((repository, document))
-    return sorted(files, key=lambda item: (item[0].lower(), item[1].name))
+    return sorted(files, key=lambda item: (item[0].lower(), str(item[1]).lower()))
 
 
 def fingerprint(files: list[tuple[str, Path]]) -> tuple[tuple[str, int, int], ...]:

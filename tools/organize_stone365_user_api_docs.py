@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+"""Organize one-operation stone365_user_api OpenAPI docs by controller."""
+
+from __future__ import annotations
+
+import json
+import re
+import shutil
+from collections import Counter
+from pathlib import Path
+
+
+DOC_DIR = Path(r"D:\Code Repositories\stone365_user_api\项目资料库\前端接口文档")
+METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
+ENV_PREFIX = re.compile(r"^\{\{[^{}]+\}\}")
+BAD_FILENAME = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+
+
+def get_operation(document: dict) -> tuple[str, str]:
+    operations = [
+        (path, method.lower())
+        for path, path_item in document.get("paths", {}).items()
+        if isinstance(path_item, dict)
+        for method, operation in path_item.items()
+        if method.lower() in METHODS and isinstance(operation, dict)
+    ]
+    if len(operations) != 1:
+        raise ValueError(f"Expected exactly one operation, got {len(operations)}")
+    return operations[0]
+
+
+def filename_for(path: str, method: str, used: Counter[str]) -> str:
+    # {{stone365_user_api}}/media/admin/video/token -> media-admin-video-token
+    name = ENV_PREFIX.sub("", path).strip("/").replace("/", "-").replace("{", "").replace("}", "")
+    name = BAD_FILENAME.sub("-", name).strip(" .-")
+    if not name:
+        raise ValueError(f"Cannot create filename for path {path}")
+    used[name.lower()] += 1
+    if used[name.lower()] > 1:
+        # GET and POST /notifications/client/counts are distinct operations.
+        name = f"{name}-{method.lower()}"
+    return f"{name}.openapi.json"
+
+
+def organize() -> list[dict[str, str]]:
+    source_files = sorted(DOC_DIR.rglob("*.openapi.json"))
+    records: list[tuple[Path, dict, str, str, str]] = []
+    for source in source_files:
+        document = json.loads(source.read_text(encoding="utf-8-sig"))
+        tags = document.get("tags", [])
+        if not tags or not isinstance(tags[0], dict) or not tags[0].get("name"):
+            raise ValueError(f"Missing controller tag: {source}")
+        path, method = get_operation(document)
+        records.append((source, document, str(tags[0]["name"]), path, method))
+
+    # Keep POST as the unsuffixed document when a URL supports more than one
+    # method. This also makes repeated runs idempotent.
+    records.sort(key=lambda item: (item[3], 0 if item[4] == "post" else 1, item[4], str(item[0])))
+    planned: list[tuple[Path, Path, str, str]] = []
+    used: Counter[str] = Counter()
+    for source, _, controller, path, method in records:
+        target = DOC_DIR / controller / filename_for(path, method, used)
+        planned.append((source, target, controller, path))
+
+    targets = [target for _, target, _, _ in planned]
+    if len(set(targets)) != len(targets):
+        raise ValueError("Duplicate target filename")
+
+    for source, target, _, _ in planned:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if source.resolve() != target.resolve():
+            shutil.move(str(source), str(target))
+
+    return [
+        {"controller": controller, "file": str(target.relative_to(DOC_DIR)), "path": path}
+        for _, target, controller, path in planned
+    ]
+
+
+if __name__ == "__main__":
+    result = organize()
+    print(json.dumps({"documentCount": len(result), "documents": result}, ensure_ascii=False, indent=2))
