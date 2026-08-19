@@ -108,9 +108,11 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
 
         rewritten = redact_public_values(deep_rewrite_refs(copy.deepcopy(source), reference_map))
         for server in rewritten.get("servers", []):
-            # Preserve the project-level APIPOST domain placeholder. Paths remain
-            # standard OpenAPI paths, so cloud validation does not receive a
-            # non-standard {{environment}} prefix in the paths object.
+            if isinstance(server, dict) and "{{" in str(server.get("url", "")):
+                # APIPOST cloud sync validates servers.url as a strict URL and
+                # rejects its own {{environment}} syntax here. Keep the source
+                # placeholder locally, and configure it in APIPOST Environment.
+                continue
             signature = str(server.get("url", "")) if isinstance(server, dict) else json.dumps(server, ensure_ascii=False, sort_keys=True)
             if signature not in server_urls:
                 servers.append(server)

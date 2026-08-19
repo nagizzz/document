@@ -2328,12 +2328,6 @@
       }
     }
   },
-  "servers": [
-    {
-      "url": "{{ccement_enterprise_api}}",
-      "description": "企业接口项目变量。测试环境：http://enterprise.test.cbmnet.cn；正式环境：http://enterprise.cbmnet.cn。当前文档的 paths 键已直接写成 {{ccement_enterprise_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL。"
-    }
-  ],
   "tags": [
     {
       "name": "水泥模块",
