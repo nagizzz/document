@@ -12,8 +12,11 @@ APIPOST 请使用下列 Raw URL 作为“实时同步数据源”：
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/cbmnet_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_enterprise_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_user_behavior_api.openapi.json`
+- `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ads_api.openapi.json`
 
-每个文件由 `tools/build_openapi.py` 从 `D:\Code Repositories` 下各仓库的 `项目资料库\前端接口文档\*.openapi.json` 自动聚合生成，文件名按项目仓库名称命名。源仓库中每个接口各占一个文件；发布副本会将同一控制器的接口保留为相同 OpenAPI 标签，APIPOST 导入后会按标签显示为控制器目录。发布副本会将 paths 中的 `{{环境变量}}/path` 转换为标准 OpenAPI `/path`，并移除 `servers` 中的 APIPOST 占位符，以便云端同步校验；导入后请在 APIPOST 环境中配置以仓库名命名的域名变量，例如 `stone365_user_api`。
+每个文件由 `tools/build_openapi.py` 从 `D:\Code Repositories` 下各仓库的 `项目资料库\前端接口文档\*.openapi.json` 自动聚合生成，文件名按项目仓库名称命名。源仓库中每个接口各占一个文件；发布副本会将同一控制器的接口保留为相同 OpenAPI 标签，APIPOST 导入后会按标签显示为控制器目录。发布副本会将 paths 中的 `{{环境变量}}/path` 转换为标准 OpenAPI `/path`，并移除 `servers` 中的 APIPOST 占位符，以便云端同步校验。
+
+导入后，在 APIPOST 的目标环境中创建一个以仓库名命名的服务（例如 `stone365_user_api`），前置 URL 填写完整域名（例如 `https://www.user.com`）。对外共享时，在共享设置的“开发环境”中勾选该环境；服务地址和域名变量必须保存为云端值，不能只保存为本地值。共享页显示“默认环境”且没有域名时，通常是未选择该开发环境或默认环境没有配置服务。
 
 ## 更新和发布
 
