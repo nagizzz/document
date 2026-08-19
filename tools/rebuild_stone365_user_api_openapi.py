@@ -17,6 +17,19 @@ from pathlib import Path
 DOC_DIR = Path(r"D:\Code Repositories\stone365_user_api\项目资料库\前端接口文档")
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
+FIELD_EXAMPLES = {
+    "Code": 200, "Msg": "成功", "U_ID": 100001, "SD_ID": 10001,
+    "UI_Name": "杭州示例石材有限公司", "PickTime": "2026-08-19 10:00:00",
+    "UI_Moblie": "13800000000", "UI_LinkMan": "张三", "Area_ID": "浙江",
+    "UI_Area": "杭州", "U_Address": "杭州市示例路 1 号", "U_PType": "大理石",
+    "UI_Synopsis": "示例企业简介", "UI_logo": "https://example.com/logo.jpg",
+    "UI_banner": "https://example.com/banner.jpg", "SD_Title": "示例石材产品",
+    "ThumbnailImg": "https://example.com/product.jpg", "PageIndex": 1,
+    "PageSize": 20, "PageCounts": 1, "Counts": 1, "Unread": 12,
+    "utoken": "<USER_TOKEN>", "requestSource": 2, "Extension": "mp4",
+    "VideoKey": "supply-video/20260819/example.mp4", "IDs": "1001,1002",
+}
+
 
 def resolve_ref(ref: str, document: dict) -> object | None:
     if not ref.startswith("#/components/"):
@@ -83,6 +96,83 @@ def schema_from_example(value: object) -> dict:
     return {"type": "string", "example": str(value)}
 
 
+def generated_example(schema: dict, field_name: str = "") -> object:
+    """Return a useful non-empty example while preserving explicit examples."""
+    if "example" in schema:
+        return copy.deepcopy(schema["example"])
+    if field_name in FIELD_EXAMPLES:
+        return copy.deepcopy(FIELD_EXAMPLES[field_name])
+    schema_type = schema.get("type")
+    if schema_type == "object" or "properties" in schema:
+        return {
+            name: generated_example(property_schema, name)
+            for name, property_schema in schema.get("properties", {}).items()
+            if isinstance(property_schema, dict)
+        }
+    if schema_type == "array":
+        items = schema.get("items", {})
+        return [generated_example(items, field_name) if isinstance(items, dict) else "示例值"]
+    if schema_type == "boolean":
+        return True
+    if schema_type == "integer":
+        return 1
+    if schema_type == "number":
+        return 1
+    if schema.get("format") in {"date-time", "datetime"}:
+        return "2026-08-19 10:00:00"
+    if schema.get("format") == "date":
+        return "2026-08-19"
+    return f"示例{field_name or '值'}"
+
+
+def enrich_schema_examples(schema: object, field_name: str = "") -> None:
+    if not isinstance(schema, dict):
+        return
+    for name, property_schema in schema.get("properties", {}).items():
+        if isinstance(property_schema, dict):
+            enrich_schema_examples(property_schema, str(name))
+    items = schema.get("items")
+    if isinstance(items, dict):
+        enrich_schema_examples(items, field_name)
+    if "example" not in schema:
+        schema["example"] = generated_example(schema, field_name)
+
+
+def fill_example(value: object, schema: object, field_name: str = "") -> object:
+    if not isinstance(schema, dict):
+        return value
+    if value in (None, ""):
+        return generated_example(schema, field_name)
+    if isinstance(value, dict) and (schema.get("type") == "object" or "properties" in schema):
+        result = dict(value)
+        for name, property_schema in schema.get("properties", {}).items():
+            if isinstance(property_schema, dict):
+                result[name] = fill_example(result.get(name), property_schema, str(name))
+        return result
+    if isinstance(value, list) and schema.get("type") == "array":
+        item_schema = schema.get("items", {})
+        if not value:
+            return [generated_example(item_schema, field_name)] if isinstance(item_schema, dict) else value
+        return [fill_example(item, item_schema, field_name) for item in value]
+    return value
+
+
+def enrich_media_examples(media: dict) -> None:
+    schema = media.get("schema")
+    if not isinstance(schema, dict):
+        return
+    enrich_schema_examples(schema)
+    examples = media.get("examples")
+    if isinstance(examples, dict) and examples:
+        for item in examples.values():
+            if isinstance(item, dict) and "value" in item:
+                item["value"] = fill_example(item["value"], schema)
+    elif "example" in media:
+        media["example"] = fill_example(media["example"], schema)
+    else:
+        media["example"] = generated_example(schema)
+
+
 def example_value(media: dict) -> object | None:
     if "example" in media:
         return media["example"]
@@ -145,6 +235,7 @@ def rebuild_document(path: Path) -> dict[str, int]:
                         elif (value := example_value(media)) is not None:
                             media["schema"] = schema_from_example(value)
                             generated += 1
+                        enrich_media_examples(media)
             for response in operation.get("responses", {}).values():
                 if not isinstance(response, dict):
                     continue
@@ -157,6 +248,7 @@ def rebuild_document(path: Path) -> dict[str, int]:
                         elif (value := example_value(media)) is not None:
                             media["schema"] = schema_from_example(value)
                             generated += 1
+                        enrich_media_examples(media)
             # The historical GET compatibility doc omitted its response body,
             # while the controller returns the same envelope as POST counts.
             if method.lower() == "get" and "notifications/client/counts" in str(next(iter(document.get("paths", {})), "")):
@@ -164,6 +256,7 @@ def rebuild_document(path: Path) -> dict[str, int]:
                 if isinstance(response, dict) and "content" not in response:
                     response["content"] = {"application/json": {"schema": notification_count_schema(), "examples": {"success": {"value": {"Msg": "成功", "Code": 200, "Data": {"Unread": 12}}}}}}
                     generated += 1
+                    enrich_media_examples(response["content"]["application/json"])
             normalize_compatibility_text(operation)
     document.setdefault("info", {})["version"] = date.today().isoformat()
     path.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
