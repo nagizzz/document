@@ -9,7 +9,7 @@
     "/member/admin/adminLogin": {
       "post": {
         "tags": [
-          "会话与首页"
+          "admin"
         ],
         "summary": "会员后台登录",
         "description": "调用 user_api 的 /login/admin。成功后写入 utoken、UserID、UserName Cookie（7 天），并重定向 /member。",
@@ -53,10 +53,38 @@
         }
       }
     },
+    "/member/album/pic_list": {
+      "post": {
+        "tags": [
+          "album"
+        ],
+        "summary": "图册图片列表",
+        "description": "代理 /album/member/getAlbumnPicList，通常按图册 ID 查询。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 为图册图片数据"
+          }
+        }
+      }
+    },
+    "/member/common/getqiniutoken": {
+      "get": {
+        "tags": [
+          "common"
+        ],
+        "summary": "获取图片七牛上传凭证",
+        "description": "Auth 白名单接口，供 miniUpload 使用。供应视频必须使用 supplyVideoToken。",
+        "responses": {
+          "200": {
+            "description": "成功，返回图片上传 token"
+          }
+        }
+      }
+    },
     "/member/index/getSystemInit": {
       "get": {
         "tags": [
-          "会话与首页"
+          "index"
         ],
         "summary": "获取会员中心菜单",
         "description": "从 /menu/member/index 获取当前会员可见菜单，返回 LayuiMini 初始化结构。",
@@ -101,10 +129,281 @@
         }
       }
     },
+    "/member/notifications/list": {
+      "get": {
+        "tags": [
+          "notifications"
+        ],
+        "summary": "会员通知列表",
+        "description": "代理 /notifications/member/list；支持分页参数。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 为通知分页数据"
+          }
+        }
+      }
+    },
+    "/member/order/query": {
+      "post": {
+        "tags": [
+          "order"
+        ],
+        "summary": "支付宝订单查询",
+        "description": "代理 /order/member/aliPayQuery。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Order_ID": {
+                    "type": "string",
+                    "example": "202608130001"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功，Data 为上游支付状态"
+          }
+        }
+      }
+    },
+    "/member/spot/list": {
+      "get": {
+        "tags": [
+          "spot"
+        ],
+        "summary": "现货列表",
+        "description": "代理 /spot/member/list；可结合 PageIndex、PageSize、Keywords、AuditingState、IsExpired 等筛选。",
+        "responses": {
+          "200": {
+            "description": "成功，Data 由上游返回分页列表"
+          }
+        }
+      }
+    },
+    "/member/supply/addConfirm": {
+      "post": {
+        "tags": [
+          "supply"
+        ],
+        "summary": "发布供应产品",
+        "description": "转发 /supply/member/add。图片列表由 ImgList 转为 Pics；VideoKey 是七牛视频直传完成后的对象键，为可选字段。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "Title",
+                  "PT_ID",
+                  "ImgList"
+                ],
+                "properties": {
+                  "Title": {
+                    "type": "string",
+                    "example": "芝麻白"
+                  },
+                  "PT_ID": {
+                    "type": "integer",
+                    "example": 101
+                  },
+                  "ImgList": {
+                    "type": "string",
+                    "description": "逗号分隔的图片 URL",
+                    "example": "https://img.example.com/a.jpg"
+                  },
+                  "Description": {
+                    "type": "string",
+                    "example": "产品介绍"
+                  },
+                  "VideoKey": {
+                    "type": "string",
+                    "description": "视频对象键；为空则不绑定视频",
+                    "example": "supply-video/20260813/example.mp4"
+                  }
+                }
+              },
+              "example": {
+                "Title": "芝麻白",
+                "PT_ID": 101,
+                "ImgList": "https://img.example.com/a.jpg",
+                "Description": "产品介绍",
+                "VideoKey": "supply-video/20260813/example.mp4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "ID": {
+                          "type": "integer",
+                          "example": 10001
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/supply/deleteSupplyVideo": {
+      "post": {
+        "tags": [
+          "supply"
+        ],
+        "summary": "删除当前产品视频",
+        "description": "服务端按当前 Cookie 用户校验产品归属后软删除视频记录；成功后可重新上传。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ID"
+                ],
+                "properties": {
+                  "ID": {
+                    "type": "integer",
+                    "example": 10001
+                  }
+                }
+              },
+              "example": {
+                "ID": 10001
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/supply/editConfirm": {
+      "post": {
+        "tags": [
+          "supply"
+        ],
+        "summary": "修改供应产品",
+        "description": "转发 /supply/member/update。ID 必填；已有视频时，先删除旧视频才允许提交新的 VideoKey。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ID",
+                  "Title",
+                  "PT_ID",
+                  "ImgList"
+                ],
+                "properties": {
+                  "ID": {
+                    "type": "integer",
+                    "example": 10001
+                  },
+                  "Title": {
+                    "type": "string",
+                    "example": "芝麻白"
+                  },
+                  "PT_ID": {
+                    "type": "integer",
+                    "example": 101
+                  },
+                  "ImgList": {
+                    "type": "string",
+                    "example": "https://img.example.com/a.jpg"
+                  },
+                  "VideoKey": {
+                    "type": "string",
+                    "description": "新视频对象键，可选"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "成功"
+                    },
+                    "Data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/member/supply/list": {
       "get": {
         "tags": [
-          "供应管理"
+          "supply"
         ],
         "summary": "已审核通过的供应列表",
         "description": "固定追加 AuditingState=2。分页参数透传至 /supply/member/list；HasVideo 和 VideoUrl 仅代表已经转码和内容审核通过、可播放的视频。",
@@ -211,239 +510,10 @@
         }
       }
     },
-    "/member/supply/addConfirm": {
-      "post": {
-        "tags": [
-          "供应管理"
-        ],
-        "summary": "发布供应产品",
-        "description": "转发 /supply/member/add。图片列表由 ImgList 转为 Pics；VideoKey 是七牛视频直传完成后的对象键，为可选字段。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "Title",
-                  "PT_ID",
-                  "ImgList"
-                ],
-                "properties": {
-                  "Title": {
-                    "type": "string",
-                    "example": "芝麻白"
-                  },
-                  "PT_ID": {
-                    "type": "integer",
-                    "example": 101
-                  },
-                  "ImgList": {
-                    "type": "string",
-                    "description": "逗号分隔的图片 URL",
-                    "example": "https://img.example.com/a.jpg"
-                  },
-                  "Description": {
-                    "type": "string",
-                    "example": "产品介绍"
-                  },
-                  "VideoKey": {
-                    "type": "string",
-                    "description": "视频对象键；为空则不绑定视频",
-                    "example": "supply-video/20260813/example.mp4"
-                  }
-                }
-              },
-              "example": {
-                "Title": "芝麻白",
-                "PT_ID": 101,
-                "ImgList": "https://img.example.com/a.jpg",
-                "Description": "产品介绍",
-                "VideoKey": "supply-video/20260813/example.mp4"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "Code": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "Msg": {
-                      "type": "string",
-                      "example": "成功"
-                    },
-                    "Data": {
-                      "type": "object",
-                      "properties": {
-                        "ID": {
-                          "type": "integer",
-                          "example": 10001
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/member/supply/editConfirm": {
-      "post": {
-        "tags": [
-          "供应管理"
-        ],
-        "summary": "修改供应产品",
-        "description": "转发 /supply/member/update。ID 必填；已有视频时，先删除旧视频才允许提交新的 VideoKey。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "ID",
-                  "Title",
-                  "PT_ID",
-                  "ImgList"
-                ],
-                "properties": {
-                  "ID": {
-                    "type": "integer",
-                    "example": 10001
-                  },
-                  "Title": {
-                    "type": "string",
-                    "example": "芝麻白"
-                  },
-                  "PT_ID": {
-                    "type": "integer",
-                    "example": 101
-                  },
-                  "ImgList": {
-                    "type": "string",
-                    "example": "https://img.example.com/a.jpg"
-                  },
-                  "VideoKey": {
-                    "type": "string",
-                    "description": "新视频对象键，可选"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "Code": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "Msg": {
-                      "type": "string",
-                      "example": "成功"
-                    },
-                    "Data": {
-                      "type": "object"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/member/supply/supplyVideoToken": {
-      "post": {
-        "tags": [
-          "供应管理"
-        ],
-        "summary": "获取供应视频七牛上传凭证",
-        "description": "仅诚石通、石图宝、小程序会员可用。服务端取当前 Cookie 用户；凭证强制 100MB。客户端还应限制时长不超过 30 秒。支持 mp4、mov、avi、mkv、flv、wmv、webm、m4v。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "Extension"
-                ],
-                "properties": {
-                  "Extension": {
-                    "type": "string",
-                    "description": "视频扩展名",
-                    "example": "mp4"
-                  }
-                }
-              },
-              "example": {
-                "Extension": "mp4"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "Code": {
-                      "type": "integer",
-                      "example": 200
-                    },
-                    "Msg": {
-                      "type": "string",
-                      "example": "成功"
-                    },
-                    "Data": {
-                      "type": "object",
-                      "properties": {
-                        "token": {
-                          "type": "string",
-                          "description": "七牛上传 token"
-                        },
-                        "key": {
-                          "type": "string",
-                          "description": "需写入 VideoKey 的对象键"
-                        },
-                        "domain": {
-                          "type": "string",
-                          "description": "视频访问域名"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/member/supply/supplyVideoStatus": {
       "post": {
         "tags": [
-          "供应管理"
+          "supply"
         ],
         "summary": "查询供应视频状态",
         "description": "处理中、审核失败同样 has_video=true，用于禁止重复上传；只有 v_qiniu_examine_video=3 且 v_video_url 非空时可播放。",
@@ -520,13 +590,13 @@
         }
       }
     },
-    "/member/supply/deleteSupplyVideo": {
+    "/member/supply/supplyVideoToken": {
       "post": {
         "tags": [
-          "供应管理"
+          "supply"
         ],
-        "summary": "删除当前产品视频",
-        "description": "服务端按当前 Cookie 用户校验产品归属后软删除视频记录；成功后可重新上传。",
+        "summary": "获取供应视频七牛上传凭证",
+        "description": "仅诚石通、石图宝、小程序会员可用。服务端取当前 Cookie 用户；凭证强制 100MB。客户端还应限制时长不超过 30 秒。支持 mp4、mov、avi、mkv、flv、wmv、webm、m4v。",
         "requestBody": {
           "required": true,
           "content": {
@@ -534,17 +604,18 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "ID"
+                  "Extension"
                 ],
                 "properties": {
-                  "ID": {
-                    "type": "integer",
-                    "example": 10001
+                  "Extension": {
+                    "type": "string",
+                    "description": "视频扩展名",
+                    "example": "mp4"
                   }
                 }
               },
               "example": {
-                "ID": 10001
+                "Extension": "mp4"
               }
             }
           }
@@ -566,7 +637,21 @@
                       "example": "成功"
                     },
                     "Data": {
-                      "nullable": true
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "description": "七牛上传 token"
+                        },
+                        "key": {
+                          "type": "string",
+                          "description": "需写入 VideoKey 的对象键"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "视频访问域名"
+                        }
+                      }
                     }
                   }
                 }
@@ -575,105 +660,32 @@
           }
         }
       }
-    },
-    "/member/spot/list": {
-      "get": {
-        "tags": [
-          "其他模块"
-        ],
-        "summary": "现货列表",
-        "description": "代理 /spot/member/list；可结合 PageIndex、PageSize、Keywords、AuditingState、IsExpired 等筛选。",
-        "responses": {
-          "200": {
-            "description": "成功，Data 由上游返回分页列表"
-          }
-        }
-      }
-    },
-    "/member/album/pic_list": {
-      "post": {
-        "tags": [
-          "其他模块"
-        ],
-        "summary": "图册图片列表",
-        "description": "代理 /album/member/getAlbumnPicList，通常按图册 ID 查询。",
-        "responses": {
-          "200": {
-            "description": "成功，Data 为图册图片数据"
-          }
-        }
-      }
-    },
-    "/member/notifications/list": {
-      "get": {
-        "tags": [
-          "其他模块"
-        ],
-        "summary": "会员通知列表",
-        "description": "代理 /notifications/member/list；支持分页参数。",
-        "responses": {
-          "200": {
-            "description": "成功，Data 为通知分页数据"
-          }
-        }
-      }
-    },
-    "/member/order/query": {
-      "post": {
-        "tags": [
-          "其他模块"
-        ],
-        "summary": "支付宝订单查询",
-        "description": "代理 /order/member/aliPayQuery。",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "Order_ID": {
-                    "type": "string",
-                    "example": "202608130001"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功，Data 为上游支付状态"
-          }
-        }
-      }
-    },
-    "/member/common/getqiniutoken": {
-      "get": {
-        "tags": [
-          "其他模块"
-        ],
-        "summary": "获取图片七牛上传凭证",
-        "description": "Auth 白名单接口，供 miniUpload 使用。供应视频必须使用 supplyVideoToken。",
-        "responses": {
-          "200": {
-            "description": "成功，返回图片上传 token"
-          }
-        }
-      }
     }
   },
   "tags": [
     {
-      "name": "会话与首页",
-      "description": "登录、菜单、首页。"
+      "name": "admin"
     },
     {
-      "name": "供应管理",
-      "description": "供应产品、分类和视频。"
+      "name": "album"
     },
     {
-      "name": "其他模块",
-      "description": "现货、图册、通知、订单等常用入口。"
+      "name": "common"
+    },
+    {
+      "name": "index"
+    },
+    {
+      "name": "notifications"
+    },
+    {
+      "name": "order"
+    },
+    {
+      "name": "spot"
+    },
+    {
+      "name": "supply"
     }
   ]
 }
