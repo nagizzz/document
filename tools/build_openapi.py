@@ -22,6 +22,7 @@ from urllib.parse import unquote
 
 SOURCE_ROOT = Path(r"D:\Code Repositories")
 OUTPUT_ROOT = Path(__file__).resolve().parent.parent / "openapi"
+PLACEHOLDER_REPOSITORIES = {"ads_api"}
 COMPONENT_REF = re.compile(r"^#/components/([^/]+)/(.+)$")
 PRIVATE_IP = re.compile(r"\b(?:10(?:\.\d{1,3}){3}|127(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})\b")
 APIPOST_PATH_PREFIX = re.compile(r"^\{\{[^{}]+\}\}")
@@ -212,6 +213,31 @@ def build(force: bool = False) -> dict:
             }
         )
         index["warnings"].extend(f"{repository}: {warning}" for warning in warnings)
+
+    for repository in sorted(PLACEHOLDER_REPOSITORIES - set(grouped)):
+        output_name = f"{repository}.openapi.json"
+        output_path = OUTPUT_ROOT / output_name
+        placeholder = {
+            "openapi": "3.0.3",
+            "info": {
+                "title": f"{repository} - 待发布接口文档",
+                "version": "2026-08-19",
+                "description": "此文件为固定 Raw 地址占位。当前尚无已确认发布的前端接口文档；后续由聚合流程自动覆盖。",
+            },
+            "tags": [],
+            "paths": {},
+        }
+        output_path.write_text(json.dumps(placeholder, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        expected_outputs.add(output_path)
+        index["repositories"].append(
+            {
+                "repository": repository,
+                "file": output_name,
+                "sourceFileCount": 0,
+                "pathCount": 0,
+                "sha256": hashlib.sha256(output_path.read_bytes()).hexdigest(),
+            }
+        )
 
     for old_output in OUTPUT_ROOT.glob("*.openapi.json"):
         if old_output not in expected_outputs:
