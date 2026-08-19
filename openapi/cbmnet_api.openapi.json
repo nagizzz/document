@@ -6,187 +6,6 @@
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
-    "/video/supply/token": {
-      "post": {
-        "summary": "获取七牛直传凭证",
-        "description": "返回短期上传 token 与指定 key。客户端使用七牛 SDK 直传，不得持有 AK/SK。供应产品视频上传凭证内置 100MB 文件大小上限，直传端不可绕过。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "extension"
-                ],
-                "properties": {
-                  "extension": {
-                    "type": "string",
-                    "description": "视频扩展名，仅支持 mp4、mov、avi、mkv、flv、wmv、webm、m4v",
-                    "example": "mp4"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
-                },
-                "example": {
-                  "Code": 200,
-                  "Msg": "获取上传 token 成功",
-                  "Data": {
-                    "token": "<qiniu-upload-token>",
-                    "key": "supply-video/20260812/example.mp4",
-                    "domain": "https://video.stone365.com/"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/video/supply/save": {
-      "post": {
-        "summary": "绑定视频至供应产品",
-        "description": "一个产品仅允许一个未删除视频。产品先保存或七牛回调先到均可处理；供应视频只在转码完成后发起内容审核。",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "product_id",
-                  "video_key"
-                ],
-                "properties": {
-                  "product_id": {
-                    "type": "integer",
-                    "example": 10001
-                  },
-                  "video_key": {
-                    "type": "string",
-                    "example": "supply-video/20260812/example.mp4"
-                  },
-                  "uid": {
-                    "type": "integer",
-                    "example": 746675
-                  },
-                  "title": {
-                    "type": "string",
-                    "example": "测试石材"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/video/supply/status": {
-      "post": {
-        "summary": "查询产品视频绑定状态",
-        "description": "处理、审核失败的视频同样返回 has_video=true，用于禁止重复上传。",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "product_id"
-                ],
-                "properties": {
-                  "product_id": {
-                    "type": "integer",
-                    "example": 10001
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
-                },
-                "example": {
-                  "Code": 200,
-                  "Msg": "获取成功",
-                  "Data": {
-                    "has_video": true,
-                    "video": {
-                      "v_id": 1,
-                      "v_qiniu_video_type": 1,
-                      "v_qiniu_examine_video": 3
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/video/supply/delete": {
-      "post": {
-        "summary": "删除产品视频",
-        "description": "软删除视频记录，之后可重新上传；不物理删除七牛文件，避免影响异步转码或审核任务。",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "product_id"
-                ],
-                "properties": {
-                  "product_id": {
-                    "type": "integer",
-                    "example": 10001
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "成功",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/video/supply/batch": {
       "post": {
         "summary": "批量获取可播放视频地址",
@@ -208,6 +27,17 @@
                     "example": [
                       10001,
                       10002
+                    ],
+                    "description": "product_ids 字段。"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "product_ids": [
+                      10001,
+                      10002
                     ]
                   }
                 }
@@ -217,29 +47,485 @@
         },
         "responses": {
           "200": {
-            "description": "成功",
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/doc01____________openapi__Envelope"
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "获取成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "产品 ID 到可播放视频 URL 的映射；仅返回未删除、转码完成且审核通过的视频。",
+                      "example": {
+                        "10001": "https://video.example.com/supply-video/example.mp4"
+                      },
+                      "additionalProperties": {
+                        "type": "string",
+                        "description": "视频访问 URL。",
+                        "example": "https://video.example.com/supply-video/example.mp4"
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "获取成功",
+                    "Data": {
+                      "10001": "https://video.example.com/supply-video/example.mp4"
+                    }
+                  }
                 },
-                "example": {
-                  "Code": 200,
-                  "Msg": "获取成功",
-                  "Data": {
-                    "10001": "https://video.stone365.com/supply-video/20260812/example.mp4"
+                "examples": {
+                  "success": {
+                    "value": {
+                      "Code": 200,
+                      "Msg": "获取成功",
+                      "Data": {
+                        "10001": "https://video.example.com/supply-video/example.mp4"
+                      }
+                    }
                   }
                 }
               }
             }
           }
-        }
+        },
+        "tags": [
+          "video"
+        ]
+      }
+    },
+    "/video/supply/delete": {
+      "post": {
+        "summary": "删除产品视频",
+        "description": "软删除视频记录，之后可重新上传；不物理删除七牛文件，避免影响异步转码或审核任务。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_id"
+                ],
+                "properties": {
+                  "product_id": {
+                    "type": "integer",
+                    "example": 10001,
+                    "description": "product_id 字段。"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "product_id": 10001
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "删除成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "删除成功时为 null。",
+                      "nullable": true,
+                      "example": null
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "删除成功",
+                    "Data": null
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "Code": 200,
+                      "Msg": "删除成功",
+                      "Data": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "video"
+        ]
+      }
+    },
+    "/video/supply/save": {
+      "post": {
+        "summary": "绑定视频至供应产品",
+        "description": "一个产品仅允许一个未删除视频。产品先保存或七牛回调先到均可处理；供应视频只在转码完成后发起内容审核。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_id",
+                  "video_key"
+                ],
+                "properties": {
+                  "product_id": {
+                    "type": "integer",
+                    "example": 10001,
+                    "description": "product_id 字段。"
+                  },
+                  "video_key": {
+                    "type": "string",
+                    "example": "supply-video/20260812/example.mp4",
+                    "description": "video_key 字段。"
+                  },
+                  "uid": {
+                    "type": "integer",
+                    "example": 746675,
+                    "description": "uid 字段。"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "测试石材",
+                    "description": "title 字段。"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "product_id": 10001,
+                    "video_key": "supply-video/20260812/example.mp4",
+                    "uid": 746675,
+                    "title": "测试石材"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "供应视频创建成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "新建的视频记录。",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "视频记录 ID。",
+                          "example": 1
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "供应视频创建成功",
+                    "Data": {
+                      "id": 1
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "Code": 200,
+                      "Msg": "供应视频创建成功",
+                      "Data": {
+                        "id": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "video"
+        ]
+      }
+    },
+    "/video/supply/status": {
+      "post": {
+        "summary": "查询产品视频绑定状态",
+        "description": "处理、审核失败的视频同样返回 has_video=true，用于禁止重复上传。",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_id"
+                ],
+                "properties": {
+                  "product_id": {
+                    "type": "integer",
+                    "example": 10001,
+                    "description": "product_id 字段。"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "product_id": 10001
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "获取成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "产品视频绑定状态。",
+                      "properties": {
+                        "has_video": {
+                          "type": "boolean",
+                          "description": "是否存在未删除的视频记录；处理中或审核失败时也为 true。",
+                          "example": true
+                        },
+                        "video": {
+                          "type": "object",
+                          "example": "示例值",
+                          "description": "已绑定的视频记录；未绑定时为 null。",
+                          "nullable": true,
+                          "properties": {
+                            "v_video_url": {
+                              "type": "string",
+                              "description": "视频访问地址。",
+                              "example": "https://video.example.com/supply-video/example.mp4"
+                            },
+                            "v_qiniu_video_type": {
+                              "type": "integer",
+                              "description": "七牛转码状态标记。",
+                              "example": 1
+                            },
+                            "v_qiniu_examine_video": {
+                              "type": "integer",
+                              "description": "七牛内容审核状态，3 表示通过。",
+                              "example": 3
+                            },
+                            "v_id": {
+                              "type": "integer",
+                              "description": "视频记录 ID。",
+                              "example": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "获取成功",
+                    "Data": {
+                      "has_video": true,
+                      "video": {
+                        "v_video_url": "https://video.example.com/supply-video/example.mp4",
+                        "v_qiniu_video_type": 1,
+                        "v_qiniu_examine_video": 3,
+                        "v_id": 1
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "Code": 200,
+                      "Msg": "获取成功",
+                      "Data": {
+                        "has_video": true,
+                        "video": {
+                          "v_video_url": "https://video.example.com/supply-video/example.mp4",
+                          "v_qiniu_video_type": 1,
+                          "v_qiniu_examine_video": 3,
+                          "v_id": 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "video"
+        ]
+      }
+    },
+    "/video/supply/token": {
+      "post": {
+        "summary": "获取七牛直传凭证",
+        "description": "返回短期上传 token 与指定 key。客户端使用七牛 SDK 直传，不得持有 AK/SK。供应产品视频上传凭证内置 100MB 文件大小上限，直传端不可绕过。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "extension"
+                ],
+                "properties": {
+                  "extension": {
+                    "type": "string",
+                    "description": "视频扩展名，仅支持 mp4、mov、avi、mkv、flv、wmv、webm、m4v",
+                    "example": "mp4"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "extension": "mp4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "获取上传 token 成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "七牛直传凭证。",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "description": "建议上传使用的对象 key。",
+                          "example": "supply-video/20260819/example.mp4"
+                        },
+                        "domain": {
+                          "type": "string",
+                          "description": "视频访问域名。",
+                          "example": "https://video.example.com/"
+                        },
+                        "token": {
+                          "type": "string",
+                          "description": "七牛上传 token。",
+                          "example": "qiniu-upload-token"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "获取上传 token 成功",
+                    "Data": {
+                      "key": "supply-video/20260819/example.mp4",
+                      "domain": "https://video.example.com/",
+                      "token": "qiniu-upload-token"
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "Code": 200,
+                      "Msg": "获取上传 token 成功",
+                      "Data": {
+                        "key": "supply-video/20260819/example.mp4",
+                        "domain": "https://video.example.com/",
+                        "token": "qiniu-upload-token"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "video"
+        ]
       }
     },
     "/token/wechat": {
       "post": {
         "tags": [
-          "凭证认证类接口"
+          "voucher"
         ],
         "summary": "按 type 获取微信公众号 access_token",
         "description": "用于前端或中间层按业务类型获取微信基础接口 access_token。当前仅支持 type=cement_project，对应水泥项目通公众号。后续如新增其他公众号或项目，只需在 config/wechat.php 的 token_list 中追加配置，无需改接口逻辑。\n\n关键规则：\n1. type 为必填字段，当前可用值为 cement_project。\n2. 当前 type=cement_project 映射的公众号为“水泥项目通公众号”。\n3. 返回的 token 为微信官方 access_token，expires_in 为微信返回的秒数，前端或调用方应按 expires_in 做缓存，不要每次页面刷新都重复请求。\n4. 微信官方接口可能受 IP 白名单限制；如果公众号后台开启了白名单而当前服务出口 IP 未加入，微信会返回类似 40164 invalid ip 的错误。\n5. 当微信返回 errcode 或未返回 access_token 时，接口会直接返回失败信息。",
@@ -257,6 +543,13 @@
                     "type": "string",
                     "description": "微信业务类型。当前固定传 cement_project，详见上方说明。",
                     "example": "cement_project"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "type": "cement_project"
                   }
                 }
               }
@@ -280,78 +573,72 @@
         },
         "responses": {
           "200": {
-            "description": "请求成功，业务是否成功以返回体中的 Code 判断。",
+            "description": "请求处理结果。Code 为 200 表示成功；其余业务状态码表示参数、资源或处理错误。",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "Data": {
-                      "type": "object",
-                      "nullable": true,
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "description": "本次命中的微信类型，便于前端确认当前 token 来源。",
-                          "example": "cement_project"
-                        },
-                        "name": {
-                          "type": "string",
-                          "description": "当前 type 对应的配置名称，用于调试、日志或管理端展示。",
-                          "example": "水泥项目通公众号"
-                        },
-                        "token": {
-                          "type": "string",
-                          "description": "微信官方返回的 access_token。只有 Code=200 时才会返回。前端应缓存并在失效前复用。",
-                          "example": "42_abcdefg1234567890"
-                        },
-                        "expires_in": {
-                          "type": "integer",
-                          "description": "token 有效期，单位秒。微信官方通常返回 7200。前端或调用方应以该值作为缓存失效时间参考。",
-                          "example": 7200
-                        }
-                      }
-                    },
                     "Code": {
                       "type": "integer",
-                      "description": "业务状态码。200 表示成功；400 表示 type 不存在、微信返回 errcode 等业务失败；500 表示配置不完整或返回解析失败。",
+                      "description": "业务状态码。",
                       "example": 200
                     },
                     "Msg": {
                       "type": "string",
-                      "description": "业务提示信息。成功时固定为“获取微信token成功”；失败时返回具体错误原因。",
+                      "description": "结果说明。",
                       "example": "获取微信token成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "微信公众号 access_token 信息。",
+                      "nullable": true,
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "description": "命中的微信业务类型。",
+                          "example": "cement_project"
+                        },
+                        "expires_in": {
+                          "type": "integer",
+                          "description": "有效期，单位秒。",
+                          "example": 7200
+                        },
+                        "token": {
+                          "type": "string",
+                          "description": "微信官方 access_token。",
+                          "example": "42_abcdefg1234567890"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "公众号配置名称。",
+                          "example": "水泥项目通公众号"
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "获取微信token成功",
+                    "Data": {
+                      "type": "cement_project",
+                      "expires_in": 7200,
+                      "token": "42_abcdefg1234567890",
+                      "name": "水泥项目通公众号"
                     }
                   }
                 },
                 "examples": {
                   "success": {
-                    "summary": "成功示例",
                     "value": {
+                      "Code": 200,
+                      "Msg": "获取微信token成功",
                       "Data": {
                         "type": "cement_project",
-                        "name": "水泥项目通公众号",
+                        "expires_in": 7200,
                         "token": "42_abcdefg1234567890",
-                        "expires_in": 7200
-                      },
-                      "Code": 200,
-                      "Msg": "获取微信token成功"
-                    }
-                  },
-                  "invalidType": {
-                    "summary": "type 不存在",
-                    "value": {
-                      "Data": null,
-                      "Code": 400,
-                      "Msg": "未配置对应的微信类型"
-                    }
-                  },
-                  "wechatInvalidIp": {
-                    "summary": "微信 IP 白名单限制",
-                    "value": {
-                      "Data": null,
-                      "Code": 400,
-                      "Msg": "invalid ip 115.196.55.159 ipv6 ::ffff:115.196.55.159, not in whitelist rid: xxxxxxxxxxxx"
+                        "name": "水泥项目通公众号"
+                      }
                     }
                   }
                 }
@@ -364,31 +651,12 @@
   },
   "tags": [
     {
-      "name": "凭证认证类接口"
+      "name": "video",
+      "description": "对应 app/video/controller/SupplyController。"
+    },
+    {
+      "name": "voucher",
+      "description": "对应 app/voucher/controller/TokenController。"
     }
-  ],
-  "components": {
-    "schemas": {
-      "doc01____________openapi__Envelope": {
-        "type": "object",
-        "required": [
-          "Code",
-          "Msg"
-        ],
-        "properties": {
-          "Code": {
-            "type": "integer",
-            "example": 200
-          },
-          "Msg": {
-            "type": "string",
-            "example": "获取成功"
-          },
-          "Data": {
-            "description": "接口业务数据"
-          }
-        }
-      }
-    }
-  }
+  ]
 }

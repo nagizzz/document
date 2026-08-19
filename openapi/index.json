@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T10:36:51.363568+08:00",
+  "generatedAt": "2026-08-19T11:10:21.125741+08:00",
   "sourceRoot": "D:\\Code Repositories",
   "repositories": [
     {
@@ -7,14 +7,14 @@
       "file": "ads_api.openapi.json",
       "sourceFileCount": 40,
       "pathCount": 40,
-      "sha256": "3cedcbc3a67d1f7606c6518521423ba6e07f955fecc2fabfaf82082d7c4dffdb"
+      "sha256": "0a23f11e2ecdea9e0f8374b3f43ded10a4c97a624da8c619847d278c6cf6d243"
     },
     {
       "repository": "cbmnet_api",
       "file": "cbmnet_api.openapi.json",
-      "sourceFileCount": 2,
+      "sourceFileCount": 6,
       "pathCount": 6,
-      "sha256": "7d4fb1a6e73cd0791c4e7e7897d5418bc44f2af8a3292d08c1d4a2d3f45391cf"
+      "sha256": "a808a0403d98f60dba12d96328a842ed63928441bb811dfb2ec71d74ab3e6a64"
     },
     {
       "repository": "ccement_enterprise_api",
