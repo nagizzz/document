@@ -6,7 +6,11 @@ pushd "%ROOT%"
 
 where py >nul 2>nul
 if not errorlevel 1 (
-    py -3 tools\build_openapi.py --build-only
+    if "%~1"=="" (
+        py -3 tools\build_openapi.py --build-only
+    ) else (
+        py -3 tools\build_openapi.py --build-only --source-root "%~1"
+    )
 ) else (
     where python >nul 2>nul
     if errorlevel 1 (
@@ -15,7 +19,11 @@ if not errorlevel 1 (
         pause
         exit /b 1
     )
-    python tools\build_openapi.py --build-only
+    if "%~1"=="" (
+        python tools\build_openapi.py --build-only
+    ) else (
+        python tools\build_openapi.py --build-only --source-root "%~1"
+    )
 )
 
 if errorlevel 1 (

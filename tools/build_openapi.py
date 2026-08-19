@@ -11,6 +11,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import re
 import sys
 import threading
@@ -20,7 +21,10 @@ from pathlib import Path
 from urllib.parse import unquote
 
 
-SOURCE_ROOT = Path(r"D:\Code Repositories")
+# Priority: --source-root > OPENAPI_SOURCE_ROOT > legacy default.
+# A colleague can therefore keep both the project repository and this
+# publication repository anywhere on disk.
+SOURCE_ROOT = Path(os.environ.get("OPENAPI_SOURCE_ROOT", r"D:\Code Repositories"))
 OUTPUT_ROOT = Path(__file__).resolve().parent.parent / "openapi"
 PLACEHOLDER_REPOSITORIES = {"ads_api"}
 COMPONENT_REF = re.compile(r"^#/components/([^/]+)/(.+)$")
@@ -178,7 +182,7 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
     return merged, warnings
 
 
-def build(force: bool = False) -> dict:
+def build(force: bool = False, preserve_existing_outputs: bool = False) -> dict:
     global LAST_FINGERPRINT
     files = source_files()
     current_fingerprint = fingerprint(files)
@@ -190,20 +194,42 @@ def build(force: bool = False) -> dict:
     for repository, path in files:
         grouped.setdefault(repository, []).append(path)
 
+    previous_repositories: list[dict[str, object]] = []
+    if preserve_existing_outputs and (OUTPUT_ROOT / "index.json").is_file():
+        try:
+            previous_index = json.loads((OUTPUT_ROOT / "index.json").read_text(encoding="utf-8"))
+            previous_repositories = [
+                item
+                for item in previous_index.get("repositories", [])
+                if isinstance(item, dict) and isinstance(item.get("repository"), str)
+            ]
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            pass
+
     index: dict[str, object] = {
         "generatedAt": datetime.now(timezone.utc).astimezone().isoformat(),
         "sourceRoot": str(SOURCE_ROOT),
-        "repositories": [],
+        "repositories": previous_repositories,
         "warnings": [],
     }
     expected_outputs: set[Path] = {OUTPUT_ROOT / "index.json"}
+    if preserve_existing_outputs:
+        expected_outputs.update(OUTPUT_ROOT.glob("*.openapi.json"))
+
+    def replace_index_repository(item: dict[str, object]) -> None:
+        repository = item["repository"]
+        index["repositories"] = [
+            previous for previous in index["repositories"] if previous.get("repository") != repository
+        ]
+        index["repositories"].append(item)
+
     for repository, documents in grouped.items():
         merged, warnings = merge_repository(repository, documents)
         output_name = f"{repository}.openapi.json"
         output_path = OUTPUT_ROOT / output_name
         output_path.write_text(json.dumps(merged, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         expected_outputs.add(output_path)
-        index["repositories"].append(
+        replace_index_repository(
             {
                 "repository": repository,
                 "file": output_name,
@@ -229,7 +255,7 @@ def build(force: bool = False) -> dict:
         }
         output_path.write_text(json.dumps(placeholder, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         expected_outputs.add(output_path)
-        index["repositories"].append(
+        replace_index_repository(
             {
                 "repository": repository,
                 "file": output_name,
@@ -239,9 +265,10 @@ def build(force: bool = False) -> dict:
             }
         )
 
-    for old_output in OUTPUT_ROOT.glob("*.openapi.json"):
-        if old_output not in expected_outputs:
-            old_output.unlink()
+    if not preserve_existing_outputs:
+        for old_output in OUTPUT_ROOT.glob("*.openapi.json"):
+            if old_output not in expected_outputs:
+                old_output.unlink()
     (OUTPUT_ROOT / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     LAST_FINGERPRINT = current_fingerprint
     return index
@@ -269,10 +296,19 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=8787)
     parser.add_argument("--build-only", action="store_true")
+    parser.add_argument(
+        "--source-root",
+        help="Project repository or parent directory to scan for 项目资料库/前端接口文档. "
+        "Overrides OPENAPI_SOURCE_ROOT and the legacy default.",
+    )
     args = parser.parse_args()
 
+    global SOURCE_ROOT
+    if args.source_root:
+        SOURCE_ROOT = Path(args.source_root).expanduser().resolve()
+
     with LOCK:
-        index = build(force=True)
+        index = build(force=True, preserve_existing_outputs=bool(args.source_root))
     if args.build_only:
         print(json.dumps(index, ensure_ascii=False, indent=2))
         return 0
