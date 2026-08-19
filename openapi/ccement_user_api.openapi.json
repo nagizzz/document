@@ -1,0 +1,1259 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ccement_user_api - APIPOST 聚合接口文档",
+    "version": "2026.08.19",
+    "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
+  },
+  "paths": {
+    "/home/app/xcxProductLists": {
+      "get": {
+        "tags": [
+          "home"
+        ],
+        "summary": "获取小程序商品列表",
+        "description": "按商品分类返回当前可售的小程序商品。\n\n## 适用页面\n- 小程序会员商品页\n- 虚拟支付前置商品选择页\n- 小程序首页会员购买弹层\n\n## 关键规则\n1. type 不传默认按 3 处理。\n2. 只接受 3,4,5,6,7,8,9,10,11,12,13,14,16。\n3. 商品未到起售时间或已过停售时间时，后端会自动过滤。\n4. between_discount_date=true 时，price 为活动价；numeric_price 仍是原配置基准价格。\n5. Code=204 仅表示该分类暂无可售商品，不表示系统报错。\n6. 测试版虚拟支付商品默认不返回；只有传 `include_test_products=1` 且 `enable_xpay_test_products=true` 时才会一并返回。\n7. 当 `enable_xpay_test_products=false` 时，即使传 `include_test_products=1`，测试版虚拟支付商品也会继续隐藏。\n\n## type 取值说明\n- 3=精选会员，返回 SNJXHY01 等精选商品\n- 4=企业通会员，返回 hqt_cxc_company_year\n- 5=行情通小程序会员；默认返回正式年卡与月卡，传 `include_test_products=1` 时额外返回 hqt_cxc_vip_year_cs\n- 6=联合会员，代码保留分类但当前 productIds 为空，通常返回空列表\n- 7=水泥百事通会员，返回 SNTHY01\n- 8=水泥数据会员，返回 hqt_cxc_data_2months、hqt_cxc_data_year\n- 9=混凝土行情通会员；默认返回 hnt_hqt_cxc_vip_year，传 `include_test_products=1` 时额外返回 hnt_cxc_vip_year_cs\n- 10=数字新能源光伏行情通会员，返回虚拟支付道具 price_year\n- 11=百事通小程序项目通会员；默认返回 xmt_cxc_svip_year，传 `include_test_products=1` 时额外返回 xmt_svip_year\n- 12=数字新能源项目通会员，返回 bid_2months、bid_1year\n- 13=数字新能源电站会员；默认返回 powerstation_3months，传 `include_test_products=1` 时额外返回 cespowerstation_3\n- 14=水泥购项目通会员，返回 SNGXMTHY01、SNGXMTHY02、SNGXMTHY03\n- 16=采购通会员，返回 hqt_cxc_CGT_year\n\n前端必须按业务场景传明确分类，不能只根据页面文案猜数字。",
+        "operationId": "xcxProductLists",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "商品分类，默认 3；详细取值见上方 type 取值说明。",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                16
+              ],
+              "default": 3,
+              "example": 5
+            }
+          },
+          {
+            "name": "include_test_products",
+            "in": "query",
+            "required": false,
+            "description": "是否返回测试商品。默认 0 不返回；仅当传 1 且后端测试商品开关仍开启时，才会把测试版虚拟支付商品一起返回。",
+            "schema": {
+              "type": "integer",
+              "enum": [
+                0,
+                1
+              ],
+              "default": 0,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "获取小程序产品列表成功"
+                    },
+                    "Data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "description": "单个商品对象。推荐前端直接使用 product_id、product_name、price、original_price、time_description、dynamic_button 等字段拼卡片。",
+                        "properties": {
+                          "product_id": {
+                            "type": "string",
+                            "description": "商品 ID。用于下单、点击跳转和埋点标识。"
+                          },
+                          "product_name": {
+                            "type": "string",
+                            "description": "商品名称，适合卡片主标题。"
+                          },
+                          "group_name": {
+                            "type": "string",
+                            "description": "商品分组名称，可作为副标题或分区标题。"
+                          },
+                          "original_price": {
+                            "type": "string",
+                            "description": "格式化后的原价字符串，适合直接展示划线价。"
+                          },
+                          "numeric_original_price": {
+                            "type": "number",
+                            "description": "原价数字版，适合金额比较或排序。"
+                          },
+                          "price": {
+                            "type": "string",
+                            "description": "当前展示售价。命中优惠期时，这里返回优惠价。\n兼容说明：实际返回可能存在历史分支；此处展示前端默认处理结构。"
+                          },
+                          "numeric_price": {
+                            "type": "number",
+                            "description": "配置中的基准价格数字，不一定等于活动展示价。"
+                          },
+                          "year": {
+                            "type": "integer",
+                            "description": "时长中的年。"
+                          },
+                          "month": {
+                            "type": "integer",
+                            "description": "时长中的月。"
+                          },
+                          "week": {
+                            "type": "integer",
+                            "description": "时长中的周。"
+                          },
+                          "day": {
+                            "type": "integer",
+                            "description": "时长中的天。"
+                          },
+                          "between_discount_date": {
+                            "type": "boolean",
+                            "description": "是否处于优惠期。true 表示 price 已切到优惠价。"
+                          },
+                          "discount_start_date": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "优惠开始时间。无活动时可能为空。"
+                          },
+                          "discount_end_date": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "优惠结束时间。无活动时可能为空。"
+                          },
+                          "tag": {
+                            "type": "string",
+                            "description": "标签文案，如限时优惠、推荐。"
+                          },
+                          "price_tips": {
+                            "type": "string",
+                            "description": "价格补充说明。"
+                          },
+                          "scribing_price": {
+                            "type": "string",
+                            "description": "划线价补充文案。"
+                          },
+                          "time_description": {
+                            "type": "string",
+                            "description": "时长展示文案，如 1年有效。"
+                          },
+                          "dynamic_button": {
+                            "type": "string",
+                            "description": "按钮文案，如立即开通、续费升级。"
+                          },
+                          "detail_tag": {
+                            "type": "string",
+                            "description": "详情标签或补充角标。"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "返回可售商品",
+                    "value": {
+                      "Code": 200,
+                      "Msg": "获取小程序产品列表成功",
+                      "Data": [
+                        {
+                          "product_id": "hqt_cxc_vip_year",
+                          "product_name": "行情通小程序会员",
+                          "group_name": "行情通小程序会员",
+                          "original_price": "699",
+                          "numeric_original_price": 699,
+                          "price": 499,
+                          "numeric_price": 699,
+                          "year": 1,
+                          "month": 0,
+                          "week": 0,
+                          "day": 0,
+                          "between_discount_date": true,
+                          "discount_start_date": "2026-05-01 00:00:00",
+                          "discount_end_date": "2026-05-31 23:59:59",
+                          "tag": "限时优惠",
+                          "price_tips": "首屏展示价",
+                          "scribing_price": "原价699元",
+                          "time_description": "1年有效",
+                          "dynamic_button": "立即开通",
+                          "detail_tag": "推荐"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "当前分类无可售商品",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 204,
+                  "Msg": "获取小程序产品列表成功",
+                  "Data": []
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Msg": "产品分类值不正确",
+                  "Data": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/createorder": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "预创建订单",
+        "description": "已登录用户建单接口。支付前先创建待支付订单，返回 order_sn 作为后续 outTradeNo。\n\n## 关键规则\n1. uid 必须为真实注册用户。\n2. openid 必填，后端会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. env 不传默认 0；建单、getPaySig、queryOrder、微信支付请求必须使用同一环境。\n4. pay_type 仅支持 2=微信支付、3=Apple 内购。\n5. order_source 不接受前端传值，由后端按 productId 自动映射。\n6. order_amount 取商品 price，original_price 取商品 original_price；回调发货时会以微信 query_order 返回的 paid_fee/order_fee 覆盖实付金额。\n7. 前端仍建议在 wx.requestVirtualPayment 的 attach 中传 uid=xxx；有预建订单时服务端以订单 u_id 为准，attach 仅作为无预建订单兜底。\n8. 当 `enable_xpay_test_products=false` 时，测试版商品不会出现在商品列表里，且 getPaySig、createOrder、createVisitorOrder 会拒绝测试商品；deliverNotify 对测试商品回调只记录后返回成功。\n\n## 支持的道具 ID（productId 取值）\n| productId | 商品名称 | 价格 | 小程序 |\n|---|---|---|---|\n| xmt_cxc_svip_year | 项目通高级版1年 | ¥3999 | 百事通小程序 |\n| xmt_svip_year | 项目通高级会员一年-测试版 | ¥3999 | 百事通小程序 |\n| hqt_cxc_vip_year | 行情通小程序会员1年 | ¥2988 | 行情通小程序 |\n| hqt_cxc_CGT_year | 采购通会员1年 | ¥399 | 行情通小程序 |\n| hqt_cxc_data_year | 水泥数据会员1年 | ¥6888 | 行情通小程序 |\n| hqt_cxc_data_2months | 水泥数据会员2个月 | ¥1388 | 行情通小程序 |\n| hqt_cxc_company_year | 企业通会员1年 | ¥1298 | 行情通小程序 |\n| hqt_cxc_DJGvip_month | 行情通-多晶硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GYGvip_month | 行情通-工业硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_SZvip_month | 行情通-水渣会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_BLvip_month | 行情通-玻璃会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_DCPvip_month | 行情通-电池片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GPvip_month | 行情通-硅片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_ZJvip_month | 行情通-组件会员1个月 | ¥49 | 行情通小程序 |\n| price_year | 数字新能源光伏行情通1年 | ¥2999 | 数字新能源小程序 |\n| powerstation_3months | 数字新能源电站通3个月 | ¥300 | 数字新能源小程序 |\n| bid_2months | 数字新能源项目通2个月 | ¥100 | 数字新能源小程序 |\n| bid_1year | 数字新能源项目通1年 | ¥399 | 数字新能源小程序 |\n| hnt_hqt_cxc_vip_year | 混凝土行情通会员1年 | ¥3799 | 混凝土行情通小程序 |\n| hnt_cxc_vip_year_cs | 混凝土行情通会员1年-测试版 | ¥3799 | 混凝土行情通小程序 |\n\n正式环境若已关闭测试商品开关，则上表中的两个测试版 productId 仅作为测试期留档，不应继续用于联调或上线调用。",
+        "operationId": "createOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "uid",
+                  "openid",
+                  "productId"
+                ],
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "用户 ID，必须为真实注册用户。"
+                  },
+                  "openid": {
+                    "type": "string",
+                    "description": "微信用户在当前小程序下的 OpenID。后端会保存到订单扩展参数，用于回调发货前查询微信订单。"
+                  },
+                  "productId": {
+                    "type": "string",
+                    "description": "微信虚拟支付道具 ID，例如 xmt_cxc_svip_year、hqt_cxc_vip_year、hqt_cxc_CGT_year、price_year、bid_1year。"
+                  },
+                  "pay_type": {
+                    "type": "integer",
+                    "default": 2,
+                    "description": "支付方式。2=微信支付，3=Apple 内购。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "微信虚拟支付环境。0=现网正式环境，1=沙箱环境；需与 getPaySig 和 wx.requestVirtualPayment 使用的 env 保持一致。"
+                  }
+                }
+              },
+              "example": {
+                "uid": "843388",
+                "openid": "oxxxxxxxxxxxxxxxxxxxxxxxx",
+                "productId": "xmt_cxc_svip_year",
+                "pay_type": 2,
+                "env": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "order_sn": {
+                          "type": "string",
+                          "description": "业务订单号，后续作为 outTradeNo 使用。"
+                        },
+                        "order_id": {
+                          "type": "integer",
+                          "description": "本地订单主键 ID。仅用于排查或后台追单，前端实际回查仍以 order_sn/outTradeNo 为主。"
+                        },
+                        "order_amount": {
+                          "type": "string",
+                          "description": "订单金额，单位元字符串。建单时取商品当前售价，不是分。"
+                        },
+                        "product_name": {
+                          "type": "string",
+                          "description": "商品名称，适合直接展示在支付确认或结果页。"
+                        }
+                      }
+                    },
+                    "Msg": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Data": {
+                    "order_sn": "20260422143012123456abcd",
+                    "order_id": 88888,
+                    "order_amount": "1",
+                    "product_name": "水泥网-项目通高级版"
+                  },
+                  "Msg": "订单创建成功"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Data": null,
+                  "Msg": "未知的商品ID：xxx"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/createvisitororder": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "预创建订单（访客模式）",
+        "description": "未登录用户建单接口。后端根据 openid + unionid 查找或注册游客账号，再创建待支付订单。\n\n## 关键规则\n1. 返回的 uid 必须由前端写入 attach，格式 uid={uid}，否则发货回调无法识别用户。\n2. openid/env/productId 会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. from 只影响游客注册逻辑，不影响 order_source。\n4. pay_type 仍只支持 2、3。\n5. productId 支持的道具 ID 与取值规则同 createOrder，详见 createOrder 接口说明。",
+        "operationId": "createVisitorOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "openid",
+                  "unionid",
+                  "productId"
+                ],
+                "properties": {
+                  "openid": {
+                    "type": "string",
+                    "description": "微信用户在当前小程序下的 OpenID。游客建单时用于定位或创建游客账号。"
+                  },
+                  "unionid": {
+                    "type": "string",
+                    "description": "微信开放平台 UnionID。后端会结合 openid 做游客身份识别与账号复用。"
+                  },
+                  "productId": {
+                    "type": "string",
+                    "description": "微信虚拟支付道具 ID，例如 xmt_cxc_svip_year、hqt_cxc_vip_year、hqt_cxc_CGT_year、price_year、bid_1year。"
+                  },
+                  "pay_type": {
+                    "type": "integer",
+                    "default": 2,
+                    "description": "2=微信支付，3=Apple 内购。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "微信虚拟支付环境。0=现网正式环境，1=沙箱环境；后端会保存到订单扩展参数，供回调查询微信订单使用。"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "来源标识，仅影响游客注册逻辑，不影响 order_source 映射。通常用于区分小程序入口、活动入口或特定注册来源。"
+                  }
+                }
+              },
+              "example": {
+                "openid": "oxxxxxxxxxxxxxxxxxxxxxxxx",
+                "unionid": "oxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                "productId": "xmt_cxc_svip_year",
+                "pay_type": 2,
+                "env": 0,
+                "from": "ccementbst_xcx"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "order_sn": {
+                          "type": "string"
+                        },
+                        "order_id": {
+                          "type": "integer"
+                        },
+                        "order_amount": {
+                          "type": "string"
+                        },
+                        "product_name": {
+                          "type": "string"
+                        },
+                        "uid": {
+                          "type": "string",
+                          "description": "游客账号 uid，前端必须写入 attach。"
+                        }
+                      }
+                    },
+                    "Msg": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Data": {
+                    "order_sn": "20260422143012123456abcd",
+                    "order_id": 88888,
+                    "order_amount": "1",
+                    "product_name": "水泥网-项目通高级版",
+                    "uid": "GUEST_XXXXXXXXXXXXX"
+                  },
+                  "Msg": "订单创建成功"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Data": null,
+                  "Msg": "unionid不能为空"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/delivernotify": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "发货回调",
+        "description": "微信服务器调用，非前端主动接口。支付成功后微信推送发货事件，后端完成权益开通。\n\n## 关键规则\n1. Event 固定为 xpay_goods_deliver_notify。\n2. 有预建订单时服务端以本地订单 u_id 和建单保存的 productId 为准；attach 仍建议传 uid=xxx，用于无预建订单兜底补单。\n3. 回调 GoodsInfo.ProductId 必须与预建订单保存的 productId 一致，同时本地订单 product_id 必须与商品映射一致。\n4. 服务端已兼容标准 JSON、表单嵌套、外层再次序列化 JSON 三类包体。\n5. 本地已付款订单会按幂等直接返回成功；待支付/待发货订单才会继续校验并发货。\n6. 发货前服务端会优先使用建单时保存的 openid/productId/env 调微信 xpay/query_order；微信侧 status=2（订单已经支付，待发货）或 status=3（订单发货中）时才会更新本地订单并开通权益。\n7. 金额以微信 query_order 返回的 paid_fee 优先、order_fee 兜底，必须与商品配置价格匹配；不再信任回调包体里的 GoodsInfo.ActualPrice。",
+        "operationId": "deliverNotify",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ToUserName": {
+                    "type": "string"
+                  },
+                  "Event": {
+                    "type": "string",
+                    "description": "固定为 xpay_goods_deliver_notify。"
+                  },
+                  "OpenId": {
+                    "type": "string"
+                  },
+                  "OutTradeNo": {
+                    "type": "string"
+                  },
+                  "Env": {
+                    "type": "integer"
+                  },
+                  "GoodsInfo": {
+                    "type": "object",
+                    "properties": {
+                      "ProductId": {
+                        "type": "string",
+                        "description": "微信虚拟支付道具 ID。服务端会据此反查本地商品并校验金额。"
+                      },
+                      "Quantity": {
+                        "type": "integer",
+                        "description": "购买数量。当前虚拟支付链路通常为 1。"
+                      },
+                      "ActualPrice": {
+                        "type": "integer",
+                        "description": "实际支付金额，单位分。"
+                      },
+                      "Attach": {
+                        "type": "string",
+                        "description": "格式 uid=xxx。"
+                      }
+                    }
+                  },
+                  "WeChatPayInfo": {
+                    "type": "object",
+                    "properties": {
+                      "MchOrderNo": {
+                        "type": "string",
+                        "description": "商户订单号，通常对应 outTradeNo/order_sn。"
+                      },
+                      "TransactionId": {
+                        "type": "string",
+                        "description": "微信支付交易流水号。支付成功后用于对账和发货日志追踪。"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "ToUserName": "gh_xxxxxx",
+                "Event": "xpay_goods_deliver_notify",
+                "OpenId": "oxxxxxxxxxxxxxxxxxxxxxxxx",
+                "OutTradeNo": "20260422143012123456abcd",
+                "Env": 0,
+                "GoodsInfo": {
+                  "ProductId": "xmt_cxc_svip_year",
+                  "Quantity": 1,
+                  "ActualPrice": 399900,
+                  "Attach": "uid=843388"
+                },
+                "WeChatPayInfo": {
+                  "MchOrderNo": "mch_xxxxxx",
+                  "TransactionId": "tx_xxxxxx"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "微信要求的成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ErrCode": {
+                      "type": "integer",
+                      "description": "微信回调处理结果。0 表示成功或无需重试；-1 表示临时失败，微信会按策略重试。",
+                      "example": 0
+                    },
+                    "ErrMsg": {
+                      "type": "string",
+                      "description": "回调处理结果说明。",
+                      "example": "ok"
+                    }
+                  }
+                },
+                "example": {
+                  "ErrCode": 0,
+                  "ErrMsg": "ok"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/getpaysig": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "获取支付签名",
+        "description": "前端将 wx.requestVirtualPayment 全量参数序列化为 signData 后调用本接口，获取 paySig。\n\n## 关键规则\n1. signData 必须与最终调用 wx.requestVirtualPayment 的内容完全一致，包括字段顺序。\n2. env=0 走现网，env=1 走沙箱。\n3. paySig 算法为 HMAC-SHA256(appKey, 'requestVirtualPayment' + '&' + signData)。",
+        "operationId": "getPaySig",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "uid",
+                  "signData"
+                ],
+                "properties": {
+                  "uid": {
+                    "type": "string",
+                    "description": "当前登录用户 UID。用于生成 paySig 前再次校验订单归属。"
+                  },
+                  "signData": {
+                    "type": "string",
+                    "description": "wx.requestVirtualPayment 全量参数的 JSON 字符串，必须与最终调用完全一致。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "0=现网，1=沙箱。"
+                  }
+                }
+              },
+              "example": {
+                "uid": "843388",
+                "signData": "{\"mode\":\"goods_payment\",\"offerId\":\"1450512918\",\"buyQuantity\":1,\"currencyType\":\"real_money\",\"platform\":\"android\",\"productId\":\"xmt_cxc_svip_year\",\"nonceStr\":\"abc123\",\"timeStamp\":1713600000,\"outTradeNo\":\"20260422143012123456abcd\",\"env\":0,\"attach\":\"uid=843388\"}",
+                "env": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "签名生成成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "paySig": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "Msg": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Data": {
+                    "paySig": "c37809f27c6d7fd1837ad2500a04512b66b34fd793a39a385fade56dca89a4b5"
+                  },
+                  "Msg": "签名生成成功"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Data": null,
+                  "Msg": "uid不能为空"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/queryorder": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "查询微信订单状态",
+        "description": "服务端按微信 query_order 文档查询微信侧订单状态，不再查询或合并本地订单。\n\n## 请求规则\n1. productId 必填，用于选择对应小程序 AppKey 与 access_token。\n2. openid 可选；前端传入时优先使用，未传时服务端会按 outTradeNo 从本地订单 order_extra_params.wechat_virtual_pay.openid 读取。\n3. outTradeNo 与 wxOrderId 至少传一个；优先使用 outTradeNo 作为微信请求体 order_id。\n4. env 可选；未传且 outTradeNo 对应订单保存了 env 时，优先使用订单保存的 env。\n\n## 微信订单状态 status\n0=订单初始化，1=订单创建成功，2=订单已经支付待发货，3=订单发货中，4=订单已发货，5=订单已经退款，6=订单已经关闭，7=订单退款失败，8=用户退款完成，9=回收广告金完成，10=分账回退完成。\n\n## 微信订单类型 order_type\n0=普通虚拟支付，1=普通退款，7=苹果 iOS 支付，8=苹果 iOS 退款。",
+        "operationId": "queryOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "productId"
+                ],
+                "properties": {
+                  "productId": {
+                    "type": "string",
+                    "description": "微信虚拟支付道具 ID，用于选择对应小程序配置。多小程序场景必传，否则服务端无法确定使用哪个 AppKey 与 access_token。"
+                  },
+                  "openid": {
+                    "type": "string",
+                    "description": "用户 openid。可选；前端传入时优先使用，未传时服务端按 outTradeNo 从本地订单扩展参数读取。"
+                  },
+                  "outTradeNo": {
+                    "type": "string",
+                    "description": "创建的业务订单号，对应微信 query_order 请求体 order_id。与 wxOrderId 至少传一个，优先使用 outTradeNo。"
+                  },
+                  "wxOrderId": {
+                    "type": "string",
+                    "description": "微信内部单号，对应微信 query_order 请求体 wx_order_id。当没有 outTradeNo 时使用。"
+                  },
+                  "env": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "微信虚拟支付环境。0=现网正式环境，1=沙箱环境。当前联调默认用 0。"
+                  }
+                }
+              },
+              "example": {
+                "productId": "hnt_hqt_cxc_vip_year",
+                "openid": "oAbcd1234567890",
+                "outTradeNo": "20260422143012123456abcd",
+                "env": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "wx_errcode": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "微信查询接口返回的错误码。仅当调用微信侧查询失败或返回异常时出现。"
+                        },
+                        "wx_errmsg": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "微信查询接口返回的错误信息。与 wx_errcode 配套，用于排查查询失败原因。"
+                        },
+                        "wx_order": {
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "status": {
+                              "type": "integer",
+                              "description": "当前状态。0=订单初始化，1=订单创建成功，2=订单已经支付待发货，3=订单发货中，4=订单已发货，5=订单已经退款，6=订单已经关闭，7=订单退款失败，8=用户退款完成，9=回收广告金完成，10=分账回退完成。"
+                            },
+                            "order_id": {
+                              "type": "string",
+                              "description": "创建的业务订单号。"
+                            },
+                            "order_fee": {
+                              "type": "integer",
+                              "description": "微信订单应付金额，单位分。"
+                            },
+                            "paid_fee": {
+                              "type": "integer",
+                              "description": "微信订单实付金额，单位分。未支付时通常为 0。"
+                            },
+                            "paid_time": {
+                              "type": "integer",
+                              "description": "微信侧支付完成时间，Unix 秒级时间戳。未支付时可能为空或 0。"
+                            },
+                            "order_type": {
+                              "type": "integer",
+                              "description": "订单类型。0=普通虚拟支付，1=普通退款，7=苹果 iOS 支付，8=苹果 iOS 退款。"
+                            },
+                            "left_fee": {
+                              "type": "integer",
+                              "description": "支付单经过退款后剩余金额，单位分。"
+                            },
+                            "env_type": {
+                              "type": "integer",
+                              "description": "微信返回的环境类型。1=现网，2=沙箱。"
+                            },
+                            "wx_order_id": {
+                              "type": "string",
+                              "description": "微信虚拟支付订单号。用于和微信侧工单或日志对账。"
+                            },
+                            "wxpay_order_id": {
+                              "type": "string",
+                              "description": "微信支付侧订单号。部分链路下可能与 wx_order_id 不同。"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "Msg": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "微信查询成功",
+                    "value": {
+                      "Code": 200,
+                      "Data": {
+                        "wx_errcode": 0,
+                        "wx_errmsg": "ok",
+                        "wx_order": {
+                          "order_id": "20260422143012123456abcd",
+                          "status": 2,
+                          "order_fee": 380000,
+                          "paid_fee": 380000,
+                          "paid_time": 1745300100,
+                          "env_type": 1,
+                          "wx_order_id": "wx_order_xxxxxx",
+                          "wxpay_order_id": "wxpay_order_xxxxxx"
+                        }
+                      },
+                      "Msg": "查询成功"
+                    }
+                  },
+                  "wechatError": {
+                    "summary": "微信返回失败",
+                    "value": {
+                      "Code": 200,
+                      "Data": {
+                        "wx_errcode": 268490002,
+                        "wx_errmsg": "请求参数字段错误",
+                        "wx_order": null
+                      },
+                      "Msg": "微信订单查询失败"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Msg": "uid不能为空",
+                  "Data": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/home/virtualpay/v2/refundnotify": {
+      "post": {
+        "tags": [
+          "home"
+        ],
+        "summary": "退款通知",
+        "description": "微信服务器调用，非前端主动接口。当前平台不支持退款，收到通知后仅记录日志，不做会员扣减。",
+        "operationId": "refundNotify",
+        "responses": {
+          "200": {
+            "description": "微信要求的成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ErrCode": {
+                      "type": "integer",
+                      "description": "退款通知处理结果。当前平台仅记录退款通知，固定返回 0 表示已接收。",
+                      "example": 0
+                    },
+                    "ErrMsg": {
+                      "type": "string",
+                      "description": "退款通知处理结果说明。",
+                      "example": "ok"
+                    }
+                  }
+                },
+                "example": {
+                  "ErrCode": 0,
+                  "ErrMsg": "ok"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/member/order/queryOrderList": {
+      "post": {
+        "tags": [
+          "member"
+        ],
+        "summary": "查询用户订单列表",
+        "description": "按用户维度分页查询主订单列表。\n\n## 适用页面\n- 个人中心订单列表页\n- 支付完成后的订单回查页\n- 后续继续支付入口判断\n\n## 查询规则\n1. 仅返回 is_delete=0 且 parent_id=0 的主订单。\n2. 默认按 create_time 倒序。\n3. order_state 支持单值、逗号串、多值 in 查询；空字符串、null、空数组视为不过滤。\n4. pay_type 支持逗号串拆分后做 in 查询。\n5. 当 order_source=1 且无数据时，返回 Code=200 + 空分页；其它来源无数据时返回 Code=204。\n\n## 筛选字段口径\n- order_state：0=已失效/已关闭，1=已支付/已完成，2=待支付，3=待发货\n- product_type：常见值 1=行情通/光伏价格类会员，2=地区订阅，3=大数据会员，5=精选会员，6=邀请礼包，7=联合会员礼包，8=企业通会员，9=大屏会员，18=建筑材料 VIP，19=水泥百事通会员，24=水泥数据/水泥观察会员，25=混凝土行情通，30=项目通会员，31=采购通会员；历史订单还可能出现 15=研究报告会员、16=线下产品、17=Pad 大屏、21=CementPLUS、22=CementPRO、23=石材价格会员、26=混凝土企业通\n- pay_type：0=聚合支付占位值，1=支付宝，2=微信，3=Apple 内购，6=微信 H5，7=汇付天下支付宝，8=汇付天下微信，10=PayPal，11=斗拱支付宝，12=斗拱微信，14=微信虚拟支付历史标识\n- order_source：1=行情通小程序，2=PC，3=App，4=微信内 H5/JSAPI 或电视触屏特定链路，5=通用订单 H5，6=普通 H5，10=水泥百事通小程序，11=英文站，13=水泥商城小程序，14=混凝土小程序，15=混凝土游客 PC，16=行情通游客 PC，17=数字新能源游客 PC，18=数字新能源小程序，20=水泥大数据桌面端",
+        "operationId": "queryOrderList",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "u_id"
+                ],
+                "properties": {
+                  "u_id": {
+                    "type": "string",
+                    "description": "用户 ID，必填。"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "页码，默认 1。"
+                  },
+                  "page_size": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "每页条数，默认 10。"
+                  },
+                  "order_state": {
+                    "type": "string",
+                    "description": "订单状态筛选。支持 1、1,2、[1,2] 等形式；详细取值见上方筛选字段口径。\n兼容说明：实际返回可能存在历史分支；此处展示前端默认处理结构。"
+                  },
+                  "product_id": {
+                    "type": "string",
+                    "description": "商品 ID 精确筛选。"
+                  },
+                  "product_type": {
+                    "type": "integer",
+                    "description": "商品类型筛选；详细取值见上方筛选字段口径。"
+                  },
+                  "product_name": {
+                    "type": "string",
+                    "description": "商品名称模糊查询。"
+                  },
+                  "pay_type": {
+                    "type": "string",
+                    "description": "支付方式筛选，支持逗号串，例如 2,3；详细取值见上方筛选字段口径。"
+                  },
+                  "order_source": {
+                    "type": "integer",
+                    "description": "订单来源筛选；详细取值见上方筛选字段口径。"
+                  }
+                }
+              },
+              "examples": {
+                "basic": {
+                  "summary": "基础分页查询",
+                  "value": {
+                    "u_id": "B1324352-EEE3-4A6F-B52C-3055924F67EE",
+                    "page": 1,
+                    "page_size": 10
+                  }
+                },
+                "filtered": {
+                  "summary": "按状态和来源筛选",
+                  "value": {
+                    "u_id": "B1324352-EEE3-4A6F-B52C-3055924F67EE",
+                    "page": 1,
+                    "page_size": 10,
+                    "order_state": "1,2",
+                    "order_source": 1,
+                    "pay_type": "2,3"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer"
+                    },
+                    "Msg": {
+                      "type": "string"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "list": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "description": "订单项字段较多，已保留真实订单表高频字段，供前端直接渲染列表、状态标签和支付入口。",
+                            "properties": {
+                              "order_id": {
+                                "type": "integer",
+                                "description": "订单主键 ID。"
+                              },
+                              "order_sn": {
+                                "type": "string",
+                                "description": "平台订单号。"
+                              },
+                              "order_amount": {
+                                "type": "string",
+                                "description": "订单金额。未支付时通常表示应付金额，已支付时表示实付金额。\n兼容说明：实际返回可能存在历史分支；此处展示前端默认处理结构。"
+                              },
+                              "order_source": {
+                                "type": "integer",
+                                "description": "订单来源编码。常见值：1=行情通小程序，2=PC，3=App，4=微信内 H5/JSAPI 或电视触屏链路，5=通用订单 H5，6=普通 H5，10=水泥百事通小程序，11=英文站，13=水泥商城小程序，14=混凝土小程序，15=混凝土游客 PC，16=行情通游客 PC，17=数字新能源游客 PC，18=数字新能源小程序，20=水泥大数据桌面端。"
+                              },
+                              "order_state": {
+                                "type": "integer",
+                                "description": "订单状态。0=已失效/已关闭，1=已支付/已完成，2=待支付，3=待发货。"
+                              },
+                              "u_id": {
+                                "type": "string",
+                                "description": "下单用户 ID。"
+                              },
+                              "u_name": {
+                                "type": "string",
+                                "description": "下单用户名或展示昵称。"
+                              },
+                              "create_time": {
+                                "type": "integer",
+                                "description": "创建时间，Unix 秒级时间戳。"
+                              },
+                              "update_time": {
+                                "type": "integer",
+                                "description": "更新时间，Unix 秒级时间戳。"
+                              },
+                              "product_name": {
+                                "type": "string",
+                                "description": "商品名称。个别报告类订单会被格式化成【精选报告】前缀。"
+                              },
+                              "product_id": {
+                                "type": "string",
+                                "description": "商品 ID。"
+                              },
+                              "product_count": {
+                                "type": "integer",
+                                "description": "购买数量。"
+                              },
+                              "product_type": {
+                                "type": "integer",
+                                "description": "商品类型编码。常见值基于 application/config.php 的商品配置：1=行情通/光伏价格类会员，2=地区订阅，3=大数据会员，5=精选会员，6=邀请礼包，7=联合会员礼包，8=企业通会员，9=大屏会员，18=建筑材料 VIP，19=水泥百事通会员，24=水泥数据/水泥观察会员，25=混凝土行情通，30=项目通会员，31=采购通会员；历史订单还可能出现 15=研究报告会员、16=线下产品、17=Pad 大屏、21=CementPLUS、22=CementPRO、23=石材价格会员、26=混凝土企业通等。"
+                              },
+                              "pay_type": {
+                                "type": "integer",
+                                "description": "支付方式编码。0=聚合支付占位值，1=支付宝，2=微信，3=Apple 内购，6=微信 H5，7=汇付天下支付宝，8=汇付天下微信，10=PayPal，11=斗拱支付宝，12=斗拱微信，14=微信虚拟支付历史标识。"
+                              },
+                              "pay_time": {
+                                "type": "integer",
+                                "description": "支付时间，Unix 秒级时间戳；未支付常见为 0。"
+                              },
+                              "product_years": {
+                                "type": "integer"
+                              },
+                              "product_month": {
+                                "type": "integer"
+                              },
+                              "product_week": {
+                                "type": "integer"
+                              },
+                              "product_day": {
+                                "type": "integer"
+                              },
+                              "area_code_str": {
+                                "type": "string"
+                              },
+                              "area_name_str": {
+                                "type": "string"
+                              },
+                              "is_delete": {
+                                "type": "integer"
+                              },
+                              "group_name": {
+                                "type": "string"
+                              },
+                              "group_id": {
+                                "type": "integer"
+                              },
+                              "transaction_id": {
+                                "type": "string",
+                                "description": "第三方支付流水号。微信、支付宝等支付成功后才会回填；待支付订单通常为空字符串。"
+                              },
+                              "apple_product_id": {
+                                "type": "string",
+                                "description": "Apple 内购商品 ID。仅 Apple 订阅或内购订单会有值，其它支付方式通常为空。"
+                              },
+                              "original_price": {
+                                "type": "string",
+                                "description": "兼容说明：实际返回可能存在历史分支；此处展示前端默认处理结构。"
+                              },
+                              "parent_id": {
+                                "type": "integer",
+                                "description": "父订单 ID。0 表示当前记录就是主订单；大于 0 时表示当前记录挂在某个主订单下。"
+                              },
+                              "order_type": {
+                                "type": "integer",
+                                "description": "订单类型编码。0 或未写入时通常表示普通订单；1=活动/礼包类订单，当前代码中常见于 SNZSLB01 邀请礼包及其子单链路；2=Apple 自动续订补单，见 application/home/logic/AppleNotify.php。前端展示普通订单时可按 0 处理，只有特殊活动或苹果续订订单才需要单独分支。"
+                              },
+                              "remark": {
+                                "type": "string",
+                                "description": "后台或业务备注。常用于特殊订单说明、补单说明、线下处理备注；普通订单通常为空。"
+                              },
+                              "order_extra_params": {
+                                "type": "string",
+                                "description": "订单扩展参数原始串。常见于特殊业务链路附带的 JSON 或键值串；普通订单可能为空字符串。"
+                              },
+                              "business_order_sn": {
+                                "type": "string",
+                                "description": "业务侧订单号。部分链路会与平台主订单号 order_sn 并存，用于映射下游业务系统。"
+                              },
+                              "user_remark": {
+                                "type": "string",
+                                "description": "用户侧备注。只有下单链路支持备注且用户实际填写时才会出现。"
+                              },
+                              "tag": {
+                                "type": "string",
+                                "description": "订单标签或商品附加标签。常用于活动角标、推荐标记、特殊展示文案；没有业务标签时为空字符串。"
+                              }
+                            }
+                          }
+                        },
+                        "page": {
+                          "type": "integer"
+                        },
+                        "pages": {
+                          "type": "integer"
+                        },
+                        "page_size": {
+                          "type": "integer"
+                        },
+                        "counts": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "有订单数据",
+                    "value": {
+                      "Code": 200,
+                      "Msg": "查询成功",
+                      "Data": {
+                        "list": [
+                          {
+                            "order_id": 14486203,
+                            "order_sn": "20260512100502317150",
+                            "order_amount": "899.00",
+                            "order_source": 1,
+                            "order_state": 2,
+                            "u_id": "B1324352-EEE3-4A6F-B52C-3055924F67EE",
+                            "u_name": "测试用户",
+                            "create_time": 1778551502,
+                            "update_time": 1778551502,
+                            "product_name": "精选会员2个月",
+                            "product_id": "SNJXHY01",
+                            "product_count": 1,
+                            "product_type": 5,
+                            "pay_type": 2,
+                            "pay_time": 0,
+                            "product_years": 0,
+                            "product_month": 2,
+                            "product_week": 0,
+                            "product_day": 0,
+                            "area_code_str": "",
+                            "area_name_str": "",
+                            "is_delete": 0,
+                            "group_name": "精选会员",
+                            "group_id": 167,
+                            "transaction_id": "",
+                            "apple_product_id": "",
+                            "original_price": "899.00",
+                            "parent_id": 0,
+                            "order_type": 0,
+                            "remark": "",
+                            "order_extra_params": "",
+                            "business_order_sn": "20260512100502368504",
+                            "user_remark": "",
+                            "tag": ""
+                          }
+                        ],
+                        "page": 1,
+                        "pages": 3,
+                        "page_size": 10,
+                        "counts": 23
+                      }
+                    }
+                  },
+                  "emptyForMiniProgram": {
+                    "summary": "order_source=1 且无数据",
+                    "value": {
+                      "Code": 200,
+                      "Msg": "没有数据",
+                      "Data": {
+                        "counts": 0,
+                        "list": [],
+                        "page": 1,
+                        "page_size": 10,
+                        "pages": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "无数据",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 204,
+                  "Msg": "没有数据"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数错误",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 400,
+                  "Msg": "参数有误"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "home",
+      "description": "控制器目录：home"
+    },
+    {
+      "name": "member",
+      "description": "控制器目录：member"
+    }
+  ]
+}

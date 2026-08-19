@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-19T11:33:51.006005+08:00",
+  "generatedAt": "2026-08-19T13:34:04.599839+08:00",
   "sourceRoot": "D:\\Code Repositories",
   "repositories": [
     {
@@ -15,6 +15,13 @@
       "sourceFileCount": 26,
       "pathCount": 26,
       "sha256": "823308b5fc6d501db5ce4aa0876bdd19253dedb800f8cf8896873a565fd26cc0"
+    },
+    {
+      "repository": "ccement_user_api",
+      "file": "ccement_user_api.openapi.json",
+      "sourceFileCount": 8,
+      "pathCount": 8,
+      "sha256": "10cd5395043ab165899328e1057e7b43814159f8a7ea460c250bc16f4ca7713a"
     },
     {
       "repository": "ccement_user_behavior_api",

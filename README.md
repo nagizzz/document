@@ -11,6 +11,7 @@ APIPOST 请使用下列 Raw URL 作为“实时同步数据源”：
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/stone365_member_web.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/cbmnet_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_enterprise_api.openapi.json`
+- `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_user_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_user_behavior_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ads_api.openapi.json`
 
