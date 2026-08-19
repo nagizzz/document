@@ -1,14 +1,7 @@
 {
-  "generatedAt": "2026-08-19T11:10:21.125741+08:00",
+  "generatedAt": "2026-08-19T11:15:56.043069+08:00",
   "sourceRoot": "D:\\Code Repositories",
   "repositories": [
-    {
-      "repository": "ads_api",
-      "file": "ads_api.openapi.json",
-      "sourceFileCount": 40,
-      "pathCount": 40,
-      "sha256": "0a23f11e2ecdea9e0f8374b3f43ded10a4c97a624da8c619847d278c6cf6d243"
-    },
     {
       "repository": "cbmnet_api",
       "file": "cbmnet_api.openapi.json",
