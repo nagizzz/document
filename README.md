@@ -13,7 +13,7 @@ APIPOST 请使用下列 Raw URL 作为“实时同步数据源”：
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_enterprise_api.openapi.json`
 - `https://raw.githubusercontent.com/nagizzz/document/main/openapi/ccement_user_behavior_api.openapi.json`
 
-每个文件由 `tools/build_openapi.py` 从 `D:\Code Repositories` 下各仓库的 `项目资料库\前端接口文档\*.openapi.json` 自动聚合生成，文件名按项目仓库名称命名。源仓库中每个接口各占一个文件；发布副本会将同一控制器的接口保留为相同 OpenAPI 标签，APIPOST 导入后会按标签显示为控制器目录。发布副本还会将源文档中 APIPOST 专用的 `{{环境变量}}/path` 转换为标准 OpenAPI 的 `/path`，以便云端同步校验；接口的测试环境地址请在 APIPOST 项目环境中配置。
+每个文件由 `tools/build_openapi.py` 从 `D:\Code Repositories` 下各仓库的 `项目资料库\前端接口文档\*.openapi.json` 自动聚合生成，文件名按项目仓库名称命名。源仓库中每个接口各占一个文件；发布副本会将同一控制器的接口保留为相同 OpenAPI 标签，APIPOST 导入后会按标签显示为控制器目录。发布副本会保留以仓库名命名的 `servers` 域名占位符（例如 `{{stone365_user_api}}`），同时将 paths 中的 `{{环境变量}}/path` 转换为标准 OpenAPI `/path`，以便云端同步校验。
 
 ## 更新和发布
 

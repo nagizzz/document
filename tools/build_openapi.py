@@ -82,7 +82,7 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
     merged_paths: dict[str, object] = {}
     merged_components: dict[str, dict[str, object]] = {}
     servers: list[object] = []
-    server_signatures: set[str] = set()
+    server_urls: set[str] = set()
     tags: list[object] = []
     tag_names: set[str] = set()
     warnings: list[str] = []
@@ -108,14 +108,13 @@ def merge_repository(repository: str, documents: list[Path]) -> tuple[dict, list
 
         rewritten = redact_public_values(deep_rewrite_refs(copy.deepcopy(source), reference_map))
         for server in rewritten.get("servers", []):
-            if isinstance(server, dict) and "{{" in str(server.get("url", "")):
-                # Keep environment variables in the source document, but omit them from
-                # the public strict-OpenAPI export. APIPOST can configure its own env.
-                continue
-            signature = json.dumps(server, ensure_ascii=False, sort_keys=True)
-            if signature not in server_signatures:
+            # Preserve the project-level APIPOST domain placeholder. Paths remain
+            # standard OpenAPI paths, so cloud validation does not receive a
+            # non-standard {{environment}} prefix in the paths object.
+            signature = str(server.get("url", "")) if isinstance(server, dict) else json.dumps(server, ensure_ascii=False, sort_keys=True)
+            if signature not in server_urls:
                 servers.append(server)
-                server_signatures.add(signature)
+                server_urls.add(signature)
 
         for tag in rewritten.get("tags", []):
             if not isinstance(tag, dict):

@@ -6117,6 +6117,12 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "{{project_api}}",
+      "description": "项目级环境变量占位符。测试环境可配置为 http://project.api.test.cbmnet.cn。"
+    }
+  ],
   "tags": [
     {
       "name": "光伏电站周报",

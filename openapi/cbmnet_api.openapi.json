@@ -362,6 +362,11 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "{{cbmnet_api}}"
+    }
+  ],
   "tags": [
     {
       "name": "凭证认证类接口"

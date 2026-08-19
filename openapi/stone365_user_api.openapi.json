@@ -3578,6 +3578,12 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "{{stone365_user_api}}",
+      "description": "stone365 用户中心接口项目变量。测试环境：http://user.api.test.stone365.com。当前文档的 paths 键已直接写成 {{stone365_user_api}}/接口路径，导入 APIPOST 后应直接显示完整 URL。"
+    }
+  ],
   "tags": [
     {
       "name": "collect/admin",

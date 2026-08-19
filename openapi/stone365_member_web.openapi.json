@@ -662,6 +662,12 @@
       }
     }
   },
+  "servers": [
+    {
+      "url": "{{stone365_member_web}}",
+      "description": "会员中心项目环境变量；默认前缀为 /member。"
+    }
+  ],
   "tags": [
     {
       "name": "会话与首页",
