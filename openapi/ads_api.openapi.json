@@ -1,0 +1,10 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ads_api - 待发布接口文档",
+    "version": "2026-08-19",
+    "description": "此文件为固定 Raw 地址占位。当前尚无已确认发布的 ads_api 前端接口文档；后续由聚合流程自动覆盖。"
+  },
+  "tags": [],
+  "paths": {}
+}
