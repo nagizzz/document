@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.08.19",
+    "version": "2026.08.20",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -12,7 +12,7 @@
           "approval"
         ],
         "summary": "新增审批项目",
-        "description": "用于中台新建审批项目。\n\n关键规则：\n1. 真实必填字段为 project_name、area，以及 add_user / admin_user_name 二选一必传。\n2. project_label_sorts 支持传标签 ID、中文名、逗号分隔字符串或数组；保存时统一转成逗号分隔 ID 字符串。\n3. project_code 当前不是必填，但传值时会参与唯一性校验。\n4. process_status、publish_status 未传时会回退默认枚举值。",
+        "description": "用于中台新建审批项目。\n\n关键规则：\n1. 真实必填字段为 project_name、area，以及 add_user / admin_user_name 二选一必传。\n2. project_label_sorts 支持传标签 ID、中文名、逗号分隔字符串或数组；保存时统一转成逗号分隔 ID 字符串。\n3. project_code 当前不是必填，但传值时会参与唯一性校验。\n4. dosage 为项目级建材用量测算数组；后端会过滤空 material、按 material 去重，并自动计算 cement_dosage，不能直接传 cement_dosage。\n5. process_status、publish_status 未传时会回退默认枚举值。",
         "requestBody": {
           "required": true,
           "content": {
@@ -160,6 +160,52 @@
                     "description": "项目摘要或建设内容。",
                     "example": "示例项目建设内容"
                   },
+                  "dosage": {
+                    "type": "array",
+                    "description": "项目级建材用量测算。后端会按 material 去重并自动计算 cement_dosage。",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "material": {
+                          "type": "string",
+                          "description": "建材名称；为空的项不会保存。",
+                          "example": "水泥"
+                        },
+                        "num": {
+                          "type": "number",
+                          "description": "预估用量。",
+                          "example": 2.5
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "预估用量单位。",
+                          "example": "万吨"
+                        },
+                        "per_num": {
+                          "type": "number",
+                          "description": "单位工程量用量，可为空。",
+                          "example": 0.3
+                        },
+                        "per_unit": {
+                          "type": "string",
+                          "description": "单位工程量单位，可为空。",
+                          "example": "吨/平方米"
+                        }
+                      },
+                      "required": [
+                        "material"
+                      ]
+                    },
+                    "example": [
+                      {
+                        "material": "水泥",
+                        "num": 2.5,
+                        "unit": "万吨",
+                        "per_num": 0.3,
+                        "per_unit": "吨/平方米"
+                      }
+                    ]
+                  },
                   "total_fund": {
                     "type": "number",
                     "description": "总投资金额。",
@@ -264,6 +310,15 @@
                 "end_time": "2027-08-01 00:00:00",
                 "total_area": 10000,
                 "summary": "示例项目建设内容",
+                "dosage": [
+                  {
+                    "material": "水泥",
+                    "num": 2.5,
+                    "unit": "万吨",
+                    "per_num": 0.3,
+                    "per_unit": "吨/平方米"
+                  }
+                ],
                 "total_fund": 50000,
                 "civil_fund": 32000,
                 "equipment_fund": 5000,
@@ -2682,7 +2737,7 @@
           "approval"
         ],
         "summary": "更新审批项目",
-        "description": "用于中台编辑审批项目。\n\n关键规则：\n1. 真实必填字段为 id、project_name、area、process_status、publish_status，以及 add_user / admin_user_name 二选一必传。\n2. project_label_sorts 的转换规则与新增接口一致。\n3. 若修改了核心字段，后端会触发 ProjectInfoChangeSync 更新其他表中的冗余项目字段。\n4. 项目不存在时返回 Code=404、Msg=信息不存在。",
+        "description": "用于中台编辑审批项目。\n\n关键规则：\n1. 真实必填字段为 id、project_name、area、process_status、publish_status，以及 add_user / admin_user_name 二选一必传。\n2. project_label_sorts 的转换规则与新增接口一致。\n3. dosage 为项目级建材用量测算数组；后端会过滤空 material、按 material 去重，并自动计算 cement_dosage，不能直接传 cement_dosage。\n4. 若修改了核心字段，后端会触发 ProjectInfoChangeSync 更新其他表中的冗余项目字段。\n5. 项目不存在时返回 Code=404、Msg=信息不存在。",
         "requestBody": {
           "required": true,
           "content": {
@@ -2830,6 +2885,52 @@
                     "description": "项目摘要或建设内容。",
                     "example": "示例项目建设内容"
                   },
+                  "dosage": {
+                    "type": "array",
+                    "description": "项目级建材用量测算。后端会按 material 去重并自动计算 cement_dosage。",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "material": {
+                          "type": "string",
+                          "description": "建材名称；为空的项不会保存。",
+                          "example": "水泥"
+                        },
+                        "num": {
+                          "type": "number",
+                          "description": "预估用量。",
+                          "example": 2.5
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "预估用量单位。",
+                          "example": "万吨"
+                        },
+                        "per_num": {
+                          "type": "number",
+                          "description": "单位工程量用量，可为空。",
+                          "example": 0.3
+                        },
+                        "per_unit": {
+                          "type": "string",
+                          "description": "单位工程量单位，可为空。",
+                          "example": "吨/平方米"
+                        }
+                      },
+                      "required": [
+                        "material"
+                      ]
+                    },
+                    "example": [
+                      {
+                        "material": "水泥",
+                        "num": 2.5,
+                        "unit": "万吨",
+                        "per_num": 0.3,
+                        "per_unit": "吨/平方米"
+                      }
+                    ]
+                  },
                   "total_fund": {
                     "type": "number",
                     "description": "总投资金额。",
@@ -2942,6 +3043,15 @@
                 "end_time": "2027-08-01 00:00:00",
                 "total_area": 10000,
                 "summary": "示例项目建设内容",
+                "dosage": [
+                  {
+                    "material": "水泥",
+                    "num": 2.5,
+                    "unit": "万吨",
+                    "per_num": 0.3,
+                    "per_unit": "吨/平方米"
+                  }
+                ],
                 "total_fund": 50000,
                 "civil_fund": 32000,
                 "equipment_fund": 5000,
