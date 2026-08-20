@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-08-19T15:00:05.174208+08:00",
-  "sourceRoot": "D:\\Code Repositories",
+  "generatedAt": "2026-08-20T14:40:53.266336+08:00",
+  "sourceRoot": "D:\\Code Repositories\\stone365_user_api",
   "repositories": [
     {
       "repository": "cbmnet_api",
@@ -47,9 +47,9 @@
     {
       "repository": "stone365_user_api",
       "file": "stone365_user_api.openapi.json",
-      "sourceFileCount": 21,
-      "pathCount": 20,
-      "sha256": "08a678b5ef88ec4c8fabe47bdbf67b558c30fc4c82bcb6b87b0ff53357e829ca"
+      "sourceFileCount": 22,
+      "pathCount": 21,
+      "sha256": "be06f2a1debb28b211e11febcb552ab579f93f55da656049af5384adb826bd6b"
     },
     {
       "repository": "ads_api",

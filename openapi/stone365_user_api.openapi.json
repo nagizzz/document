@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "stone365_user_api - APIPOST 聚合接口文档",
-    "version": "2026.08.19",
+    "version": "2026.08.20",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -265,6 +265,241 @@
                     "Code": 400,
                     "Data": null
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login/client/xcx": {
+      "post": {
+        "tags": [
+          "login/client"
+        ],
+        "summary": "小程序手机号登录或注册",
+        "description": "无需已有登录态。每次调用前分别重新获取 wx.login() 的 wxCode 与 getPhoneNumber 回调的 phoneCode；两类 code 都是短时、一次性凭证，不能缓存或复用。\n\n## 小程序类型\n1. programtype=1：石材产区小程序，AppID 为 wx2f8960ea100f7eb3。\n2. programtype=2：石图小程序，AppID 为 wxfd34053436d639e4。\n\n## 登录与绑定规则\n1. 手机号仅以微信返回的 purePhoneNumber 为准。\n2. 已存在手机号时登录原账号；新手机号时自动注册，并记录小程序来源。\n3. code2Session 返回 unionid/openid 时同步写入该账号的微信绑定记录。unionid 未返回时不会清空已有绑定。\n4. 已绑定其他 unionid 的手机号会返回“该手机号已绑定过微信”。\n5. 登录成功响应沿用本接口原有结构，Data.userInfo、Data.token、Data.token_expire 均保留。\n\n## 常见失败\n微信返回 Code=40029 / Msg=invalid code 时，表示 wxCode 无效、已过期、已使用，或与 programtype 对应的小程序 AppID 不匹配；前端应重新执行 wx.login() 后立即调用本接口。",
+        "operationId": "loginClientXcx",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "wxCode",
+                  "phoneCode",
+                  "programtype"
+                ],
+                "properties": {
+                  "wxCode": {
+                    "type": "string",
+                    "description": "wx.login() 成功回调中的临时 code。仅供本次服务端调用 code2Session 使用；不可复用。",
+                    "example": "0c1vjFkl2nEAhi4SUYll2x9Ktv4vjFkS"
+                  },
+                  "phoneCode": {
+                    "type": "string",
+                    "description": "getPhoneNumber 成功回调中的 code。服务端据此调用 getuserphonenumber；不可复用。",
+                    "example": "a9417eb82109d3ad9c102dd93fc8d3e527139e9983a32650eae820a25f8723c5"
+                  },
+                  "programtype": {
+                    "type": "integer",
+                    "enum": [
+                      1,
+                      2
+                    ],
+                    "description": "小程序类型。1=石材产区小程序（wx2f8960ea100f7eb3）；2=石图小程序（wxfd34053436d639e4）。必须与实际调用 wx.login() 的小程序一致。",
+                    "example": 1
+                  }
+                },
+                "example": {
+                  "wxCode": "0c1vjFkl2nEAhi4SUYll2x9Ktv4vjFkS",
+                  "phoneCode": "a9417eb82109d3ad9c102dd93fc8d3e527139e9983a32650eae820a25f8723c5",
+                  "programtype": 1
+                }
+              },
+              "example": {
+                "wxCode": "0c1vjFkl2nEAhi4SUYll2x9Ktv4vjFkS",
+                "phoneCode": "a9417eb82109d3ad9c102dd93fc8d3e527139e9983a32650eae820a25f8723c5",
+                "programtype": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "Code",
+                    "Msg",
+                    "Data"
+                  ],
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码；200 表示登录成功。",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "业务提示，成功时为“登录成功”。",
+                      "example": "登录成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "required": [
+                        "userInfo",
+                        "token",
+                        "token_expire"
+                      ],
+                      "properties": {
+                        "userInfo": {
+                          "type": "object",
+                          "description": "现有用户信息对象。U_PassWord 不会返回；其余字段保持原接口兼容。",
+                          "properties": {
+                            "U_ID": {
+                              "type": "integer",
+                              "description": "用户主键。",
+                              "example": 10001
+                            },
+                            "U_Name": {
+                              "type": "string",
+                              "description": "登录账号或注册时生成的账号名。",
+                              "example": "20260820abc1234"
+                            },
+                            "U_NickName": {
+                              "type": "string",
+                              "description": "用户昵称。",
+                              "example": "石材用户"
+                            },
+                            "U_Mobile": {
+                              "type": "string",
+                              "description": "微信验证后用于登录的手机号。",
+                              "example": "13800138000"
+                            },
+                            "U_Source": {
+                              "type": "integer",
+                              "description": "用户注册来源；新注册的小程序用户由服务端按小程序来源写入。",
+                              "example": 4
+                            },
+                            "UserAuditingState": {
+                              "type": "integer",
+                              "description": "用户审核状态，沿用既有用户模型取值。",
+                              "example": 1
+                            },
+                            "LogOff_Status": {
+                              "type": "integer",
+                              "description": "注销状态；0=未注销。",
+                              "example": 0
+                            },
+                            "DomainName": {
+                              "type": "string",
+                              "description": "用户展示域名名称，优先取 U_NickName，否则取 U_Name。",
+                              "example": "石材用户"
+                            },
+                            "userProduct": {
+                              "type": "string",
+                              "description": "当前有效会员产品标识，多个值以英文逗号分隔；无有效产品时为空字符串。",
+                              "example": "G015"
+                            }
+                          }
+                        },
+                        "token": {
+                          "type": "string",
+                          "description": "登录 token；后续需登录接口按既有约定传递。",
+                          "example": "<USER_TOKEN>"
+                        },
+                        "token_expire": {
+                          "type": "integer",
+                          "description": "token 过期时间戳，秒级 Unix 时间戳。",
+                          "example": 1787235600
+                        }
+                      }
+                    }
+                  },
+                  "example": {
+                    "Code": 200,
+                    "Msg": "登录成功",
+                    "Data": {
+                      "userInfo": {
+                        "U_ID": 10001,
+                        "U_Name": "20260820abc1234",
+                        "U_NickName": "石材用户",
+                        "U_Mobile": "13800138000",
+                        "U_Source": 4,
+                        "UserAuditingState": 1,
+                        "LogOff_Status": 0,
+                        "DomainName": "石材用户",
+                        "userProduct": "G015"
+                      },
+                      "token": "<USER_TOKEN>",
+                      "token_expire": 1787235600
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Msg": "登录成功",
+                  "Data": {
+                    "userInfo": {
+                      "U_ID": 10001,
+                      "U_Name": "20260820abc1234",
+                      "U_NickName": "石材用户",
+                      "U_Mobile": "13800138000",
+                      "U_Source": 4,
+                      "UserAuditingState": 1,
+                      "LogOff_Status": 0,
+                      "DomainName": "石材用户",
+                      "userProduct": "G015"
+                    },
+                    "token": "<USER_TOKEN>",
+                    "token_expire": 1787235600
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "参数、微信凭证或小程序类型错误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务错误码；微信错误会透传其 errcode，例如 40029。",
+                      "example": 40029
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "description": "错误说明。",
+                      "example": "invalid code"
+                    }
+                  },
+                  "example": {
+                    "Code": 40029,
+                    "Msg": "invalid code, rid: example"
+                  }
+                },
+                "example": {
+                  "Code": 40029,
+                  "Msg": "invalid code, rid: example"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "账号登录受限或手机号绑定的微信冲突",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Code": 403,
+                  "Msg": "该手机号已绑定过微信"
                 }
               }
             }
@@ -3584,6 +3819,10 @@
       "description": "控制器目录：app/controller/collect/admin"
     },
     {
+      "name": "login/client",
+      "description": "控制器目录：app/controller/login/client"
+    },
+    {
       "name": "media",
       "description": "控制器目录：app/controller/media"
     },
@@ -3720,7 +3959,7 @@
           }
         }
       },
-      "doc02_media_admin_video_deleteSupply_opena__Envelope": {
+      "doc03_media_admin_video_deleteSupply_opena__Envelope": {
         "type": "object",
         "properties": {
           "Code": {
@@ -3736,7 +3975,7 @@
           }
         }
       },
-      "doc03_media_admin_video_saveSupply_openapi__Envelope": {
+      "doc04_media_admin_video_saveSupply_openapi__Envelope": {
         "type": "object",
         "properties": {
           "Code": {
@@ -3752,7 +3991,7 @@
           }
         }
       },
-      "doc04_media_admin_video_supplyStatus_opena__Envelope": {
+      "doc05_media_admin_video_supplyStatus_opena__Envelope": {
         "type": "object",
         "properties": {
           "Code": {
@@ -3768,7 +4007,7 @@
           }
         }
       },
-      "doc05_media_admin_video_token_openapi__Envelope": {
+      "doc06_media_admin_video_token_openapi__Envelope": {
         "type": "object",
         "properties": {
           "Code": {
@@ -3784,7 +4023,7 @@
           }
         }
       },
-      "doc06_notifications_client_counts_get_open__NotificationListRequest": {
+      "doc07_notifications_client_counts_get_open__NotificationListRequest": {
         "type": "object",
         "required": [
           "PageIndex",
@@ -3814,7 +4053,7 @@
           }
         }
       },
-      "doc06_notifications_client_counts_get_open__NotificationListItem": {
+      "doc07_notifications_client_counts_get_open__NotificationListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -3871,7 +4110,7 @@
           }
         }
       },
-      "doc06_notifications_client_counts_get_open__NotificationListResponse": {
+      "doc07_notifications_client_counts_get_open__NotificationListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -3898,14 +4137,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc06_notifications_client_counts_get_open__NotificationListItem"
+                  "$ref": "#/components/schemas/doc07_notifications_client_counts_get_open__NotificationListItem"
                 }
               }
             }
           }
         }
       },
-      "doc06_notifications_client_counts_get_open__NotificationFilterRequest": {
+      "doc07_notifications_client_counts_get_open__NotificationFilterRequest": {
         "type": "object",
         "properties": {
           "type": {
@@ -3949,7 +4188,7 @@
           }
         }
       },
-      "doc06_notifications_client_counts_get_open__NotificationCountResponse": {
+      "doc07_notifications_client_counts_get_open__NotificationCountResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -3969,7 +4208,7 @@
           }
         }
       },
-      "doc07_notifications_client_counts_openapi__NotificationListRequest": {
+      "doc08_notifications_client_counts_openapi__NotificationListRequest": {
         "type": "object",
         "required": [
           "PageIndex",
@@ -3999,7 +4238,7 @@
           }
         }
       },
-      "doc07_notifications_client_counts_openapi__NotificationListItem": {
+      "doc08_notifications_client_counts_openapi__NotificationListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -4056,7 +4295,7 @@
           }
         }
       },
-      "doc07_notifications_client_counts_openapi__NotificationListResponse": {
+      "doc08_notifications_client_counts_openapi__NotificationListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4083,14 +4322,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc07_notifications_client_counts_openapi__NotificationListItem"
+                  "$ref": "#/components/schemas/doc08_notifications_client_counts_openapi__NotificationListItem"
                 }
               }
             }
           }
         }
       },
-      "doc07_notifications_client_counts_openapi__NotificationFilterRequest": {
+      "doc08_notifications_client_counts_openapi__NotificationFilterRequest": {
         "type": "object",
         "properties": {
           "type": {
@@ -4134,7 +4373,7 @@
           }
         }
       },
-      "doc07_notifications_client_counts_openapi__NotificationCountResponse": {
+      "doc08_notifications_client_counts_openapi__NotificationCountResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4154,7 +4393,7 @@
           }
         }
       },
-      "doc08_notifications_client_list_openapi__NotificationListRequest": {
+      "doc09_notifications_client_list_openapi__NotificationListRequest": {
         "type": "object",
         "required": [
           "PageIndex",
@@ -4184,7 +4423,7 @@
           }
         }
       },
-      "doc08_notifications_client_list_openapi__NotificationListItem": {
+      "doc09_notifications_client_list_openapi__NotificationListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -4241,7 +4480,7 @@
           }
         }
       },
-      "doc08_notifications_client_list_openapi__NotificationListResponse": {
+      "doc09_notifications_client_list_openapi__NotificationListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4268,14 +4507,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc08_notifications_client_list_openapi__NotificationListItem"
+                  "$ref": "#/components/schemas/doc09_notifications_client_list_openapi__NotificationListItem"
                 }
               }
             }
           }
         }
       },
-      "doc08_notifications_client_list_openapi__NotificationFilterRequest": {
+      "doc09_notifications_client_list_openapi__NotificationFilterRequest": {
         "type": "object",
         "properties": {
           "type": {
@@ -4319,7 +4558,7 @@
           }
         }
       },
-      "doc08_notifications_client_list_openapi__NotificationCountResponse": {
+      "doc09_notifications_client_list_openapi__NotificationCountResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4339,7 +4578,7 @@
           }
         }
       },
-      "doc09_notifications_client_markallread_ope__NotificationListRequest": {
+      "doc10_notifications_client_markallread_ope__NotificationListRequest": {
         "type": "object",
         "required": [
           "PageIndex",
@@ -4369,7 +4608,7 @@
           }
         }
       },
-      "doc09_notifications_client_markallread_ope__NotificationListItem": {
+      "doc10_notifications_client_markallread_ope__NotificationListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -4426,7 +4665,7 @@
           }
         }
       },
-      "doc09_notifications_client_markallread_ope__NotificationListResponse": {
+      "doc10_notifications_client_markallread_ope__NotificationListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4453,14 +4692,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc09_notifications_client_markallread_ope__NotificationListItem"
+                  "$ref": "#/components/schemas/doc10_notifications_client_markallread_ope__NotificationListItem"
                 }
               }
             }
           }
         }
       },
-      "doc09_notifications_client_markallread_ope__NotificationFilterRequest": {
+      "doc10_notifications_client_markallread_ope__NotificationFilterRequest": {
         "type": "object",
         "properties": {
           "type": {
@@ -4504,7 +4743,7 @@
           }
         }
       },
-      "doc09_notifications_client_markallread_ope__NotificationCountResponse": {
+      "doc10_notifications_client_markallread_ope__NotificationCountResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4524,7 +4763,7 @@
           }
         }
       },
-      "doc10_operationlog_admin_shopVisits_openap__ShopVisitRecordItem": {
+      "doc11_operationlog_admin_shopVisits_openap__ShopVisitRecordItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -4553,7 +4792,7 @@
           }
         }
       },
-      "doc10_operationlog_admin_shopVisits_openap__ShopVisitRecordResponse": {
+      "doc11_operationlog_admin_shopVisits_openap__ShopVisitRecordResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4584,14 +4823,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc10_operationlog_admin_shopVisits_openap__ShopVisitRecordItem"
+                  "$ref": "#/components/schemas/doc11_operationlog_admin_shopVisits_openap__ShopVisitRecordItem"
                 }
               }
             }
           }
         }
       },
-      "doc11_order_virtual_pay_createOrder_openap__VirtualPayGetPaySigRequest": {
+      "doc12_order_virtual_pay_createOrder_openap__VirtualPayGetPaySigRequest": {
         "type": "object",
         "required": [
           "signData"
@@ -4615,7 +4854,7 @@
           }
         }
       },
-      "doc11_order_virtual_pay_createOrder_openap__VirtualPayGetPaySigResponse": {
+      "doc12_order_virtual_pay_createOrder_openap__VirtualPayGetPaySigResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4643,7 +4882,7 @@
           }
         }
       },
-      "doc11_order_virtual_pay_createOrder_openap__VirtualPayQueryOrderRequest": {
+      "doc12_order_virtual_pay_createOrder_openap__VirtualPayQueryOrderRequest": {
         "type": "object",
         "required": [
           "productId"
@@ -4671,7 +4910,7 @@
           }
         }
       },
-      "doc11_order_virtual_pay_createOrder_openap__VirtualPayQueryOrderResponse": {
+      "doc12_order_virtual_pay_createOrder_openap__VirtualPayQueryOrderResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4727,7 +4966,7 @@
           }
         }
       },
-      "doc12_order_virtual_pay_createVisitorOrder__VirtualPayGetPaySigRequest": {
+      "doc13_order_virtual_pay_createVisitorOrder__VirtualPayGetPaySigRequest": {
         "type": "object",
         "required": [
           "signData"
@@ -4751,7 +4990,7 @@
           }
         }
       },
-      "doc12_order_virtual_pay_createVisitorOrder__VirtualPayGetPaySigResponse": {
+      "doc13_order_virtual_pay_createVisitorOrder__VirtualPayGetPaySigResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4779,7 +5018,7 @@
           }
         }
       },
-      "doc12_order_virtual_pay_createVisitorOrder__VirtualPayQueryOrderRequest": {
+      "doc13_order_virtual_pay_createVisitorOrder__VirtualPayQueryOrderRequest": {
         "type": "object",
         "required": [
           "productId"
@@ -4807,7 +5046,7 @@
           }
         }
       },
-      "doc12_order_virtual_pay_createVisitorOrder__VirtualPayQueryOrderResponse": {
+      "doc13_order_virtual_pay_createVisitorOrder__VirtualPayQueryOrderResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4863,7 +5102,7 @@
           }
         }
       },
-      "doc13_order_virtual_pay_getPaySig_openapi__VirtualPayGetPaySigRequest": {
+      "doc14_order_virtual_pay_getPaySig_openapi__VirtualPayGetPaySigRequest": {
         "type": "object",
         "required": [
           "signData"
@@ -4887,7 +5126,7 @@
           }
         }
       },
-      "doc13_order_virtual_pay_getPaySig_openapi__VirtualPayGetPaySigResponse": {
+      "doc14_order_virtual_pay_getPaySig_openapi__VirtualPayGetPaySigResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4915,7 +5154,7 @@
           }
         }
       },
-      "doc13_order_virtual_pay_getPaySig_openapi__VirtualPayQueryOrderRequest": {
+      "doc14_order_virtual_pay_getPaySig_openapi__VirtualPayQueryOrderRequest": {
         "type": "object",
         "required": [
           "productId"
@@ -4943,7 +5182,7 @@
           }
         }
       },
-      "doc13_order_virtual_pay_getPaySig_openapi__VirtualPayQueryOrderResponse": {
+      "doc14_order_virtual_pay_getPaySig_openapi__VirtualPayQueryOrderResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -4999,7 +5238,7 @@
           }
         }
       },
-      "doc14_order_virtual_pay_queryOrder_openapi__VirtualPayGetPaySigRequest": {
+      "doc15_order_virtual_pay_queryOrder_openapi__VirtualPayGetPaySigRequest": {
         "type": "object",
         "required": [
           "signData"
@@ -5023,7 +5262,7 @@
           }
         }
       },
-      "doc14_order_virtual_pay_queryOrder_openapi__VirtualPayGetPaySigResponse": {
+      "doc15_order_virtual_pay_queryOrder_openapi__VirtualPayGetPaySigResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5051,7 +5290,7 @@
           }
         }
       },
-      "doc14_order_virtual_pay_queryOrder_openapi__VirtualPayQueryOrderRequest": {
+      "doc15_order_virtual_pay_queryOrder_openapi__VirtualPayQueryOrderRequest": {
         "type": "object",
         "required": [
           "productId"
@@ -5079,7 +5318,7 @@
           }
         }
       },
-      "doc14_order_virtual_pay_queryOrder_openapi__VirtualPayQueryOrderResponse": {
+      "doc15_order_virtual_pay_queryOrder_openapi__VirtualPayQueryOrderResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5135,7 +5374,7 @@
           }
         }
       },
-      "doc15_supply_admin_batch_update_fields_ope__SupplyBatchUpdateRequest": {
+      "doc16_supply_admin_batch_update_fields_ope__SupplyBatchUpdateRequest": {
         "type": "object",
         "required": [
           "IDs"
@@ -5182,7 +5421,7 @@
         },
         "description": "四个业务字段至少传一个，未传的字段保持原值。"
       },
-      "doc15_supply_admin_batch_update_fields_ope__SupplyBatchUpdateResponse": {
+      "doc16_supply_admin_batch_update_fields_ope__SupplyBatchUpdateResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5200,7 +5439,7 @@
           }
         }
       },
-      "doc16_user_admin_detail_U_ID_openapi__UserDetailResponse": {
+      "doc17_user_admin_detail_U_ID_openapi__UserDetailResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5229,7 +5468,7 @@
           }
         }
       },
-      "doc16_user_admin_detail_U_ID_openapi__UpdateUserInfoRequest": {
+      "doc17_user_admin_detail_U_ID_openapi__UpdateUserInfoRequest": {
         "type": "object",
         "required": [
           "U_ID",
@@ -5251,7 +5490,7 @@
         },
         "additionalProperties": true
       },
-      "doc17_user_admin_updateUserInfo_openapi__UserDetailResponse": {
+      "doc18_user_admin_updateUserInfo_openapi__UserDetailResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5280,7 +5519,7 @@
           }
         }
       },
-      "doc17_user_admin_updateUserInfo_openapi__UpdateUserInfoRequest": {
+      "doc18_user_admin_updateUserInfo_openapi__UpdateUserInfoRequest": {
         "type": "object",
         "required": [
           "U_ID",
@@ -5302,7 +5541,7 @@
         },
         "additionalProperties": true
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintListRequest": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintListRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -5326,7 +5565,7 @@
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintListItem": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -5375,7 +5614,7 @@
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintListResponse": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5410,14 +5649,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc18_user_client_customerFootprint_add_op__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc19_user_client_customerFootprint_add_op__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintSummaryRequest": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintSummaryRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -5431,7 +5670,7 @@
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintSummaryResponse": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintSummaryResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5504,7 +5743,7 @@
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintMockResponse": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintMockResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5548,14 +5787,14 @@
               "SampleDataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc18_user_client_customerFootprint_add_op__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc19_user_client_customerFootprint_add_op__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintAddRequest": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintAddRequest": {
         "type": "object",
         "required": [
           "log_company_u_id"
@@ -5591,7 +5830,7 @@
           }
         }
       },
-      "doc18_user_client_customerFootprint_add_op__CustomerFootprintAddResponse": {
+      "doc19_user_client_customerFootprint_add_op__CustomerFootprintAddResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5611,7 +5850,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintListRequest": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintListRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -5635,7 +5874,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintListItem": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -5684,7 +5923,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintListResponse": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5719,14 +5958,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc19_user_client_customerFootprint_list_o__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc20_user_client_customerFootprint_list_o__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintSummaryRequest": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintSummaryRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -5740,7 +5979,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintSummaryResponse": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintSummaryResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5813,7 +6052,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintMockResponse": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintMockResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5857,14 +6096,14 @@
               "SampleDataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc19_user_client_customerFootprint_list_o__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc20_user_client_customerFootprint_list_o__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintAddRequest": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintAddRequest": {
         "type": "object",
         "required": [
           "log_company_u_id"
@@ -5900,7 +6139,7 @@
           }
         }
       },
-      "doc19_user_client_customerFootprint_list_o__CustomerFootprintAddResponse": {
+      "doc20_user_client_customerFootprint_list_o__CustomerFootprintAddResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -5920,7 +6159,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintListRequest": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintListRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -5944,7 +6183,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintListItem": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -5993,7 +6232,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintListResponse": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6028,14 +6267,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc20_user_client_customerFootprint_mock_o__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc21_user_client_customerFootprint_mock_o__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintSummaryRequest": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintSummaryRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -6049,7 +6288,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintSummaryResponse": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintSummaryResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6122,7 +6361,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintMockResponse": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintMockResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6166,14 +6405,14 @@
               "SampleDataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc20_user_client_customerFootprint_mock_o__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc21_user_client_customerFootprint_mock_o__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintAddRequest": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintAddRequest": {
         "type": "object",
         "required": [
           "log_company_u_id"
@@ -6209,7 +6448,7 @@
           }
         }
       },
-      "doc20_user_client_customerFootprint_mock_o__CustomerFootprintAddResponse": {
+      "doc21_user_client_customerFootprint_mock_o__CustomerFootprintAddResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6229,7 +6468,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintListRequest": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintListRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -6253,7 +6492,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintListItem": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintListItem": {
         "type": "object",
         "properties": {
           "Id": {
@@ -6302,7 +6541,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintListResponse": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintListResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6337,14 +6576,14 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc21_user_client_customerFootprint_summar__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc22_user_client_customerFootprint_summar__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintSummaryRequest": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintSummaryRequest": {
         "type": "object",
         "required": [
           "utoken"
@@ -6358,7 +6597,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintSummaryResponse": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintSummaryResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6431,7 +6670,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintMockResponse": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintMockResponse": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -6475,14 +6714,14 @@
               "SampleDataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc21_user_client_customerFootprint_summar__CustomerFootprintListItem"
+                  "$ref": "#/components/schemas/doc22_user_client_customerFootprint_summar__CustomerFootprintListItem"
                 }
               }
             }
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintAddRequest": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintAddRequest": {
         "type": "object",
         "required": [
           "log_company_u_id"
@@ -6518,7 +6757,7 @@
           }
         }
       },
-      "doc21_user_client_customerFootprint_summar__CustomerFootprintAddResponse": {
+      "doc22_user_client_customerFootprint_summar__CustomerFootprintAddResponse": {
         "type": "object",
         "properties": {
           "Msg": {
