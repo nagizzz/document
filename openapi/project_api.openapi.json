@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.08.20",
+    "version": "2026.08.25",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -3929,7 +3929,7 @@
           "approval"
         ],
         "summary": "前台项目分页列表",
-        "description": "用于前台列表页分页查询项目。关键规则：1. 固定仅返回已发布、创建时间位于最近一年的数据；此默认时间窗口与开放搜索合集接口一致。2. `project_label_sorts=true` 表示标签非空；传标签 ID、中文名、数组或逗号分隔值时按指定标签筛选。3. `cement_dosage` 按项目下任一标段的 `cement_dosage >= 入参值` 筛选。4. `match_any` 中的总投资、标签非空和水泥用量条件按 OR 组合，整组再与其他条件按 AND 组合。5. create_time_start/create_time_end 仍按 project_info.create_time 过滤，结束日期会自动补齐到 23:59:59。6. 列表项 id 是 business_id 字符串，不是 project_info 主键。7. page 最小为 1、page_size 限制为 1-100；排序默认 id desc，可选 id、create_time、total_fund。",
+        "description": "用于前台列表页分页查询项目。关键规则：1. 固定仅返回已发布、创建时间位于最近一年的数据；此默认时间窗口与开放搜索合集接口一致。2. `project_label_sorts=true` 表示标签非空；传标签 ID、中文名、数组或逗号分隔值时按指定标签筛选。3. `cement_dosage` 按项目下任一标段的 `cement_dosage >= 入参值` 筛选。4. `match_any` 中的总投资、标签非空和水泥用量条件按 OR 组合，整组再与其他条件按 AND 组合。5. create_time_start/create_time_end 仍按 project_info.create_time 过滤，结束日期会自动补齐到 23:59:59。6. 列表项 id 是 business_id 字符串，不是 project_info 主键。7. `dosage_source=project` 时 dosage 直接来自 project_info.dosage；`section` 时为标段汇总回退值。8. page 最小为 1、page_size 限制为 1-100；排序默认 id desc，可选 id、create_time、total_fund。",
         "requestBody": {
           "required": false,
           "description": "筛选参数。后端通过 request->param() 读取，因此 application/json 和 application/x-www-form-urlencoded 都可用；前端联调建议统一使用 application/json。",
@@ -4667,6 +4667,15 @@
                                 "example": 0,
                                 "description": "是否存在材料摘要。1 表示 dosage 数组非空，0 表示 dosage 为空数组。"
                               },
+                              "dosage_source": {
+                                "type": "string",
+                                "enum": [
+                                  "project",
+                                  "section"
+                                ],
+                                "example": "project",
+                                "description": "材料估算来源。project 表示项目自身 dosage；section 表示项目 dosage 为空时的标段汇总回退值。"
+                              },
                               "dosage": {
                                 "type": "array",
                                 "items": {
@@ -4719,6 +4728,7 @@
                               "create_time",
                               "end_time",
                               "has_dosage",
+                              "dosage_source",
                               "dosage"
                             ]
                           },
@@ -13241,6 +13251,15 @@
             "example": 0,
             "description": "是否存在材料摘要。1 表示 dosage 数组非空，0 表示 dosage 为空数组。"
           },
+          "dosage_source": {
+            "type": "string",
+            "enum": [
+              "project",
+              "section"
+            ],
+            "example": "project",
+            "description": "材料估算来源。project 表示项目自身 dosage；section 表示项目 dosage 为空时的标段汇总回退值。"
+          },
           "dosage": {
             "type": "array",
             "items": {
@@ -13265,6 +13284,7 @@
           "create_time",
           "end_time",
           "has_dosage",
+          "dosage_source",
           "dosage"
         ]
       },
