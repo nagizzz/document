@@ -3169,6 +3169,586 @@
         }
       }
     },
+    "/approval/front/project/detail": {
+      "post": {
+        "tags": [
+          "approval"
+        ],
+        "summary": "前台审批项目详情",
+        "description": "按项目 ID 读取前台详情。\n\n关键规则：\n1. id 必传，优先按 project_info.id 查询；未命中时兼容按 business_id 查询，因此前台列表返回的字符串 id 可以直接传入。\n2. 当前接口会加载审批记录、关联公告和标段数据；项目不存在时返回 Code=404。\n3. dosage_source=project 时 dosage 是项目自身保存的原始数组；section 时为标段材料汇总回退值。前端应按 dosage_source 判断 text、per_num、per_unit 是否存在。\n4. 前台详情当前未额外追加发布状态过滤，调用方应只使用前台列表或可信跳转参数取得项目 ID。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "项目主键 ID 或前台列表返回的 business_id 字符串。",
+                    "example": "168779804077005"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              "example": {
+                "id": "168779804077005"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "接口返回消息。",
+                      "example": "请求成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "项目前台详情。",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "前台项目 business_id 字符串。",
+                          "example": "168779804077005"
+                        },
+                        "project_code": {
+                          "type": "string",
+                          "description": "项目代码。",
+                          "example": "2608-330252-04-01-699458"
+                        },
+                        "project_name": {
+                          "type": "string",
+                          "description": "项目名称。",
+                          "example": "示例产业园建设项目"
+                        },
+                        "project_pn": {
+                          "type": "string",
+                          "description": "项目主体编号。",
+                          "example": "PN-001"
+                        },
+                        "company_id": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "建设单位 ID。",
+                          "example": 1001
+                        },
+                        "company": {
+                          "type": "string",
+                          "description": "建设单位名称。",
+                          "example": "示例建设有限公司"
+                        },
+                        "project_label_sorts": {
+                          "type": "array",
+                          "description": "项目标签 ID 列表。",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "1",
+                            "5"
+                          ]
+                        },
+                        "project_label_sort_names": {
+                          "type": "array",
+                          "description": "项目标签名称列表。",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "高速",
+                            "公路"
+                          ]
+                        },
+                        "item_nature": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "建设性质：1新建、2扩建、3改建、4迁建、9其他。",
+                          "example": 1
+                        },
+                        "item_nature_name": {
+                          "type": "string",
+                          "description": "建设性质名称。",
+                          "example": "新建"
+                        },
+                        "phase": {
+                          "type": "integer",
+                          "nullable": true,
+                          "description": "项目阶段：10立项、20规划、30施工、40竣工。",
+                          "example": 10
+                        },
+                        "phase_name": {
+                          "type": "string",
+                          "description": "项目阶段名称。",
+                          "example": "立项"
+                        },
+                        "item_type": {
+                          "type": "string",
+                          "description": "项目类型。",
+                          "example": "备案类（内资基本建设项目）"
+                        },
+                        "show_industry": {
+                          "type": "array",
+                          "description": "展示行业列表。",
+                          "items": {
+                            "type": "string"
+                          },
+                          "example": [
+                            "房建"
+                          ]
+                        },
+                        "data_source": {
+                          "type": "integer",
+                          "description": "数据来源枚举值。",
+                          "example": 1
+                        },
+                        "data_source_name": {
+                          "type": "string",
+                          "description": "数据来源名称。",
+                          "example": "备案"
+                        },
+                        "area": {
+                          "type": "array",
+                          "description": "项目地区列表。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "province_code": {
+                                "type": "integer",
+                                "example": 330000
+                              },
+                              "province_name": {
+                                "type": "string",
+                                "example": "浙江省"
+                              },
+                              "city_code": {
+                                "type": "integer",
+                                "example": 330100
+                              },
+                              "city_name": {
+                                "type": "string",
+                                "example": "杭州市"
+                              },
+                              "county_code": {
+                                "type": "integer",
+                                "nullable": true,
+                                "example": 330106
+                              },
+                              "county_name": {
+                                "type": "string",
+                                "example": "西湖区"
+                              }
+                            }
+                          }
+                        },
+                        "address": {
+                          "type": "string",
+                          "description": "项目详细地址。",
+                          "example": "浙江省杭州市西湖区示例路 88 号"
+                        },
+                        "national_industry": {
+                          "type": "string",
+                          "description": "国民经济行业分类。",
+                          "example": "房屋建筑业"
+                        },
+                        "item_industry": {
+                          "type": "string",
+                          "description": "项目行业。",
+                          "example": "房建"
+                        },
+                        "duration_date": {
+                          "type": "string",
+                          "description": "计划工期。",
+                          "example": "365"
+                        },
+                        "start_time": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "计划开工时间。",
+                          "example": "2026-08-01 00:00:00"
+                        },
+                        "end_time": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "计划竣工时间。",
+                          "example": "2027-08-01 00:00:00"
+                        },
+                        "total_area": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "总建筑面积或占地面积。",
+                          "example": 10000
+                        },
+                        "summary": {
+                          "type": "string",
+                          "description": "建设规模与内容。",
+                          "example": "建设办公楼及配套设施。"
+                        },
+                        "fund_source": {
+                          "type": "string",
+                          "description": "资金来源。",
+                          "example": "企业自筹"
+                        },
+                        "total_fund": {
+                          "type": "number",
+                          "description": "总投资，单位万元；项目值不大于 0 时回退汇总标段合同额。",
+                          "example": 50000
+                        },
+                        "civil_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "土建工程费用，单位万元。",
+                          "example": 32000
+                        },
+                        "equipment_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "设备购置费，单位万元。",
+                          "example": 5000
+                        },
+                        "install_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "安装工程费，单位万元。",
+                          "example": 3000
+                        },
+                        "other_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "其他费用，单位万元。",
+                          "example": 2000
+                        },
+                        "reserve_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "预备费，单位万元。",
+                          "example": 1000
+                        },
+                        "interest_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "建设期利息，单位万元。",
+                          "example": 800
+                        },
+                        "initial_fund": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "铺底流动资金，单位万元。",
+                          "example": 1200
+                        },
+                        "create_time": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "创建时间。",
+                          "example": "2026-08-20 16:13:02"
+                        },
+                        "dosage_source": {
+                          "type": "string",
+                          "description": "材料数据来源：project 为项目自身 dosage，section 为标段汇总回退值。",
+                          "enum": [
+                            "project",
+                            "section"
+                          ],
+                          "example": "project"
+                        },
+                        "dosage": {
+                          "type": "array",
+                          "description": "材料测算数组。project 来源项可含 per_num、per_unit；section 来源项可含 text。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "material": {
+                                "type": "string",
+                                "description": "材料名称。",
+                                "example": "水泥"
+                              },
+                              "num": {
+                                "type": "number",
+                                "description": "用量。",
+                                "example": 2.5
+                              },
+                              "unit": {
+                                "type": "string",
+                                "description": "用量单位。",
+                                "example": "万吨"
+                              },
+                              "per_num": {
+                                "type": "number",
+                                "description": "单位工程量用量，仅项目级数据可能返回。",
+                                "example": 0.3
+                              },
+                              "per_unit": {
+                                "type": "string",
+                                "description": "单位工程量单位，仅项目级数据可能返回。",
+                                "example": "吨/平方米"
+                              },
+                              "text": {
+                                "type": "string",
+                                "description": "展示文案，仅标段汇总回退值可能返回。",
+                                "example": "水泥：2.50万吨"
+                              }
+                            },
+                            "required": [
+                              "material",
+                              "num",
+                              "unit"
+                            ]
+                          }
+                        },
+                        "approvals": {
+                          "type": "array",
+                          "description": "审批记录。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "approval_id": {
+                                "type": "integer",
+                                "example": 9001
+                              },
+                              "approval_status": {
+                                "type": "integer",
+                                "example": 1
+                              },
+                              "approval_status_name": {
+                                "type": "string",
+                                "example": "已审批"
+                              },
+                              "approval_dept": {
+                                "type": "string",
+                                "example": "发展和改革局"
+                              },
+                              "approval_item": {
+                                "type": "string",
+                                "example": "项目备案"
+                              },
+                              "phase": {
+                                "type": "integer",
+                                "example": 10
+                              },
+                              "phase_name": {
+                                "type": "string",
+                                "example": "立项"
+                              },
+                              "audit_date": {
+                                "type": "string",
+                                "example": "2026-08-01"
+                              },
+                              "approval_doc_no": {
+                                "type": "string",
+                                "example": "浙发改备-001"
+                              }
+                            }
+                          }
+                        },
+                        "bids": {
+                          "type": "array",
+                          "description": "关联招中标公告 ID 列表。",
+                          "items": {
+                            "type": "integer"
+                          },
+                          "example": [
+                            123456
+                          ]
+                        },
+                        "sections": {
+                          "type": "array",
+                          "description": "项目标段列表。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "description": "标段 business_id。",
+                                "example": "168779804077006"
+                              },
+                              "section_name": {
+                                "type": "string",
+                                "example": "一标段"
+                              },
+                              "section_pn": {
+                                "type": "string",
+                                "example": "SG-01"
+                              },
+                              "section_area": {
+                                "type": "array",
+                                "description": "标段地区列表。",
+                                "items": {
+                                  "type": "object"
+                                }
+                              },
+                              "section_address": {
+                                "type": "string",
+                                "example": "杭州市西湖区"
+                              },
+                              "section_start_time": {
+                                "type": "string",
+                                "nullable": true,
+                                "example": "2026-08-01 00:00:00"
+                              },
+                              "section_end_time": {
+                                "type": "string",
+                                "nullable": true,
+                                "example": "2027-08-01 00:00:00"
+                              },
+                              "section_fund": {
+                                "type": "number",
+                                "nullable": true,
+                                "example": 12000
+                              },
+                              "lonlat_set": {
+                                "type": "object",
+                                "nullable": true,
+                                "description": "起止经纬度集合。"
+                              },
+                              "dosage": {
+                                "type": "array",
+                                "description": "标段原始材料测算数组。",
+                                "items": {
+                                  "type": "object"
+                                }
+                              },
+                              "create_time": {
+                                "type": "string",
+                                "nullable": true,
+                                "example": "2026-08-20 16:13:02"
+                              },
+                              "companies": {
+                                "type": "array",
+                                "description": "标段参建单位列表。",
+                                "items": {
+                                  "type": "object"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "project_name",
+                        "company",
+                        "dosage_source",
+                        "dosage"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "Msg",
+                    "Code",
+                    "Data"
+                  ]
+                },
+                "example": {
+                  "Msg": "请求成功",
+                  "Code": 200,
+                  "Data": {
+                    "id": "168779804077005",
+                    "project_code": "2608-330252-04-01-699458",
+                    "project_name": "示例产业园建设项目",
+                    "project_pn": "",
+                    "company_id": 1001,
+                    "company": "示例建设有限公司",
+                    "project_label_sorts": [],
+                    "project_label_sort_names": [],
+                    "item_nature": 1,
+                    "item_nature_name": "新建",
+                    "phase": 10,
+                    "phase_name": "立项",
+                    "item_type": "备案类（内资基本建设项目）",
+                    "show_industry": [
+                      "房建"
+                    ],
+                    "data_source": 1,
+                    "data_source_name": "备案",
+                    "area": [
+                      {
+                        "province_code": 330000,
+                        "province_name": "浙江省",
+                        "city_code": 330100,
+                        "city_name": "杭州市",
+                        "county_code": 330106,
+                        "county_name": "西湖区"
+                      }
+                    ],
+                    "address": "浙江省杭州市西湖区示例路 88 号",
+                    "national_industry": "房屋建筑业",
+                    "item_industry": "房建",
+                    "duration_date": "365",
+                    "start_time": "2026-08-01 00:00:00",
+                    "end_time": "2027-08-01 00:00:00",
+                    "total_area": 10000,
+                    "summary": "建设办公楼及配套设施。",
+                    "fund_source": "企业自筹",
+                    "total_fund": 50000,
+                    "civil_fund": 32000,
+                    "equipment_fund": 5000,
+                    "install_fund": 3000,
+                    "other_fund": 2000,
+                    "reserve_fund": 1000,
+                    "interest_fund": 800,
+                    "initial_fund": 1200,
+                    "create_time": "2026-08-20 16:13:02",
+                    "dosage_source": "project",
+                    "dosage": [
+                      {
+                        "material": "水泥",
+                        "num": 2.5,
+                        "unit": "万吨",
+                        "per_num": 0.3,
+                        "per_unit": "吨/平方米"
+                      }
+                    ],
+                    "approvals": [
+                      {
+                        "approval_id": 9001,
+                        "approval_status": 1,
+                        "approval_status_name": "已审批",
+                        "approval_dept": "发展和改革局",
+                        "approval_item": "项目备案",
+                        "phase": 10,
+                        "phase_name": "立项",
+                        "audit_date": "2026-08-01",
+                        "approval_doc_no": "浙发改备-001"
+                      }
+                    ],
+                    "bids": [
+                      123456
+                    ],
+                    "sections": []
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "项目不存在",
+            "content": {
+              "application/json": {
+                "example": {
+                  "Msg": "信息不存在",
+                  "Code": 404,
+                  "Data": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/approval/front/project/home-stages": {
       "post": {
         "tags": [
@@ -4703,20 +5283,29 @@
                                       "example": "万吨",
                                       "description": "数量单位。"
                                     },
+                                    "per_num": {
+                                      "type": "number",
+                                      "example": 0.3,
+                                      "description": "项目级材料的单位工程量用量；标段汇总回退值通常不返回。"
+                                    },
+                                    "per_unit": {
+                                      "type": "string",
+                                      "example": "吨/平方米",
+                                      "description": "项目级材料的单位工程量单位；标段汇总回退值通常不返回。"
+                                    },
                                     "text": {
                                       "type": "string",
                                       "example": "水泥：1.2万吨",
-                                      "description": "后端拼好的展示文案，前端可直接展示。"
+                                      "description": "仅 dosage_source=section 时由后端拼好的展示文案；项目级 dosage 可不返回。"
                                     }
                                   },
                                   "required": [
                                     "material",
                                     "num",
-                                    "unit",
-                                    "text"
+                                    "unit"
                                   ]
                                 },
-                                "description": "材料摘要数组。后端会把多个标段的同材质同单位进行汇总，并按 num 从大到小排序。"
+                                "description": "材料摘要数组。dosage_source=project 时直接返回 project_info.dosage；section 时汇总多个标段的同材质同单位，并按 num 从大到小排序。"
                               }
                             },
                             "required": [
@@ -12178,7 +12767,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__DaysRequest": {
+      "doc13_approval_front_project_home_stages_o__DaysRequest": {
         "type": "object",
         "description": "统计窗口请求体。当前两个接口只识别 days 这一个业务参数。",
         "properties": {
@@ -12191,7 +12780,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__ApiEnvelope": {
+      "doc13_approval_front_project_home_stages_o__ApiEnvelope": {
         "type": "object",
         "description": "项目接口的统一返回外层包裹结构。",
         "properties": {
@@ -12211,7 +12800,7 @@
           "Code"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__MaterialStatItem": {
+      "doc13_approval_front_project_home_stages_o__MaterialStatItem": {
         "type": "object",
         "description": "材料统计项。用于重点材料总览，也用于首页各阶段材料汇总。",
         "properties": {
@@ -12237,7 +12826,7 @@
           "unit"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__KeyMaterialsData": {
+      "doc13_approval_front_project_home_stages_o__KeyMaterialsData": {
         "type": "object",
         "description": "重点项目五大材料接口的核心数据区。",
         "properties": {
@@ -12255,7 +12844,7 @@
             "type": "array",
             "description": "五大材料的汇总结果。当前固定输出 5 项，前端通常可直接用于卡片或柱状图。若重点项目池为空，数组仍建议按固定五类处理。",
             "items": {
-              "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__MaterialStatItem"
+              "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__MaterialStatItem"
             }
           }
         },
@@ -12265,16 +12854,16 @@
           "materials"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__KeyMaterialsResponse": {
+      "doc13_approval_front_project_home_stages_o__KeyMaterialsResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__ApiEnvelope"
+            "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__KeyMaterialsData"
+                "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__KeyMaterialsData"
               }
             },
             "required": [
@@ -12283,7 +12872,7 @@
           }
         ]
       },
-      "doc12_approval_front_project_home_stages_o__StageStatItem": {
+      "doc13_approval_front_project_home_stages_o__StageStatItem": {
         "type": "object",
         "description": "单个阶段统计项。home-stages 的 stages 数组固定返回 5 项。",
         "properties": {
@@ -12313,7 +12902,7 @@
             "type": "array",
             "description": "该阶段内项目对应的材料预估总量。total 的 materials 为四个阶段材料汇总后再按 num 倒序排序。若该阶段没有材料统计，则返回空数组。",
             "items": {
-              "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__MaterialStatItem"
+              "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__MaterialStatItem"
             }
           }
         },
@@ -12324,7 +12913,7 @@
           "materials"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__AreaStatItem": {
+      "doc13_approval_front_project_home_stages_o__AreaStatItem": {
         "type": "object",
         "description": "地区分布统计项，粒度为省级行政区。",
         "properties": {
@@ -12350,7 +12939,7 @@
           "project_count"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__IndustryStatItem": {
+      "doc13_approval_front_project_home_stages_o__IndustryStatItem": {
         "type": "object",
         "description": "行业分布统计项。",
         "properties": {
@@ -12370,7 +12959,7 @@
           "project_count"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__HomeStagesData": {
+      "doc13_approval_front_project_home_stages_o__HomeStagesData": {
         "type": "object",
         "description": "首页项目阶段统计接口的核心数据区。",
         "properties": {
@@ -12388,21 +12977,21 @@
             "type": "array",
             "description": "阶段统计数组，固定顺序为 total、initiation、tender、publicity、award。首页卡片建议按 key 取值，避免后端后续调整排序时产生错位。",
             "items": {
-              "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__StageStatItem"
+              "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__StageStatItem"
             }
           },
           "areas": {
             "type": "array",
             "description": "地区统计数组。实测默认返回 34 项省级地区数据，可直接驱动地图、热力图或 TopN 列表。",
             "items": {
-              "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__AreaStatItem"
+              "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__AreaStatItem"
             }
           },
           "industries": {
             "type": "array",
             "description": "行业统计数组。当前实测返回 8 项，包含代码预置行业及 其他。前端应按接口实际返回渲染，不要本地写死排序与枚举。",
             "items": {
-              "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__IndustryStatItem"
+              "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__IndustryStatItem"
             }
           }
         },
@@ -12414,16 +13003,16 @@
           "industries"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__HomeStagesResponse": {
+      "doc13_approval_front_project_home_stages_o__HomeStagesResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__ApiEnvelope"
+            "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__HomeStagesData"
+                "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__HomeStagesData"
               }
             },
             "required": [
@@ -12432,7 +13021,7 @@
           }
         ]
       },
-      "doc12_approval_front_project_home_stages_o__MonthlyTrendItem": {
+      "doc13_approval_front_project_home_stages_o__MonthlyTrendItem": {
         "type": "object",
         "description": "月度趋势项。字段名沿用前端既有图表字段，其中 avg_price 在不同接口下表示不同业务值。",
         "properties": {
@@ -12452,10 +13041,10 @@
           "avg_price"
         ]
       },
-      "doc12_approval_front_project_home_stages_o__MonthlyTrendResponse": {
+      "doc13_approval_front_project_home_stages_o__MonthlyTrendResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__ApiEnvelope"
+            "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__ApiEnvelope"
           },
           {
             "type": "object",
@@ -12464,7 +13053,7 @@
                 "type": "array",
                 "description": "最近 6 个自然月的趋势数据，固定返回 6 条，按 year_month 升序排列。",
                 "items": {
-                  "$ref": "#/components/schemas/doc12_approval_front_project_home_stages_o__MonthlyTrendItem"
+                  "$ref": "#/components/schemas/doc13_approval_front_project_home_stages_o__MonthlyTrendItem"
                 }
               }
             },
@@ -12474,7 +13063,7 @@
           }
         ]
       },
-      "doc13_approval_front_project_key_materials__DaysRequest": {
+      "doc14_approval_front_project_key_materials__DaysRequest": {
         "type": "object",
         "description": "统计窗口请求体。当前两个接口只识别 days 这一个业务参数。",
         "properties": {
@@ -12487,7 +13076,7 @@
           }
         }
       },
-      "doc13_approval_front_project_key_materials__ApiEnvelope": {
+      "doc14_approval_front_project_key_materials__ApiEnvelope": {
         "type": "object",
         "description": "项目接口的统一返回外层包裹结构。",
         "properties": {
@@ -12507,7 +13096,7 @@
           "Code"
         ]
       },
-      "doc13_approval_front_project_key_materials__MaterialStatItem": {
+      "doc14_approval_front_project_key_materials__MaterialStatItem": {
         "type": "object",
         "description": "材料统计项。用于重点材料总览，也用于首页各阶段材料汇总。",
         "properties": {
@@ -12533,7 +13122,7 @@
           "unit"
         ]
       },
-      "doc13_approval_front_project_key_materials__KeyMaterialsData": {
+      "doc14_approval_front_project_key_materials__KeyMaterialsData": {
         "type": "object",
         "description": "重点项目五大材料接口的核心数据区。",
         "properties": {
@@ -12551,7 +13140,7 @@
             "type": "array",
             "description": "五大材料的汇总结果。当前固定输出 5 项，前端通常可直接用于卡片或柱状图。若重点项目池为空，数组仍建议按固定五类处理。",
             "items": {
-              "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__MaterialStatItem"
+              "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__MaterialStatItem"
             }
           }
         },
@@ -12561,16 +13150,16 @@
           "materials"
         ]
       },
-      "doc13_approval_front_project_key_materials__KeyMaterialsResponse": {
+      "doc14_approval_front_project_key_materials__KeyMaterialsResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__ApiEnvelope"
+            "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__KeyMaterialsData"
+                "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__KeyMaterialsData"
               }
             },
             "required": [
@@ -12579,7 +13168,7 @@
           }
         ]
       },
-      "doc13_approval_front_project_key_materials__StageStatItem": {
+      "doc14_approval_front_project_key_materials__StageStatItem": {
         "type": "object",
         "description": "单个阶段统计项。home-stages 的 stages 数组固定返回 5 项。",
         "properties": {
@@ -12609,7 +13198,7 @@
             "type": "array",
             "description": "该阶段内项目对应的材料预估总量。total 的 materials 为四个阶段材料汇总后再按 num 倒序排序。若该阶段没有材料统计，则返回空数组。",
             "items": {
-              "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__MaterialStatItem"
+              "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__MaterialStatItem"
             }
           }
         },
@@ -12620,7 +13209,7 @@
           "materials"
         ]
       },
-      "doc13_approval_front_project_key_materials__AreaStatItem": {
+      "doc14_approval_front_project_key_materials__AreaStatItem": {
         "type": "object",
         "description": "地区分布统计项，粒度为省级行政区。",
         "properties": {
@@ -12646,7 +13235,7 @@
           "project_count"
         ]
       },
-      "doc13_approval_front_project_key_materials__IndustryStatItem": {
+      "doc14_approval_front_project_key_materials__IndustryStatItem": {
         "type": "object",
         "description": "行业分布统计项。",
         "properties": {
@@ -12666,7 +13255,7 @@
           "project_count"
         ]
       },
-      "doc13_approval_front_project_key_materials__HomeStagesData": {
+      "doc14_approval_front_project_key_materials__HomeStagesData": {
         "type": "object",
         "description": "首页项目阶段统计接口的核心数据区。",
         "properties": {
@@ -12684,21 +13273,21 @@
             "type": "array",
             "description": "阶段统计数组，固定顺序为 total、initiation、tender、publicity、award。首页卡片建议按 key 取值，避免后端后续调整排序时产生错位。",
             "items": {
-              "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__StageStatItem"
+              "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__StageStatItem"
             }
           },
           "areas": {
             "type": "array",
             "description": "地区统计数组。实测默认返回 34 项省级地区数据，可直接驱动地图、热力图或 TopN 列表。",
             "items": {
-              "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__AreaStatItem"
+              "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__AreaStatItem"
             }
           },
           "industries": {
             "type": "array",
             "description": "行业统计数组。当前实测返回 8 项，包含代码预置行业及 其他。前端应按接口实际返回渲染，不要本地写死排序与枚举。",
             "items": {
-              "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__IndustryStatItem"
+              "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__IndustryStatItem"
             }
           }
         },
@@ -12710,16 +13299,16 @@
           "industries"
         ]
       },
-      "doc13_approval_front_project_key_materials__HomeStagesResponse": {
+      "doc14_approval_front_project_key_materials__HomeStagesResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__ApiEnvelope"
+            "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__HomeStagesData"
+                "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__HomeStagesData"
               }
             },
             "required": [
@@ -12728,7 +13317,7 @@
           }
         ]
       },
-      "doc13_approval_front_project_key_materials__MonthlyTrendItem": {
+      "doc14_approval_front_project_key_materials__MonthlyTrendItem": {
         "type": "object",
         "description": "月度趋势项。字段名沿用前端既有图表字段，其中 avg_price 在不同接口下表示不同业务值。",
         "properties": {
@@ -12748,10 +13337,10 @@
           "avg_price"
         ]
       },
-      "doc13_approval_front_project_key_materials__MonthlyTrendResponse": {
+      "doc14_approval_front_project_key_materials__MonthlyTrendResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__ApiEnvelope"
+            "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__ApiEnvelope"
           },
           {
             "type": "object",
@@ -12760,7 +13349,7 @@
                 "type": "array",
                 "description": "最近 6 个自然月的趋势数据，固定返回 6 条，按 year_month 升序排列。",
                 "items": {
-                  "$ref": "#/components/schemas/doc13_approval_front_project_key_materials__MonthlyTrendItem"
+                  "$ref": "#/components/schemas/doc14_approval_front_project_key_materials__MonthlyTrendItem"
                 }
               }
             },
@@ -12770,7 +13359,7 @@
           }
         ]
       },
-      "doc14_approval_front_project_list_openapi__ProjectFrontListRequest": {
+      "doc15_approval_front_project_list_openapi__ProjectFrontListRequest": {
         "type": "object",
         "description": "前台项目列表筛选参数；包含与开放搜索合集接口对齐的公开筛选条件，以及 MySQL 列表保留的材料摘要和创建时间范围条件。",
         "properties": {
@@ -13083,7 +13672,7 @@
           }
         }
       },
-      "doc14_approval_front_project_list_openapi__ProjectFrontListResponse": {
+      "doc15_approval_front_project_list_openapi__ProjectFrontListResponse": {
         "type": "object",
         "description": "项目前台列表统一返回结构。",
         "properties": {
@@ -13121,7 +13710,7 @@
               "DataList": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/doc14_approval_front_project_list_openapi__ProjectFrontListItem"
+                  "$ref": "#/components/schemas/doc15_approval_front_project_list_openapi__ProjectFrontListItem"
                 },
                 "description": "当前页项目列表。"
               }
@@ -13141,7 +13730,7 @@
           "Data"
         ]
       },
-      "doc14_approval_front_project_list_openapi__ProjectFrontListItem": {
+      "doc15_approval_front_project_list_openapi__ProjectFrontListItem": {
         "type": "object",
         "description": "ProjectInfo::toFrontList 的前台返回口径。注意 id 是 business_id 字符串。",
         "properties": {
@@ -13224,7 +13813,7 @@
           "area": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc14_approval_front_project_list_openapi__ProjectAreaItem"
+              "$ref": "#/components/schemas/doc15_approval_front_project_list_openapi__ProjectAreaItem"
             },
             "description": "项目地区数组。一个项目可能挂多个地区。"
           },
@@ -13270,9 +13859,9 @@
           "dosage": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc14_approval_front_project_list_openapi__ProjectDosageItem"
+              "$ref": "#/components/schemas/doc15_approval_front_project_list_openapi__ProjectDosageItem"
             },
-            "description": "材料摘要数组。后端会把多个标段的同材质同单位进行汇总，并按 num 从大到小排序。"
+            "description": "材料摘要数组。dosage_source=project 时直接返回 project_info.dosage；section 时汇总多个标段的同材质同单位，并按 num 从大到小排序。"
           }
         },
         "required": [
@@ -13295,7 +13884,7 @@
           "dosage"
         ]
       },
-      "doc14_approval_front_project_list_openapi__ProjectAreaItem": {
+      "doc15_approval_front_project_list_openapi__ProjectAreaItem": {
         "type": "object",
         "properties": {
           "province_code": {
@@ -13332,7 +13921,7 @@
           "county_name"
         ]
       },
-      "doc14_approval_front_project_list_openapi__ProjectDosageItem": {
+      "doc15_approval_front_project_list_openapi__ProjectDosageItem": {
         "type": "object",
         "properties": {
           "material": {
@@ -13357,20 +13946,29 @@
             "example": "万吨",
             "description": "数量单位。"
           },
+          "per_num": {
+            "type": "number",
+            "example": 0.3,
+            "description": "项目级材料的单位工程量用量；标段汇总回退值通常不返回。"
+          },
+          "per_unit": {
+            "type": "string",
+            "example": "吨/平方米",
+            "description": "项目级材料的单位工程量单位；标段汇总回退值通常不返回。"
+          },
           "text": {
             "type": "string",
             "example": "水泥：1.2万吨",
-            "description": "后端拼好的展示文案，前端可直接展示。"
+            "description": "仅 dosage_source=section 时由后端拼好的展示文案；项目级 dosage 可不返回。"
           }
         },
         "required": [
           "material",
           "num",
-          "unit",
-          "text"
+          "unit"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__DaysRequest": {
+      "doc16_approval_front_project_monthly_cemen__DaysRequest": {
         "type": "object",
         "description": "统计窗口请求体。当前两个接口只识别 days 这一个业务参数。",
         "properties": {
@@ -13383,7 +13981,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__ApiEnvelope": {
+      "doc16_approval_front_project_monthly_cemen__ApiEnvelope": {
         "type": "object",
         "description": "项目接口的统一返回外层包裹结构。",
         "properties": {
@@ -13403,7 +14001,7 @@
           "Code"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__MaterialStatItem": {
+      "doc16_approval_front_project_monthly_cemen__MaterialStatItem": {
         "type": "object",
         "description": "材料统计项。用于重点材料总览，也用于首页各阶段材料汇总。",
         "properties": {
@@ -13429,7 +14027,7 @@
           "unit"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__KeyMaterialsData": {
+      "doc16_approval_front_project_monthly_cemen__KeyMaterialsData": {
         "type": "object",
         "description": "重点项目五大材料接口的核心数据区。",
         "properties": {
@@ -13447,7 +14045,7 @@
             "type": "array",
             "description": "五大材料的汇总结果。当前固定输出 5 项，前端通常可直接用于卡片或柱状图。若重点项目池为空，数组仍建议按固定五类处理。",
             "items": {
-              "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__MaterialStatItem"
+              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__MaterialStatItem"
             }
           }
         },
@@ -13457,16 +14055,16 @@
           "materials"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__KeyMaterialsResponse": {
+      "doc16_approval_front_project_monthly_cemen__KeyMaterialsResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__ApiEnvelope"
+            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__KeyMaterialsData"
+                "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__KeyMaterialsData"
               }
             },
             "required": [
@@ -13475,7 +14073,7 @@
           }
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__StageStatItem": {
+      "doc16_approval_front_project_monthly_cemen__StageStatItem": {
         "type": "object",
         "description": "单个阶段统计项。home-stages 的 stages 数组固定返回 5 项。",
         "properties": {
@@ -13505,7 +14103,7 @@
             "type": "array",
             "description": "该阶段内项目对应的材料预估总量。total 的 materials 为四个阶段材料汇总后再按 num 倒序排序。若该阶段没有材料统计，则返回空数组。",
             "items": {
-              "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__MaterialStatItem"
+              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__MaterialStatItem"
             }
           }
         },
@@ -13516,7 +14114,7 @@
           "materials"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__AreaStatItem": {
+      "doc16_approval_front_project_monthly_cemen__AreaStatItem": {
         "type": "object",
         "description": "地区分布统计项，粒度为省级行政区。",
         "properties": {
@@ -13542,7 +14140,7 @@
           "project_count"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__IndustryStatItem": {
+      "doc16_approval_front_project_monthly_cemen__IndustryStatItem": {
         "type": "object",
         "description": "行业分布统计项。",
         "properties": {
@@ -13562,7 +14160,7 @@
           "project_count"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__HomeStagesData": {
+      "doc16_approval_front_project_monthly_cemen__HomeStagesData": {
         "type": "object",
         "description": "首页项目阶段统计接口的核心数据区。",
         "properties": {
@@ -13580,21 +14178,21 @@
             "type": "array",
             "description": "阶段统计数组，固定顺序为 total、initiation、tender、publicity、award。首页卡片建议按 key 取值，避免后端后续调整排序时产生错位。",
             "items": {
-              "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__StageStatItem"
+              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__StageStatItem"
             }
           },
           "areas": {
             "type": "array",
             "description": "地区统计数组。实测默认返回 34 项省级地区数据，可直接驱动地图、热力图或 TopN 列表。",
             "items": {
-              "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__AreaStatItem"
+              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__AreaStatItem"
             }
           },
           "industries": {
             "type": "array",
             "description": "行业统计数组。当前实测返回 8 项，包含代码预置行业及 其他。前端应按接口实际返回渲染，不要本地写死排序与枚举。",
             "items": {
-              "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__IndustryStatItem"
+              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__IndustryStatItem"
             }
           }
         },
@@ -13606,16 +14204,16 @@
           "industries"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__HomeStagesResponse": {
+      "doc16_approval_front_project_monthly_cemen__HomeStagesResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__ApiEnvelope"
+            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__HomeStagesData"
+                "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__HomeStagesData"
               }
             },
             "required": [
@@ -13624,7 +14222,7 @@
           }
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__MonthlyTrendItem": {
+      "doc16_approval_front_project_monthly_cemen__MonthlyTrendItem": {
         "type": "object",
         "description": "月度趋势项。字段名沿用前端既有图表字段，其中 avg_price 在不同接口下表示不同业务值。",
         "properties": {
@@ -13644,10 +14242,10 @@
           "avg_price"
         ]
       },
-      "doc15_approval_front_project_monthly_cemen__MonthlyTrendResponse": {
+      "doc16_approval_front_project_monthly_cemen__MonthlyTrendResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__ApiEnvelope"
+            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__ApiEnvelope"
           },
           {
             "type": "object",
@@ -13656,7 +14254,7 @@
                 "type": "array",
                 "description": "最近 6 个自然月的趋势数据，固定返回 6 条，按 year_month 升序排列。",
                 "items": {
-                  "$ref": "#/components/schemas/doc15_approval_front_project_monthly_cemen__MonthlyTrendItem"
+                  "$ref": "#/components/schemas/doc16_approval_front_project_monthly_cemen__MonthlyTrendItem"
                 }
               }
             },
@@ -13666,7 +14264,7 @@
           }
         ]
       },
-      "doc16_approval_front_project_monthly_total__DaysRequest": {
+      "doc17_approval_front_project_monthly_total__DaysRequest": {
         "type": "object",
         "description": "统计窗口请求体。当前两个接口只识别 days 这一个业务参数。",
         "properties": {
@@ -13679,7 +14277,7 @@
           }
         }
       },
-      "doc16_approval_front_project_monthly_total__ApiEnvelope": {
+      "doc17_approval_front_project_monthly_total__ApiEnvelope": {
         "type": "object",
         "description": "项目接口的统一返回外层包裹结构。",
         "properties": {
@@ -13699,7 +14297,7 @@
           "Code"
         ]
       },
-      "doc16_approval_front_project_monthly_total__MaterialStatItem": {
+      "doc17_approval_front_project_monthly_total__MaterialStatItem": {
         "type": "object",
         "description": "材料统计项。用于重点材料总览，也用于首页各阶段材料汇总。",
         "properties": {
@@ -13725,7 +14323,7 @@
           "unit"
         ]
       },
-      "doc16_approval_front_project_monthly_total__KeyMaterialsData": {
+      "doc17_approval_front_project_monthly_total__KeyMaterialsData": {
         "type": "object",
         "description": "重点项目五大材料接口的核心数据区。",
         "properties": {
@@ -13743,7 +14341,7 @@
             "type": "array",
             "description": "五大材料的汇总结果。当前固定输出 5 项，前端通常可直接用于卡片或柱状图。若重点项目池为空，数组仍建议按固定五类处理。",
             "items": {
-              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__MaterialStatItem"
+              "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__MaterialStatItem"
             }
           }
         },
@@ -13753,16 +14351,16 @@
           "materials"
         ]
       },
-      "doc16_approval_front_project_monthly_total__KeyMaterialsResponse": {
+      "doc17_approval_front_project_monthly_total__KeyMaterialsResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__ApiEnvelope"
+            "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__KeyMaterialsData"
+                "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__KeyMaterialsData"
               }
             },
             "required": [
@@ -13771,7 +14369,7 @@
           }
         ]
       },
-      "doc16_approval_front_project_monthly_total__StageStatItem": {
+      "doc17_approval_front_project_monthly_total__StageStatItem": {
         "type": "object",
         "description": "单个阶段统计项。home-stages 的 stages 数组固定返回 5 项。",
         "properties": {
@@ -13801,7 +14399,7 @@
             "type": "array",
             "description": "该阶段内项目对应的材料预估总量。total 的 materials 为四个阶段材料汇总后再按 num 倒序排序。若该阶段没有材料统计，则返回空数组。",
             "items": {
-              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__MaterialStatItem"
+              "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__MaterialStatItem"
             }
           }
         },
@@ -13812,7 +14410,7 @@
           "materials"
         ]
       },
-      "doc16_approval_front_project_monthly_total__AreaStatItem": {
+      "doc17_approval_front_project_monthly_total__AreaStatItem": {
         "type": "object",
         "description": "地区分布统计项，粒度为省级行政区。",
         "properties": {
@@ -13838,7 +14436,7 @@
           "project_count"
         ]
       },
-      "doc16_approval_front_project_monthly_total__IndustryStatItem": {
+      "doc17_approval_front_project_monthly_total__IndustryStatItem": {
         "type": "object",
         "description": "行业分布统计项。",
         "properties": {
@@ -13858,7 +14456,7 @@
           "project_count"
         ]
       },
-      "doc16_approval_front_project_monthly_total__HomeStagesData": {
+      "doc17_approval_front_project_monthly_total__HomeStagesData": {
         "type": "object",
         "description": "首页项目阶段统计接口的核心数据区。",
         "properties": {
@@ -13876,21 +14474,21 @@
             "type": "array",
             "description": "阶段统计数组，固定顺序为 total、initiation、tender、publicity、award。首页卡片建议按 key 取值，避免后端后续调整排序时产生错位。",
             "items": {
-              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__StageStatItem"
+              "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__StageStatItem"
             }
           },
           "areas": {
             "type": "array",
             "description": "地区统计数组。实测默认返回 34 项省级地区数据，可直接驱动地图、热力图或 TopN 列表。",
             "items": {
-              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__AreaStatItem"
+              "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__AreaStatItem"
             }
           },
           "industries": {
             "type": "array",
             "description": "行业统计数组。当前实测返回 8 项，包含代码预置行业及 其他。前端应按接口实际返回渲染，不要本地写死排序与枚举。",
             "items": {
-              "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__IndustryStatItem"
+              "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__IndustryStatItem"
             }
           }
         },
@@ -13902,16 +14500,16 @@
           "industries"
         ]
       },
-      "doc16_approval_front_project_monthly_total__HomeStagesResponse": {
+      "doc17_approval_front_project_monthly_total__HomeStagesResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__ApiEnvelope"
+            "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__HomeStagesData"
+                "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__HomeStagesData"
               }
             },
             "required": [
@@ -13920,7 +14518,7 @@
           }
         ]
       },
-      "doc16_approval_front_project_monthly_total__MonthlyTrendItem": {
+      "doc17_approval_front_project_monthly_total__MonthlyTrendItem": {
         "type": "object",
         "description": "月度趋势项。字段名沿用前端既有图表字段，其中 avg_price 在不同接口下表示不同业务值。",
         "properties": {
@@ -13940,10 +14538,10 @@
           "avg_price"
         ]
       },
-      "doc16_approval_front_project_monthly_total__MonthlyTrendResponse": {
+      "doc17_approval_front_project_monthly_total__MonthlyTrendResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__ApiEnvelope"
+            "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__ApiEnvelope"
           },
           {
             "type": "object",
@@ -13952,7 +14550,7 @@
                 "type": "array",
                 "description": "最近 6 个自然月的趋势数据，固定返回 6 条，按 year_month 升序排列。",
                 "items": {
-                  "$ref": "#/components/schemas/doc16_approval_front_project_monthly_total__MonthlyTrendItem"
+                  "$ref": "#/components/schemas/doc17_approval_front_project_monthly_total__MonthlyTrendItem"
                 }
               }
             },
@@ -13962,7 +14560,7 @@
           }
         ]
       },
-      "doc17_approval_front_project_section_list___ApiEnvelope": {
+      "doc18_approval_front_project_section_list___ApiEnvelope": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -13979,17 +14577,17 @@
           "Code"
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectSectionOverviewData": {
+      "doc18_approval_front_project_section_list___ProjectSectionOverviewData": {
         "type": "object",
         "properties": {
           "Counts": {
-            "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectPhaseCounts"
+            "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectPhaseCounts"
           },
           "DataList": {
             "type": "array",
             "description": "按 create_time 倒序返回的最新 50 条总投资额非空项目。",
             "items": {
-              "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectSectionOverviewItem"
+              "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectSectionOverviewItem"
             }
           }
         },
@@ -13998,7 +14596,7 @@
           "DataList"
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectSectionListRequest": {
+      "doc18_approval_front_project_section_list___ProjectSectionListRequest": {
         "type": "object",
         "properties": {
           "page": {
@@ -14089,7 +14687,7 @@
           }
         }
       },
-      "doc17_approval_front_project_section_list___ProjectSectionListData": {
+      "doc18_approval_front_project_section_list___ProjectSectionListData": {
         "type": "object",
         "properties": {
           "PageCounts": {
@@ -14111,7 +14709,7 @@
           "DataList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectSectionOverviewItem"
+              "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectSectionOverviewItem"
             }
           }
         },
@@ -14123,16 +14721,16 @@
           "DataList"
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectSectionListResponse": {
+      "doc18_approval_front_project_section_list___ProjectSectionListResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ApiEnvelope"
+            "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectSectionListData"
+                "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectSectionListData"
               }
             },
             "required": [
@@ -14141,16 +14739,16 @@
           }
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectSectionOverviewResponse": {
+      "doc18_approval_front_project_section_list___ProjectSectionOverviewResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ApiEnvelope"
+            "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectSectionOverviewData"
+                "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectSectionOverviewData"
               }
             },
             "required": [
@@ -14159,7 +14757,7 @@
           }
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectPhaseCounts": {
+      "doc18_approval_front_project_section_list___ProjectPhaseCounts": {
         "type": "object",
         "description": "开放搜索四个项目阶段的项目数量。字段值来自 phase 过滤后的 total。",
         "properties": {
@@ -14191,7 +14789,7 @@
           "completion"
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectDosageItem": {
+      "doc18_approval_front_project_section_list___ProjectDosageItem": {
         "type": "object",
         "properties": {
           "material": {
@@ -14222,7 +14820,7 @@
           "text"
         ]
       },
-      "doc17_approval_front_project_section_list___ProjectSectionOverviewItem": {
+      "doc18_approval_front_project_section_list___ProjectSectionOverviewItem": {
         "type": "object",
         "description": "项目标段合集概览中的项目列表项，字段口径与前台项目列表一致。",
         "properties": {
@@ -14336,7 +14934,7 @@
           "dosage": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc17_approval_front_project_section_list___ProjectDosageItem"
+              "$ref": "#/components/schemas/doc18_approval_front_project_section_list___ProjectDosageItem"
             },
             "description": "前台材料预估汇总列表。"
           }
@@ -14364,7 +14962,7 @@
           "dosage"
         ]
       },
-      "doc18_approval_front_project_section_overv__ApiEnvelope": {
+      "doc19_approval_front_project_section_overv__ApiEnvelope": {
         "type": "object",
         "properties": {
           "Msg": {
@@ -14381,17 +14979,17 @@
           "Code"
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionOverviewData": {
+      "doc19_approval_front_project_section_overv__ProjectSectionOverviewData": {
         "type": "object",
         "properties": {
           "Counts": {
-            "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectPhaseCounts"
+            "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectPhaseCounts"
           },
           "DataList": {
             "type": "array",
             "description": "按 create_time 倒序返回的最新 50 条总投资额非空项目。",
             "items": {
-              "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectSectionOverviewItem"
+              "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectSectionOverviewItem"
             }
           }
         },
@@ -14400,7 +14998,7 @@
           "DataList"
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionListRequest": {
+      "doc19_approval_front_project_section_overv__ProjectSectionListRequest": {
         "type": "object",
         "properties": {
           "page": {
@@ -14491,7 +15089,7 @@
           }
         }
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionListData": {
+      "doc19_approval_front_project_section_overv__ProjectSectionListData": {
         "type": "object",
         "properties": {
           "PageCounts": {
@@ -14513,7 +15111,7 @@
           "DataList": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectSectionOverviewItem"
+              "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectSectionOverviewItem"
             }
           }
         },
@@ -14525,16 +15123,16 @@
           "DataList"
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionListResponse": {
+      "doc19_approval_front_project_section_overv__ProjectSectionListResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ApiEnvelope"
+            "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectSectionListData"
+                "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectSectionListData"
               }
             },
             "required": [
@@ -14543,16 +15141,16 @@
           }
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionOverviewResponse": {
+      "doc19_approval_front_project_section_overv__ProjectSectionOverviewResponse": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ApiEnvelope"
+            "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ApiEnvelope"
           },
           {
             "type": "object",
             "properties": {
               "Data": {
-                "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectSectionOverviewData"
+                "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectSectionOverviewData"
               }
             },
             "required": [
@@ -14561,7 +15159,7 @@
           }
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectPhaseCounts": {
+      "doc19_approval_front_project_section_overv__ProjectPhaseCounts": {
         "type": "object",
         "description": "开放搜索四个项目阶段的项目数量。字段值来自 phase 过滤后的 total。",
         "properties": {
@@ -14593,7 +15191,7 @@
           "completion"
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectDosageItem": {
+      "doc19_approval_front_project_section_overv__ProjectDosageItem": {
         "type": "object",
         "properties": {
           "material": {
@@ -14624,7 +15222,7 @@
           "text"
         ]
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionOverviewItem": {
+      "doc19_approval_front_project_section_overv__ProjectSectionOverviewItem": {
         "type": "object",
         "description": "项目标段合集概览中的项目列表项，字段口径与前台项目列表一致。",
         "properties": {
@@ -14738,7 +15336,7 @@
           "dosage": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/doc18_approval_front_project_section_overv__ProjectDosageItem"
+              "$ref": "#/components/schemas/doc19_approval_front_project_section_overv__ProjectDosageItem"
             },
             "description": "前台材料预估汇总列表。"
           }
@@ -14766,7 +15364,7 @@
           "dosage"
         ]
       },
-      "doc23_bids_front_detail_openapi__BidsFrontDetailRequest": {
+      "doc24_bids_front_detail_openapi__BidsFrontDetailRequest": {
         "type": "object",
         "description": "招中标前台详情请求体。`web_id` 必传；`id` 和 `ids` 二选一即可，若同时传且 `ids` 非空，则优先按 `ids` 批量模式处理。",
         "properties": {
@@ -14795,7 +15393,7 @@
           "web_id"
         ]
       },
-      "doc23_bids_front_detail_openapi__BidsFrontDetailResponse": {
+      "doc24_bids_front_detail_openapi__BidsFrontDetailResponse": {
         "type": "object",
         "description": "招中标前台详情成功响应总说明。单 id 时请参考 `BidsFrontDetailSingleResponse`；多 ids 时请参考 `BidsFrontDetailBatchResponse`。",
         "properties": {
@@ -15152,7 +15750,7 @@
                 "type": "array",
                 "nullable": true,
                 "items": {
-                  "$ref": "#/components/schemas/doc23_bids_front_detail_openapi__BidsDosageItem"
+                  "$ref": "#/components/schemas/doc24_bids_front_detail_openapi__BidsDosageItem"
                 },
                 "description": "建材用量测算。源结构由业务录入决定，未录入时为 null。"
               },
@@ -15216,7 +15814,7 @@
           "Data"
         ]
       },
-      "doc23_bids_front_detail_openapi__BidsDosageItem": {
+      "doc24_bids_front_detail_openapi__BidsDosageItem": {
         "type": "object",
         "description": "招中标附表中的单条建材用量对象。当前结构来自业务录入，不同来源站点可能存在额外字段或值格式不统一的情况。",
         "properties": {
@@ -15243,7 +15841,7 @@
         },
         "additionalProperties": true
       },
-      "doc23_bids_front_detail_openapi__BidsFrontDetailItem": {
+      "doc24_bids_front_detail_openapi__BidsFrontDetailItem": {
         "type": "object",
         "description": "单条招中标前台详情对象。字段来自 `DataTender::toFront()`，包含主表字段、附表字段以及正文、附件等详情页常用内容。",
         "properties": {
@@ -15586,7 +16184,7 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/doc23_bids_front_detail_openapi__BidsDosageItem"
+              "$ref": "#/components/schemas/doc24_bids_front_detail_openapi__BidsDosageItem"
             },
             "description": "建材用量测算。源结构由业务录入决定，未录入时为 null。"
           },
@@ -15643,7 +16241,7 @@
           "content"
         ]
       },
-      "doc23_bids_front_detail_openapi__BidsFrontDetailSingleResponse": {
+      "doc24_bids_front_detail_openapi__BidsFrontDetailSingleResponse": {
         "type": "object",
         "description": "单 id 模式成功响应。Data 为单个详情对象。",
         "properties": {
@@ -16000,7 +16598,7 @@
                 "type": "array",
                 "nullable": true,
                 "items": {
-                  "$ref": "#/components/schemas/doc23_bids_front_detail_openapi__BidsDosageItem"
+                  "$ref": "#/components/schemas/doc24_bids_front_detail_openapi__BidsDosageItem"
                 },
                 "description": "建材用量测算。源结构由业务录入决定，未录入时为 null。"
               },
@@ -16064,7 +16662,7 @@
           "Data"
         ]
       },
-      "doc23_bids_front_detail_openapi__BidsFrontDetailBatchResponse": {
+      "doc24_bids_front_detail_openapi__BidsFrontDetailBatchResponse": {
         "type": "object",
         "description": "多 ids 模式成功响应。Data 为详情对象数组。",
         "properties": {
@@ -16424,7 +17022,7 @@
                   "type": "array",
                   "nullable": true,
                   "items": {
-                    "$ref": "#/components/schemas/doc23_bids_front_detail_openapi__BidsDosageItem"
+                    "$ref": "#/components/schemas/doc24_bids_front_detail_openapi__BidsDosageItem"
                   },
                   "description": "建材用量测算。源结构由业务录入决定，未录入时为 null。"
                 },
@@ -16489,7 +17087,7 @@
           "Data"
         ]
       },
-      "doc24_bids_front_list_openapi__BidsFrontListRequest": {
+      "doc25_bids_front_list_openapi__BidsFrontListRequest": {
         "type": "object",
         "description": "招中标前台列表请求体。除 `web_id` 外其余参数均为可选；空字符串通常表示不生效。",
         "properties": {
@@ -16814,7 +17412,7 @@
           "web_id"
         ]
       },
-      "doc24_bids_front_list_openapi__BidsFrontListResponse": {
+      "doc25_bids_front_list_openapi__BidsFrontListResponse": {
         "type": "object",
         "description": "招中标前台列表统一返回结构。",
         "properties": {
@@ -17294,7 +17892,7 @@
           "Data"
         ]
       },
-      "doc24_bids_front_list_openapi__BidsFrontListItem": {
+      "doc25_bids_front_list_openapi__BidsFrontListItem": {
         "type": "object",
         "description": "单条前台列表项。字段来自 `DataTender::toFront()`，包含主表、附表及正文内容。",
         "properties": {
@@ -17637,7 +18235,7 @@
             "type": "array",
             "nullable": true,
             "items": {
-              "$ref": "#/components/schemas/doc24_bids_front_list_openapi__BidsDosageItem"
+              "$ref": "#/components/schemas/doc25_bids_front_list_openapi__BidsDosageItem"
             },
             "description": "建材用量测算。源结构由业务录入决定，未录入时为 null。"
           },
@@ -17694,7 +18292,7 @@
           "content"
         ]
       },
-      "doc24_bids_front_list_openapi__BidsDosageItem": {
+      "doc25_bids_front_list_openapi__BidsDosageItem": {
         "type": "object",
         "description": "招中标附表中的单条建材用量对象。当前结构来自业务录入，不同来源站点可能存在额外字段或值格式不统一的情况。",
         "properties": {
@@ -17723,7 +18321,7 @@
       }
     },
     "examples": {
-      "doc12_approval_front_project_home_stages_o__KeyMaterialsActual30Days": {
+      "doc13_approval_front_project_home_stages_o__KeyMaterialsActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={} 实测得到。",
         "value": {
@@ -17762,7 +18360,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__KeyMaterialsActual7Days": {
+      "doc13_approval_front_project_home_stages_o__KeyMaterialsActual7Days": {
         "summary": "测试环境实测 7 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={days:7} 实测得到。",
         "value": {
@@ -17801,7 +18399,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__HomeStagesActual30Days": {
+      "doc13_approval_front_project_home_stages_o__HomeStagesActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/home-stages，Body={} 实测得到。为控制文档长度，areas 示例仅保留部分地区，但字段结构与真实返回一致。",
         "value": {
@@ -18036,7 +18634,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__HomeStagesEmpty": {
+      "doc13_approval_front_project_home_stages_o__HomeStagesEmpty": {
         "summary": "统计表不存在或查询异常时的空态样例",
         "description": "来自代码兜底结构，不依赖测试环境当前是否返回空数据。前端空态处理可参考该结构。",
         "value": {
@@ -18106,7 +18704,7 @@
           }
         }
       },
-      "doc12_approval_front_project_home_stages_o__MonthlyTotalFundSample": {
+      "doc13_approval_front_project_home_stages_o__MonthlyTotalFundSample": {
         "summary": "最近 6 个自然月投资总额示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。",
         "value": {
@@ -18140,7 +18738,7 @@
           ]
         }
       },
-      "doc12_approval_front_project_home_stages_o__MonthlyCementDosageSample": {
+      "doc13_approval_front_project_home_stages_o__MonthlyCementDosageSample": {
         "summary": "最近 6 个自然月水泥预估需求量示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。单位为万吨。",
         "value": {
@@ -18174,7 +18772,7 @@
           ]
         }
       },
-      "doc13_approval_front_project_key_materials__KeyMaterialsActual30Days": {
+      "doc14_approval_front_project_key_materials__KeyMaterialsActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={} 实测得到。",
         "value": {
@@ -18213,7 +18811,7 @@
           }
         }
       },
-      "doc13_approval_front_project_key_materials__KeyMaterialsActual7Days": {
+      "doc14_approval_front_project_key_materials__KeyMaterialsActual7Days": {
         "summary": "测试环境实测 7 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={days:7} 实测得到。",
         "value": {
@@ -18252,7 +18850,7 @@
           }
         }
       },
-      "doc13_approval_front_project_key_materials__HomeStagesActual30Days": {
+      "doc14_approval_front_project_key_materials__HomeStagesActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/home-stages，Body={} 实测得到。为控制文档长度，areas 示例仅保留部分地区，但字段结构与真实返回一致。",
         "value": {
@@ -18487,7 +19085,7 @@
           }
         }
       },
-      "doc13_approval_front_project_key_materials__HomeStagesEmpty": {
+      "doc14_approval_front_project_key_materials__HomeStagesEmpty": {
         "summary": "统计表不存在或查询异常时的空态样例",
         "description": "来自代码兜底结构，不依赖测试环境当前是否返回空数据。前端空态处理可参考该结构。",
         "value": {
@@ -18557,7 +19155,7 @@
           }
         }
       },
-      "doc13_approval_front_project_key_materials__MonthlyTotalFundSample": {
+      "doc14_approval_front_project_key_materials__MonthlyTotalFundSample": {
         "summary": "最近 6 个自然月投资总额示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。",
         "value": {
@@ -18591,7 +19189,7 @@
           ]
         }
       },
-      "doc13_approval_front_project_key_materials__MonthlyCementDosageSample": {
+      "doc14_approval_front_project_key_materials__MonthlyCementDosageSample": {
         "summary": "最近 6 个自然月水泥预估需求量示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。单位为万吨。",
         "value": {
@@ -18625,7 +19223,7 @@
           ]
         }
       },
-      "doc14_approval_front_project_list_openapi__ProjectFrontListActualSingleItem": {
+      "doc15_approval_front_project_list_openapi__ProjectFrontListActualSingleItem": {
         "summary": "2026-06-04 测试环境 page_size=1 实测响应",
         "description": "通过 POST http://project.api.test.cbmnet.cn/approval/front/project/list，Body=page_size=1 实测得到。",
         "value": {
@@ -18675,7 +19273,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__KeyMaterialsActual30Days": {
+      "doc16_approval_front_project_monthly_cemen__KeyMaterialsActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={} 实测得到。",
         "value": {
@@ -18714,7 +19312,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__KeyMaterialsActual7Days": {
+      "doc16_approval_front_project_monthly_cemen__KeyMaterialsActual7Days": {
         "summary": "测试环境实测 7 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={days:7} 实测得到。",
         "value": {
@@ -18753,7 +19351,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__HomeStagesActual30Days": {
+      "doc16_approval_front_project_monthly_cemen__HomeStagesActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/home-stages，Body={} 实测得到。为控制文档长度，areas 示例仅保留部分地区，但字段结构与真实返回一致。",
         "value": {
@@ -18988,7 +19586,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__HomeStagesEmpty": {
+      "doc16_approval_front_project_monthly_cemen__HomeStagesEmpty": {
         "summary": "统计表不存在或查询异常时的空态样例",
         "description": "来自代码兜底结构，不依赖测试环境当前是否返回空数据。前端空态处理可参考该结构。",
         "value": {
@@ -19058,7 +19656,7 @@
           }
         }
       },
-      "doc15_approval_front_project_monthly_cemen__MonthlyTotalFundSample": {
+      "doc16_approval_front_project_monthly_cemen__MonthlyTotalFundSample": {
         "summary": "最近 6 个自然月投资总额示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。",
         "value": {
@@ -19092,7 +19690,7 @@
           ]
         }
       },
-      "doc15_approval_front_project_monthly_cemen__MonthlyCementDosageSample": {
+      "doc16_approval_front_project_monthly_cemen__MonthlyCementDosageSample": {
         "summary": "最近 6 个自然月水泥预估需求量示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。单位为万吨。",
         "value": {
@@ -19126,7 +19724,7 @@
           ]
         }
       },
-      "doc16_approval_front_project_monthly_total__KeyMaterialsActual30Days": {
+      "doc17_approval_front_project_monthly_total__KeyMaterialsActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={} 实测得到。",
         "value": {
@@ -19165,7 +19763,7 @@
           }
         }
       },
-      "doc16_approval_front_project_monthly_total__KeyMaterialsActual7Days": {
+      "doc17_approval_front_project_monthly_total__KeyMaterialsActual7Days": {
         "summary": "测试环境实测 7 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/key-materials，Body={days:7} 实测得到。",
         "value": {
@@ -19204,7 +19802,7 @@
           }
         }
       },
-      "doc16_approval_front_project_monthly_total__HomeStagesActual30Days": {
+      "doc17_approval_front_project_monthly_total__HomeStagesActual30Days": {
         "summary": "测试环境实测 30 天样例",
         "description": "2026-06-02 通过 POST http://project.api.test.cbmnet.cn/approval/front/project/home-stages，Body={} 实测得到。为控制文档长度，areas 示例仅保留部分地区，但字段结构与真实返回一致。",
         "value": {
@@ -19439,7 +20037,7 @@
           }
         }
       },
-      "doc16_approval_front_project_monthly_total__HomeStagesEmpty": {
+      "doc17_approval_front_project_monthly_total__HomeStagesEmpty": {
         "summary": "统计表不存在或查询异常时的空态样例",
         "description": "来自代码兜底结构，不依赖测试环境当前是否返回空数据。前端空态处理可参考该结构。",
         "value": {
@@ -19509,7 +20107,7 @@
           }
         }
       },
-      "doc16_approval_front_project_monthly_total__MonthlyTotalFundSample": {
+      "doc17_approval_front_project_monthly_total__MonthlyTotalFundSample": {
         "summary": "最近 6 个自然月投资总额示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。",
         "value": {
@@ -19543,7 +20141,7 @@
           ]
         }
       },
-      "doc16_approval_front_project_monthly_total__MonthlyCementDosageSample": {
+      "doc17_approval_front_project_monthly_total__MonthlyCementDosageSample": {
         "summary": "最近 6 个自然月水泥预估需求量示例",
         "description": "示例结构基于当前代码返回格式整理，实际数值需以接口实时返回为准。单位为万吨。",
         "value": {
@@ -19577,7 +20175,7 @@
           ]
         }
       },
-      "doc17_approval_front_project_section_list___ProjectSectionOverviewSample": {
+      "doc18_approval_front_project_section_list___ProjectSectionOverviewSample": {
         "summary": "项目标段合集概览示例",
         "value": {
           "Msg": "请求成功",
@@ -19630,7 +20228,7 @@
           }
         }
       },
-      "doc18_approval_front_project_section_overv__ProjectSectionOverviewSample": {
+      "doc19_approval_front_project_section_overv__ProjectSectionOverviewSample": {
         "summary": "项目标段合集概览示例",
         "value": {
           "Msg": "请求成功",
