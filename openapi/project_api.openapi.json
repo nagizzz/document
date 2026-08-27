@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.08.25",
+    "version": "2026.08.27",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -667,7 +667,7 @@
           "approval"
         ],
         "summary": "审批项目详情",
-        "description": "按项目主键 id 读取单个审批项目详情。\n\n关键规则：\n1. id 必填，传 project_info.id。\n2. 控制器最终返回 ProjectInfo::toAdmin()，因此响应字段口径与列表项一致但字段更完整。\n3. 项目不存在时返回 Code=404、Msg=信息不存在。",
+        "description": "按项目主键 id 读取单个审批项目详情。\n\n关键规则：\n1. id 必填，传 project_info.id。\n2. 控制器最终返回 ProjectInfo::toAdmin()。dosage 为 project_info 保存的项目级建材用量数组；cement_dosage 是其中材质名包含“水泥”的 num 自动合计，供编辑表单回显，不能当作标段聚合数据处理。\n3. 项目不存在时返回 Code=404、Msg=信息不存在。",
         "requestBody": {
           "required": true,
           "content": {
@@ -955,46 +955,52 @@
                         },
                         "dosage": {
                           "type": "array",
-                          "description": "项目下标段材料聚合列表。",
+                          "description": "项目级建材用量测算数组；按 material 去重后保存。",
                           "items": {
                             "type": "object",
                             "properties": {
-                              "section_id": {
+                              "material": {
                                 "type": "string",
-                                "description": "标段 ID。",
-                                "example": "5001"
+                                "description": "建材名称。",
+                                "example": "水泥"
                               },
-                              "section_name": {
+                              "num": {
+                                "type": "number",
+                                "description": "预估用量。",
+                                "example": 2.5
+                              },
+                              "unit": {
                                 "type": "string",
-                                "description": "标段名称。",
-                                "example": "一标段"
+                                "description": "预估用量单位。",
+                                "example": "万吨"
                               },
-                              "dosage": {
-                                "type": "array",
-                                "description": "当前标段的材料摘要列表。",
-                                "items": {
-                                  "type": "object",
-                                  "properties": {
-                                    "material": {
-                                      "type": "string",
-                                      "description": "材料名称。",
-                                      "example": "水泥"
-                                    },
-                                    "num": {
-                                      "type": "number",
-                                      "description": "材料数量。",
-                                      "example": 1.2
-                                    },
-                                    "unit": {
-                                      "type": "string",
-                                      "description": "材料单位。",
-                                      "example": "万吨"
-                                    }
-                                  }
-                                }
+                              "per_num": {
+                                "type": "number",
+                                "description": "单位工程量用量；未填写时为空字符串。",
+                                "example": 0.3
+                              },
+                              "per_unit": {
+                                "type": "string",
+                                "description": "单位工程量单位；未填写时为空字符串。",
+                                "example": "吨/平方米"
                               }
                             }
-                          }
+                          },
+                          "example": [
+                            {
+                              "material": "水泥",
+                              "num": 2.5,
+                              "unit": "万吨",
+                              "per_num": 0.3,
+                              "per_unit": "吨/平方米"
+                            }
+                          ]
+                        },
+                        "cement_dosage": {
+                          "type": "number",
+                          "nullable": true,
+                          "description": "项目级 dosage 中材质名包含“水泥”的 num 自动合计；没有水泥项时为 null。",
+                          "example": 2.5
                         },
                         "update_time": {
                           "type": "string",
@@ -1072,15 +1078,16 @@
                     "process_status_name": "已处理",
                     "publish_status": 1,
                     "publish_status_name": "已发布",
-                    "dosage": {
-                      "section_id": "5001",
-                      "section_name": "一标段",
-                      "dosage": {
+                    "dosage": [
+                      {
                         "material": "水泥",
-                        "num": 1.2,
-                        "unit": "万吨"
+                        "num": 2.5,
+                        "unit": "万吨",
+                        "per_num": 0.3,
+                        "per_unit": "吨/平方米"
                       }
-                    },
+                    ],
+                    "cement_dosage": 2.5,
                     "update_time": "2026-07-10 11:30:00",
                     "add_user": "admin"
                   }
