@@ -2,17 +2,157 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ccement_user_api - APIPOST 聚合接口文档",
-    "version": "2026.08.27",
+    "version": "2026.09.07",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
+    "/home/app/getIosProductsLists": {
+      "get": {
+        "tags": [
+          "home"
+        ],
+        "summary": "获取 iOS App 商品列表",
+        "description": "电站通页面传 `type=9`。接口返回 `Data.data`，每项的 `productId` 必须原样传入后续 iOS 内购建单流程。",
+        "operationId": "getIosProductsLists",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "商品分类。9=数字新能源电站通会员；默认 1=行情通。",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 9
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "获取IOS产品列表成功"
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "description": "列表展示序号。",
+                                "example": 2
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "商品展示名称。",
+                                "example": "电站通年度会员"
+                              },
+                              "productId": {
+                                "type": "string",
+                                "description": "Apple 内购产品 ID。",
+                                "example": "com.nenergy.databm.app.powerstation.oneyear"
+                              },
+                              "serviceTime": {
+                                "type": "string",
+                                "description": "服务时长数值。",
+                                "example": "1"
+                              },
+                              "serviceUnit": {
+                                "type": "string",
+                                "description": "服务时长单位。",
+                                "example": "年"
+                              },
+                              "price": {
+                                "type": "string",
+                                "description": "售价展示文本。",
+                                "example": "998"
+                              },
+                              "original_price": {
+                                "type": "string",
+                                "description": "原价展示文本。",
+                                "example": "998"
+                              },
+                              "goods_id": {
+                                "type": "string",
+                                "description": "内部商品 ID。",
+                                "example": "DNEGJHY08"
+                              }
+                            }
+                          }
+                        },
+                        "totalPages": {
+                          "type": "integer",
+                          "description": "总页数。",
+                          "example": 1
+                        },
+                        "totalCounts": {
+                          "type": "integer",
+                          "description": "商品总数。",
+                          "example": 2
+                        },
+                        "curPage": {
+                          "type": "integer",
+                          "description": "当前页码。",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Msg": "获取IOS产品列表成功",
+                  "Data": {
+                    "data": [
+                      {
+                        "id": 2,
+                        "name": "电站通年度会员",
+                        "productId": "com.nenergy.databm.app.powerstation.oneyear",
+                        "serviceTime": "1",
+                        "serviceUnit": "年",
+                        "price": "998",
+                        "original_price": "998",
+                        "goods_id": "DNEGJHY08"
+                      }
+                    ],
+                    "totalPages": 1,
+                    "totalCounts": 2,
+                    "curPage": 1
+                  }
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "当前分类无可售商品"
+          },
+          "400": {
+            "description": "商品分类参数不合法"
+          }
+        }
+      }
+    },
     "/home/app/xcxProductLists": {
       "get": {
         "tags": [
           "home"
         ],
         "summary": "获取小程序商品列表",
-        "description": "按商品分类返回当前可售的小程序商品。\n\n## 适用页面\n- 小程序会员商品页\n- 虚拟支付前置商品选择页\n- 小程序首页会员购买弹层\n\n## 关键规则\n1. type 不传默认按 3 处理。\n2. 只接受 3,4,5,6,7,8,9,10,11,12,13,14,16。\n3. 商品未到起售时间或已过停售时间时，后端会自动过滤。\n4. between_discount_date=true 时，price 为活动价；numeric_price 仍是原配置基准价格。\n5. Code=204 仅表示该分类暂无可售商品，不表示系统报错。\n6. 测试版虚拟支付商品默认不返回；只有传 `include_test_products=1` 且 `enable_xpay_test_products=true` 时才会一并返回。\n7. 当 `enable_xpay_test_products=false` 时，即使传 `include_test_products=1`，测试版虚拟支付商品也会继续隐藏。\n\n## type 取值说明\n- 3=精选会员，返回 SNJXHY01 等精选商品\n- 4=企业通会员，返回 hqt_cxc_company_year\n- 5=行情通小程序会员；默认返回正式年卡与月卡，传 `include_test_products=1` 时额外返回 hqt_cxc_vip_year_cs\n- 6=联合会员，代码保留分类但当前 productIds 为空，通常返回空列表\n- 7=水泥百事通会员，返回 SNTHY01\n- 8=水泥数据会员，返回 hqt_cxc_data_2months、hqt_cxc_data_year\n- 9=混凝土行情通会员；默认返回 hnt_hqt_cxc_vip_year，传 `include_test_products=1` 时额外返回 hnt_cxc_vip_year_cs\n- 10=数字新能源光伏行情通会员，返回虚拟支付道具 price_year\n- 11=百事通小程序项目通会员；默认返回 xmt_cxc_svip_year，传 `include_test_products=1` 时额外返回 xmt_svip_year\n- 12=数字新能源项目通会员，返回 bid_2months、bid_1year\n- 13=数字新能源电站会员；默认返回 powerstation_3months，传 `include_test_products=1` 时额外返回 cespowerstation_3\n- 14=水泥购项目通会员，返回 SNGXMTHY01、SNGXMTHY02、SNGXMTHY03\n- 16=采购通会员，返回 hqt_cxc_CGT_year\n\n前端必须按业务场景传明确分类，不能只根据页面文案猜数字。",
+        "description": "按商品分类返回当前可售的小程序商品。\n\n## 适用页面\n- 小程序会员商品页\n- 虚拟支付前置商品选择页\n- 小程序首页会员购买弹层\n\n## 关键规则\n1. type 不传默认按 3 处理。\n2. 只接受 3,4,5,6,7,8,9,10,11,12,13,14,16。\n3. 商品未到起售时间或已过停售时间时，后端会自动过滤。\n4. between_discount_date=true 时，price 为活动价；numeric_price 仍是原配置基准价格。\n5. Code=204 仅表示该分类暂无可售商品，不表示系统报错。\n6. 测试版虚拟支付商品默认不返回；只有传 `include_test_products=1` 且 `enable_xpay_test_products=true` 时才会一并返回。\n7. 当 `enable_xpay_test_products=false` 时，即使传 `include_test_products=1`，测试版虚拟支付商品也会继续隐藏。\n\n## type 取值说明\n- 3=精选会员，返回 SNJXHY01 等精选商品\n- 4=企业通会员，返回 hqt_cxc_company_year\n- 5=行情通小程序会员；默认返回正式年卡与月卡，传 `include_test_products=1` 时额外返回 hqt_cxc_vip_year_cs\n- 6=联合会员，代码保留分类但当前 productIds 为空，通常返回空列表\n- 7=水泥百事通会员，返回 SNTHY01\n- 8=水泥数据会员，返回 hqt_cxc_data_2months、hqt_cxc_data_year\n- 9=混凝土行情通会员；默认返回 hnt_hqt_cxc_vip_year，传 `include_test_products=1` 时额外返回 hnt_cxc_vip_year_cs\n- 10=数字新能源光伏行情通会员，返回虚拟支付道具 price_year\n- 11=百事通小程序项目通会员；默认返回 xmt_cxc_svip_year，传 `include_test_products=1` 时额外返回 xmt_svip_year\n- 12=数字新能源项目通会员，返回 bid_2months、bid_1year\n- 13=数字新能源电站会员；默认返回正式道具 powerstation_3months、powerstation_1year；传 `include_test_products=1` 时额外返回测试道具 cespowerstation_3\n- 14=水泥购项目通会员，返回 SNGXMTHY01、SNGXMTHY02、SNGXMTHY03\n- 16=采购通会员，返回 hqt_cxc_CGT_year\n\n前端必须按业务场景传明确分类，不能只根据页面文案猜数字。",
         "operationId": "xcxProductLists",
         "parameters": [
           {
@@ -174,26 +314,26 @@
                       "Msg": "获取小程序产品列表成功",
                       "Data": [
                         {
-                          "product_id": "hqt_cxc_vip_year",
-                          "product_name": "行情通小程序会员",
-                          "group_name": "行情通小程序会员",
-                          "original_price": "699",
-                          "numeric_original_price": 699,
-                          "price": 499,
-                          "numeric_price": 699,
+                          "product_id": "powerstation_1year",
+                          "product_name": "光伏电站通一年",
+                          "group_name": "数字新能源-电站通",
+                          "original_price": "998",
+                          "numeric_original_price": 998,
+                          "price": "998",
+                          "numeric_price": 998,
                           "year": 1,
                           "month": 0,
                           "week": 0,
                           "day": 0,
-                          "between_discount_date": true,
-                          "discount_start_date": "2026-05-01 00:00:00",
-                          "discount_end_date": "2026-05-31 23:59:59",
-                          "tag": "限时优惠",
-                          "price_tips": "首屏展示价",
-                          "scribing_price": "原价699元",
-                          "time_description": "1年有效",
-                          "dynamic_button": "立即开通",
-                          "detail_tag": "推荐"
+                          "between_discount_date": false,
+                          "discount_start_date": null,
+                          "discount_end_date": null,
+                          "tag": "",
+                          "price_tips": "",
+                          "scribing_price": "",
+                          "time_description": "",
+                          "dynamic_button": "",
+                          "detail_tag": ""
                         }
                       ]
                     }
@@ -235,7 +375,7 @@
           "home"
         ],
         "summary": "预创建订单",
-        "description": "已登录用户建单接口。支付前先创建待支付订单，返回 order_sn 作为后续 outTradeNo。\n\n## 关键规则\n1. uid 必须为真实注册用户。\n2. openid 必填，后端会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. env 不传默认 0；建单、getPaySig、queryOrder、微信支付请求必须使用同一环境。\n4. pay_type 仅支持 2=微信支付、3=Apple 内购。\n5. order_source 不接受前端传值，由后端按 productId 自动映射。\n6. order_amount 取商品 price，original_price 取商品 original_price；回调发货时会以微信 query_order 返回的 paid_fee/order_fee 覆盖实付金额。\n7. 前端仍建议在 wx.requestVirtualPayment 的 attach 中传 uid=xxx；有预建订单时服务端以订单 u_id 为准，attach 仅作为无预建订单兜底。\n8. 当 `enable_xpay_test_products=false` 时，测试版商品不会出现在商品列表里，且 getPaySig、createOrder、createVisitorOrder 会拒绝测试商品；deliverNotify 对测试商品回调只记录后返回成功。\n\n## 支持的道具 ID（productId 取值）\n| productId | 商品名称 | 价格 | 小程序 |\n|---|---|---|---|\n| xmt_cxc_svip_year | 项目通高级版1年 | ¥3999 | 百事通小程序 |\n| xmt_svip_year | 项目通高级会员一年-测试版 | ¥3999 | 百事通小程序 |\n| hqt_cxc_vip_year | 行情通小程序会员1年 | ¥2988 | 行情通小程序 |\n| hqt_cxc_CGT_year | 采购通会员1年 | ¥399 | 行情通小程序 |\n| hqt_cxc_data_year | 水泥数据会员1年 | ¥6888 | 行情通小程序 |\n| hqt_cxc_data_2months | 水泥数据会员2个月 | ¥1388 | 行情通小程序 |\n| hqt_cxc_company_year | 企业通会员1年 | ¥1298 | 行情通小程序 |\n| hqt_cxc_DJGvip_month | 行情通-多晶硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GYGvip_month | 行情通-工业硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_SZvip_month | 行情通-水渣会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_BLvip_month | 行情通-玻璃会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_DCPvip_month | 行情通-电池片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GPvip_month | 行情通-硅片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_ZJvip_month | 行情通-组件会员1个月 | ¥49 | 行情通小程序 |\n| price_year | 数字新能源光伏行情通1年 | ¥2999 | 数字新能源小程序 |\n| powerstation_3months | 数字新能源电站通3个月 | ¥300 | 数字新能源小程序 |\n| bid_2months | 数字新能源项目通2个月 | ¥100 | 数字新能源小程序 |\n| bid_1year | 数字新能源项目通1年 | ¥399 | 数字新能源小程序 |\n| hnt_hqt_cxc_vip_year | 混凝土行情通会员1年 | ¥3799 | 混凝土行情通小程序 |\n| hnt_cxc_vip_year_cs | 混凝土行情通会员1年-测试版 | ¥3799 | 混凝土行情通小程序 |\n\n正式环境若已关闭测试商品开关，则上表中的两个测试版 productId 仅作为测试期留档，不应继续用于联调或上线调用。",
+        "description": "已登录用户建单接口。支付前先创建待支付订单，返回 order_sn 作为后续 outTradeNo。\n\n## 关键规则\n1. uid 必须为真实注册用户。\n2. openid 必填，后端会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. env 不传默认 0；建单、getPaySig、queryOrder、微信支付请求必须使用同一环境。\n4. pay_type 仅支持 2=微信支付、3=Apple 内购。\n5. order_source 不接受前端传值，由后端按 productId 自动映射。\n6. order_amount 取商品 price，original_price 取商品 original_price；回调发货时会以微信 query_order 返回的 paid_fee/order_fee 覆盖实付金额。\n7. 前端仍建议在 wx.requestVirtualPayment 的 attach 中传 uid=xxx；有预建订单时服务端以订单 u_id 为准，attach 仅作为无预建订单兜底。\n8. 当 `enable_xpay_test_products=false` 时，测试版商品不会出现在商品列表里，且 getPaySig、createOrder、createVisitorOrder 会拒绝测试商品；deliverNotify 对测试商品回调只记录后返回成功。\n\n## 支持的道具 ID（productId 取值）\n| productId | 商品名称 | 价格 | 小程序 |\n|---|---|---|---|\n| xmt_cxc_svip_year | 项目通高级版1年 | ¥3999 | 百事通小程序 |\n| xmt_svip_year | 项目通高级会员一年-测试版 | ¥3999 | 百事通小程序 |\n| hqt_cxc_vip_year | 行情通小程序会员1年 | ¥2988 | 行情通小程序 |\n| hqt_cxc_CGT_year | 采购通会员1年 | ¥399 | 行情通小程序 |\n| hqt_cxc_data_year | 水泥数据会员1年 | ¥6888 | 行情通小程序 |\n| hqt_cxc_data_2months | 水泥数据会员2个月 | ¥1388 | 行情通小程序 |\n| hqt_cxc_company_year | 企业通会员1年 | ¥1298 | 行情通小程序 |\n| hqt_cxc_DJGvip_month | 行情通-多晶硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GYGvip_month | 行情通-工业硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_SZvip_month | 行情通-水渣会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_BLvip_month | 行情通-玻璃会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_DCPvip_month | 行情通-电池片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GPvip_month | 行情通-硅片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_ZJvip_month | 行情通-组件会员1个月 | ¥49 | 行情通小程序 |\n| price_year | 数字新能源光伏行情通1年 | ¥2999 | 数字新能源小程序 |\n| powerstation_3months | 数字新能源电站通3个月 | ¥300 | 数字新能源小程序 |\n| powerstation_1year | 光伏电站通一年 | ¥998 | 数字新能源小程序 |\n| bid_2months | 数字新能源项目通2个月 | ¥100 | 数字新能源小程序 |\n| bid_1year | 数字新能源项目通1年 | ¥399 | 数字新能源小程序 |\n| hnt_hqt_cxc_vip_year | 混凝土行情通会员1年 | ¥3799 | 混凝土行情通小程序 |\n| hnt_cxc_vip_year_cs | 混凝土行情通会员1年-测试版 | ¥3799 | 混凝土行情通小程序 |\n\n正式环境若已关闭测试商品开关，则上表中的两个测试版 productId 仅作为测试期留档，不应继续用于联调或上线调用。",
         "operationId": "createOrder",
         "requestBody": {
           "required": true,
@@ -259,7 +399,7 @@
                   },
                   "productId": {
                     "type": "string",
-                    "description": "微信虚拟支付道具 ID，例如 xmt_cxc_svip_year、hqt_cxc_vip_year、hqt_cxc_CGT_year、price_year、bid_1year。"
+                    "description": "微信虚拟支付道具 ID。例如数字新能源电站通使用 powerstation_3months（3个月）或 powerstation_1year（1年，¥998）；完整受支持道具清单见接口说明。"
                   },
                   "pay_type": {
                     "type": "integer",
@@ -895,6 +1035,190 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/member/fetchProductList": {
+      "get": {
+        "tags": [
+          "member"
+        ],
+        "summary": "获取 App 商品列表",
+        "description": "按 `type` 返回指定商品分类。电站通页面必须传 `type=9`，并根据 `product_id` 传入下单流程。",
+        "operationId": "fetchProductList",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "商品分类。9=数字新能源电站通会员；默认 1=行情通。",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "example": 9
+            }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "description": "App 版本标识，仅数字新能源项目通 type=8 使用；电站通 type=9 可不传。",
+            "schema": {
+              "type": "string",
+              "example": "5.0.0"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Code": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "Msg": {
+                      "type": "string",
+                      "example": "获取成功"
+                    },
+                    "Data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "product_id": {
+                            "type": "string",
+                            "description": "内部商品 ID，下单时传此值。",
+                            "example": "DNEGJHY08"
+                          },
+                          "product_name": {
+                            "type": "string",
+                            "description": "商品展示名称。",
+                            "example": "光伏电站通一年"
+                          },
+                          "group_name": {
+                            "type": "string",
+                            "description": "权益分组名称。",
+                            "example": "数字新能源-电站通"
+                          },
+                          "original_price": {
+                            "type": "string",
+                            "description": "原价展示文本。",
+                            "example": "998"
+                          },
+                          "price": {
+                            "type": "string",
+                            "description": "当前售价展示文本。",
+                            "example": "998"
+                          },
+                          "year": {
+                            "type": "integer",
+                            "description": "有效年数。",
+                            "example": 1
+                          },
+                          "month": {
+                            "type": "integer",
+                            "description": "有效月数。",
+                            "example": 0
+                          },
+                          "week": {
+                            "type": "integer",
+                            "description": "有效周数。",
+                            "example": 0
+                          },
+                          "day": {
+                            "type": "integer",
+                            "description": "有效天数。",
+                            "example": 0
+                          },
+                          "between_discount_date": {
+                            "type": "boolean",
+                            "description": "是否处于活动价时间段。",
+                            "example": false
+                          },
+                          "discount_start_date": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "活动开始时间；无活动为空。",
+                            "example": null
+                          },
+                          "discount_end_date": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "活动结束时间；无活动为空。",
+                            "example": null
+                          },
+                          "tag": {
+                            "type": "string",
+                            "description": "商品标签。",
+                            "example": ""
+                          },
+                          "price_tips": {
+                            "type": "string",
+                            "description": "价格补充提示。",
+                            "example": ""
+                          },
+                          "scribing_price": {
+                            "type": "string",
+                            "description": "划线价或订阅价补充文案。",
+                            "example": ""
+                          },
+                          "additional_remark": {
+                            "type": "string",
+                            "description": "附加说明。",
+                            "example": ""
+                          },
+                          "dynamic_button": {
+                            "type": "string",
+                            "description": "动态按钮文案。",
+                            "example": ""
+                          },
+                          "detail_tag": {
+                            "type": "string",
+                            "description": "详情标签。",
+                            "example": ""
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Code": 200,
+                  "Msg": "获取成功",
+                  "Data": [
+                    {
+                      "product_id": "DNEGJHY08",
+                      "product_name": "光伏电站通一年",
+                      "group_name": "数字新能源-电站通",
+                      "original_price": "998",
+                      "price": "998",
+                      "year": 1,
+                      "month": 0,
+                      "week": 0,
+                      "day": 0,
+                      "between_discount_date": false,
+                      "discount_start_date": null,
+                      "discount_end_date": null,
+                      "tag": "",
+                      "price_tips": "",
+                      "scribing_price": "",
+                      "additional_remark": "",
+                      "dynamic_button": "",
+                      "detail_tag": ""
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "当前分类无可售商品"
           }
         }
       }
