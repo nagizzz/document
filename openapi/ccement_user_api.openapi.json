@@ -401,6 +401,11 @@
                     "type": "string",
                     "description": "微信虚拟支付道具 ID。例如数字新能源电站通使用 powerstation_3months（3个月）或 powerstation_1year（1年，¥998）；完整受支持道具清单见接口说明。"
                   },
+                  "user_remark": {
+                    "type": "string",
+                    "description": "用户订单备注，可选。后端原样写入订单 user_remark 字段，供后台订单列表展示；空字符串或未传表示无备注。",
+                    "example": "企业采购年度会员"
+                  },
                   "pay_type": {
                     "type": "integer",
                     "default": 2,
@@ -417,6 +422,7 @@
                 "uid": "843388",
                 "openid": "oxxxxxxxxxxxxxxxxxxxxxxxx",
                 "productId": "xmt_cxc_svip_year",
+                "user_remark": "企业采购年度会员",
                 "pay_type": 2,
                 "env": 0
               }
@@ -520,6 +526,11 @@
                     "type": "string",
                     "description": "微信虚拟支付道具 ID，例如 xmt_cxc_svip_year、hqt_cxc_vip_year、hqt_cxc_CGT_year、price_year、bid_1year。"
                   },
+                  "user_remark": {
+                    "type": "string",
+                    "description": "用户订单备注，可选。后端原样写入订单 user_remark 字段，供后台订单列表展示；空字符串或未传表示无备注。",
+                    "example": "活动报名用户"
+                  },
                   "pay_type": {
                     "type": "integer",
                     "default": 2,
@@ -540,6 +551,7 @@
                 "openid": "oxxxxxxxxxxxxxxxxxxxxxxxx",
                 "unionid": "oxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
                 "productId": "xmt_cxc_svip_year",
+                "user_remark": "活动报名用户",
                 "pay_type": 2,
                 "env": 0,
                 "from": "ccementbst_xcx"
