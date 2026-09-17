@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-16T10:04:57.526503+08:00",
-  "sourceRoot": "D:\\Code Repositories\\project_api",
+  "generatedAt": "2026-09-17T09:37:35.070671+08:00",
+  "sourceRoot": "D:\\Code Repositories\\stone365_price_api",
   "repositories": [
     {
       "repository": "cbmnet_api",
@@ -50,6 +50,13 @@
       "sourceFileCount": 37,
       "pathCount": 36,
       "sha256": "fc0e4c4c64a77fabd293496ef0e13fb192f9cf99e4d9ba6e76996ccaf0c00342"
+    },
+    {
+      "repository": "stone365_price_api",
+      "file": "stone365_price_api.openapi.json",
+      "sourceFileCount": 1,
+      "pathCount": 1,
+      "sha256": "c08b2ef18cbc7cc002488fd6cc1178b398a66e5e62ede061f83133c3162f6d20"
     },
     {
       "repository": "ads_api",

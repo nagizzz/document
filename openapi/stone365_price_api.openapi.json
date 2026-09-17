@@ -1,0 +1,698 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "stone365_price_api - APIPOST 聚合接口文档",
+    "version": "2026.09.17",
+    "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
+  },
+  "paths": {
+    "/client/price/listInside": {
+      "post": {
+        "tags": [
+          "price/client"
+        ],
+        "summary": "水泥网石材价格列表",
+        "operationId": "clientPriceListInside",
+        "description": "查询 xy_price 中已发布（status=1）且未被软删除的价格记录；路由会在服务端固定追加 call_from=cement，因此该调用方始终拥有价格查看权限，前端无需也不应传 call_from。\n\n## 筛选与排序规则\n1. name 为模糊匹配；full_name 为名称精确匹配。两个同时传入时同时生效。\n2. area、label 为模糊匹配；category、color、difference、thickness、process、plate、行政区编码及 product_id 为精确匹配。supplier_id 在 supplier_ids 逗号分隔值中匹配。\n3. min_price 表示价格下限（数据库 min_price >= 传值），max_price 表示价格上限（数据库 max_price <= 传值）。\n4. start_time/end_time 过滤 create_time；publish_start/publish_end 过滤 publish_time，结束时间自动扩展为当天 23:59:59。time_or 可用下划线分隔多个自然日（yyyyMMdd 或 yyyy-MM-dd），按 publish_time 的任一整日匹配。\n5. 默认按 create_time 倒序；sort_by 仅支持 create_time、id、thickness、min_price、max_price、trim_price，其他值回退为 create_time。sort_dir 仅接受 asc/desc，缺省为 desc。\n6. PageIndex 缺省为 1，PageSize 缺省为 20。该接口仅供分页调用，不传 use_paginate/group 等内部查询控制参数。\n\n## 返回字段口径\nList 每项来自 xy_price；产品名称、产地、规格、价格及区域字段为创建价格记录时从 xy_price_product 冗余保存的快照。price_unit 在响应中统一加上“元/”前缀；trim_price 是切边费；price_average、updown_value、updown_percent 分别为均价、相对上一条同产品同供应商记录的涨跌值及涨跌百分比。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "PageIndex": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "页码；缺省为 1。",
+                    "example": 1
+                  },
+                  "PageSize": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "每页条数；缺省为 20。",
+                    "example": 20
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "品名模糊匹配 xy_price.name。",
+                    "example": "芝麻灰"
+                  },
+                  "full_name": {
+                    "type": "string",
+                    "description": "品名精确匹配 xy_price.name。",
+                    "example": "芝麻灰"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "类别精确匹配 xy_price.category。",
+                    "example": "花岗岩"
+                  },
+                  "color": {
+                    "type": "string",
+                    "description": "色系精确匹配 xy_price.color。",
+                    "example": "灰色"
+                  },
+                  "label": {
+                    "type": "string",
+                    "description": "标签模糊匹配 xy_price.label。",
+                    "example": "工程板"
+                  },
+                  "is_standard": {
+                    "type": "integer",
+                    "enum": [
+                      0,
+                      1
+                    ],
+                    "description": "标准品标记精确匹配 xy_price.is_standard；0=否，1=是。传空值时不筛选。",
+                    "example": 1
+                  },
+                  "area": {
+                    "type": "string",
+                    "description": "产地模糊匹配 xy_price.area。",
+                    "example": "福建泉州"
+                  },
+                  "province_code": {
+                    "type": "string",
+                    "description": "省级行政区编码精确匹配。",
+                    "example": "350000"
+                  },
+                  "city_code": {
+                    "type": "string",
+                    "description": "市级行政区编码精确匹配。",
+                    "example": "350500"
+                  },
+                  "county_code": {
+                    "type": "string",
+                    "description": "区县行政区编码精确匹配。",
+                    "example": "350525"
+                  },
+                  "thickness": {
+                    "type": "string",
+                    "description": "厚度精确匹配 xy_price.thickness。",
+                    "example": "18mm"
+                  },
+                  "process": {
+                    "type": "string",
+                    "description": "加工方式精确匹配 xy_price.process。",
+                    "example": "光面"
+                  },
+                  "difference": {
+                    "type": "string",
+                    "description": "差异/规格说明精确匹配 xy_price.difference。",
+                    "example": "A料"
+                  },
+                  "plate": {
+                    "type": "string",
+                    "description": "板材类型精确匹配 xy_price.plate。",
+                    "example": "大板"
+                  },
+                  "min_price": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "价格区间下限；筛选 min_price 大于或等于该值的记录。",
+                    "example": 80
+                  },
+                  "max_price": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "价格区间上限；筛选 max_price 小于或等于该值的记录。",
+                    "example": 120
+                  },
+                  "supplier_id": {
+                    "type": "string",
+                    "description": "供应商用户 ID；在 xy_price.supplier_ids 的逗号分隔值中匹配。",
+                    "example": "10001"
+                  },
+                  "product_id": {
+                    "type": "integer",
+                    "description": "价格产品主键 xy_price.product_id 的精确匹配。",
+                    "example": 1001
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "创建时间下限，过滤 create_time >= 该值。",
+                    "example": "2026-09-01 00:00:00"
+                  },
+                  "end_time": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "创建时间上限；服务端按该日 23:59:59 处理。",
+                    "example": "2026-09-17"
+                  },
+                  "publish_start": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "发布时间下限，过滤 publish_time >= 该值。",
+                    "example": "2026-09-01 00:00:00"
+                  },
+                  "publish_end": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "发布时间上限；服务端按该日 23:59:59 处理。",
+                    "example": "2026-09-17"
+                  },
+                  "time_or": {
+                    "type": "string",
+                    "description": "多个发布日期的 OR 筛选，用下划线连接 yyyyMMdd 或 yyyy-MM-dd；非法日期片段会被忽略。",
+                    "example": "20260915_2026-09-16"
+                  },
+                  "sort_by": {
+                    "type": "string",
+                    "enum": [
+                      "create_time",
+                      "id",
+                      "thickness",
+                      "min_price",
+                      "max_price",
+                      "trim_price"
+                    ],
+                    "description": "排序字段；缺省或非法值均按 create_time 排序。",
+                    "example": "min_price"
+                  },
+                  "sort_dir": {
+                    "type": "string",
+                    "enum": [
+                      "asc",
+                      "desc"
+                    ],
+                    "description": "排序方向；缺省为 desc。",
+                    "example": "desc"
+                  }
+                },
+                "example": {
+                  "PageIndex": 1,
+                  "PageSize": 20,
+                  "category": "花岗岩",
+                  "color": "灰色",
+                  "province_code": "350000",
+                  "min_price": 80,
+                  "max_price": 120,
+                  "publish_start": "2026-09-01 00:00:00",
+                  "publish_end": "2026-09-17",
+                  "sort_by": "min_price",
+                  "sort_dir": "asc"
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "按省份和价格区间查询",
+                  "value": {
+                    "PageIndex": 1,
+                    "PageSize": 20,
+                    "category": "花岗岩",
+                    "color": "灰色",
+                    "province_code": "350000",
+                    "min_price": 80,
+                    "max_price": 120,
+                    "publish_start": "2026-09-01 00:00:00",
+                    "publish_end": "2026-09-17",
+                    "sort_by": "min_price",
+                    "sort_dir": "asc"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功；无匹配记录时 Data.List 为空数组，Counts 与 PageCounts 为 0。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "Msg",
+                    "Code",
+                    "Data"
+                  ],
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "业务提示文案。",
+                      "example": "请求成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码；200 表示成功。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "required": [
+                        "PageCounts",
+                        "Counts",
+                        "PageIndex",
+                        "PageSize",
+                        "List"
+                      ],
+                      "properties": {
+                        "PageCounts": {
+                          "type": "integer",
+                          "description": "总页数。",
+                          "example": 12
+                        },
+                        "Counts": {
+                          "type": "integer",
+                          "description": "符合筛选条件的总记录数。",
+                          "example": 235
+                        },
+                        "PageIndex": {
+                          "type": "integer",
+                          "description": "当前页码。",
+                          "example": 1
+                        },
+                        "PageSize": {
+                          "type": "integer",
+                          "description": "当前每页条数。",
+                          "example": 20
+                        },
+                        "List": {
+                          "type": "array",
+                          "description": "已发布价格记录列表。",
+                          "items": {
+                            "type": "object",
+                            "required": [
+                              "id",
+                              "product_id",
+                              "name",
+                              "category",
+                              "color",
+                              "is_standard",
+                              "thickness",
+                              "process",
+                              "difference",
+                              "min_price",
+                              "max_price",
+                              "price_average",
+                              "updown_percent",
+                              "updown_value",
+                              "price_unit",
+                              "trim_price",
+                              "to_use",
+                              "plate",
+                              "status",
+                              "publish_time",
+                              "create_time"
+                            ],
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "description": "xy_price 主键，即本条价格记录 ID。",
+                                "example": 500001
+                              },
+                              "product_id": {
+                                "type": "integer",
+                                "description": "关联 xy_price_product.id 的产品 ID。",
+                                "example": 1001
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "产品名称快照，来源于价格创建时的产品名称。",
+                                "example": "芝麻灰"
+                              },
+                              "category": {
+                                "type": "string",
+                                "description": "产品类别快照。",
+                                "example": "花岗岩"
+                              },
+                              "color": {
+                                "type": "string",
+                                "description": "产品色系快照。",
+                                "example": "灰色"
+                              },
+                              "label": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "产品标签快照；数据库允许为空。",
+                                "example": "工程板"
+                              },
+                              "is_standard": {
+                                "type": "integer",
+                                "enum": [
+                                  0,
+                                  1
+                                ],
+                                "description": "是否标准品；0=否，1=是。",
+                                "example": 1
+                              },
+                              "area": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "产地快照；数据库允许为空。",
+                                "example": "福建泉州"
+                              },
+                              "province_code": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "省级行政区编码。",
+                                "example": "350000"
+                              },
+                              "province_name": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "省级行政区名称。",
+                                "example": "福建省"
+                              },
+                              "city_code": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "市级行政区编码。",
+                                "example": "350500"
+                              },
+                              "city_name": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "市级行政区名称。",
+                                "example": "泉州市"
+                              },
+                              "county_code": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "区县行政区编码。",
+                                "example": "350525"
+                              },
+                              "county_name": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "区县行政区名称。",
+                                "example": "永春县"
+                              },
+                              "thickness": {
+                                "type": "string",
+                                "description": "厚度/规格快照。",
+                                "example": "18mm"
+                              },
+                              "process": {
+                                "type": "string",
+                                "description": "加工方式快照。",
+                                "example": "光面"
+                              },
+                              "difference": {
+                                "type": "string",
+                                "description": "差异/等级说明快照。",
+                                "example": "A料"
+                              },
+                              "min_price": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "参考价格下限（元，未附单位）。",
+                                "example": 88
+                              },
+                              "max_price": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "参考价格上限（元，未附单位）。",
+                                "example": 108
+                              },
+                              "price_average": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "均价，保存时按 (min_price + max_price) / 2 计算；历史空值会按 0 返回。",
+                                "example": 98
+                              },
+                              "updown_percent": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "相对上一条同产品同供应商价格记录的涨跌百分比。",
+                                "example": 2.04
+                              },
+                              "updown_value": {
+                                "type": "number",
+                                "format": "float",
+                                "description": "相对上一条同产品同供应商价格记录的均价涨跌值。",
+                                "example": 2
+                              },
+                              "price_unit": {
+                                "type": "string",
+                                "description": "价格单位；服务端在原始单位前加“元/”，无单位时为空字符串。",
+                                "example": "元/平方米"
+                              },
+                              "trim_price": {
+                                "type": "number",
+                                "format": "float",
+                                "nullable": true,
+                                "description": "切边费；数据库允许为空。",
+                                "example": 3
+                              },
+                              "to_use": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "用途说明；数据库允许为空。",
+                                "example": "室内墙地面"
+                              },
+                              "plate": {
+                                "type": "string",
+                                "description": "板材类型。",
+                                "example": "大板"
+                              },
+                              "status": {
+                                "type": "integer",
+                                "enum": [
+                                  1
+                                ],
+                                "description": "发布状态；本接口固定只返回 1（已发布）。",
+                                "example": 1
+                              },
+                              "create_time": {
+                                "type": "string",
+                                "format": "date-time",
+                                "nullable": true,
+                                "description": "价格记录创建时间；数据库允许为空。",
+                                "example": "2026-09-16 09:30:00"
+                              },
+                              "publish_time": {
+                                "type": "string",
+                                "format": "date-time",
+                                "description": "发布时间。",
+                                "example": "2026-09-16 10:00:00"
+                              }
+                            },
+                            "example": {
+                              "id": 500001,
+                              "product_id": 1001,
+                              "name": "芝麻灰",
+                              "category": "花岗岩",
+                              "color": "灰色",
+                              "label": "工程板",
+                              "is_standard": 1,
+                              "area": "福建泉州",
+                              "province_code": "350000",
+                              "province_name": "福建省",
+                              "city_code": "350500",
+                              "city_name": "泉州市",
+                              "county_code": "350525",
+                              "county_name": "永春县",
+                              "thickness": "18mm",
+                              "process": "光面",
+                              "difference": "A料",
+                              "min_price": 88,
+                              "max_price": 108,
+                              "price_average": 98,
+                              "updown_percent": 2.04,
+                              "updown_value": 2,
+                              "price_unit": "元/平方米",
+                              "trim_price": 3,
+                              "to_use": "室内墙地面",
+                              "plate": "大板",
+                              "status": 1,
+                              "create_time": "2026-09-16 09:30:00",
+                              "publish_time": "2026-09-16 10:00:00"
+                            }
+                          },
+                          "example": [
+                            {
+                              "id": 500001,
+                              "product_id": 1001,
+                              "name": "芝麻灰",
+                              "category": "花岗岩",
+                              "color": "灰色",
+                              "label": "工程板",
+                              "is_standard": 1,
+                              "area": "福建泉州",
+                              "province_code": "350000",
+                              "province_name": "福建省",
+                              "city_code": "350500",
+                              "city_name": "泉州市",
+                              "county_code": "350525",
+                              "county_name": "永春县",
+                              "thickness": "18mm",
+                              "process": "光面",
+                              "difference": "A料",
+                              "min_price": 88,
+                              "max_price": 108,
+                              "price_average": 98,
+                              "updown_percent": 2.04,
+                              "updown_value": 2,
+                              "price_unit": "元/平方米",
+                              "trim_price": 3,
+                              "to_use": "室内墙地面",
+                              "plate": "大板",
+                              "status": 1,
+                              "create_time": "2026-09-16 09:30:00",
+                              "publish_time": "2026-09-16 10:00:00"
+                            }
+                          ]
+                        }
+                      },
+                      "example": {
+                        "PageCounts": 12,
+                        "Counts": 235,
+                        "PageIndex": 1,
+                        "PageSize": 20,
+                        "List": [
+                          {
+                            "id": 500001,
+                            "product_id": 1001,
+                            "name": "芝麻灰",
+                            "category": "花岗岩",
+                            "color": "灰色",
+                            "label": "工程板",
+                            "is_standard": 1,
+                            "area": "福建泉州",
+                            "province_code": "350000",
+                            "province_name": "福建省",
+                            "city_code": "350500",
+                            "city_name": "泉州市",
+                            "county_code": "350525",
+                            "county_name": "永春县",
+                            "thickness": "18mm",
+                            "process": "光面",
+                            "difference": "A料",
+                            "min_price": 88,
+                            "max_price": 108,
+                            "price_average": 98,
+                            "updown_percent": 2.04,
+                            "updown_value": 2,
+                            "price_unit": "元/平方米",
+                            "trim_price": 3,
+                            "to_use": "室内墙地面",
+                            "plate": "大板",
+                            "status": 1,
+                            "create_time": "2026-09-16 09:30:00",
+                            "publish_time": "2026-09-16 10:00:00"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "example": {
+                    "Msg": "请求成功",
+                    "Code": 200,
+                    "Data": {
+                      "PageCounts": 12,
+                      "Counts": 235,
+                      "PageIndex": 1,
+                      "PageSize": 20,
+                      "List": [
+                        {
+                          "id": 500001,
+                          "product_id": 1001,
+                          "name": "芝麻灰",
+                          "category": "花岗岩",
+                          "color": "灰色",
+                          "label": "工程板",
+                          "is_standard": 1,
+                          "area": "福建泉州",
+                          "province_code": "350000",
+                          "province_name": "福建省",
+                          "city_code": "350500",
+                          "city_name": "泉州市",
+                          "county_code": "350525",
+                          "county_name": "永春县",
+                          "thickness": "18mm",
+                          "process": "光面",
+                          "difference": "A料",
+                          "min_price": 88,
+                          "max_price": 108,
+                          "price_average": 98,
+                          "updown_percent": 2.04,
+                          "updown_value": 2,
+                          "price_unit": "元/平方米",
+                          "trim_price": 3,
+                          "to_use": "室内墙地面",
+                          "plate": "大板",
+                          "status": 1,
+                          "create_time": "2026-09-16 09:30:00",
+                          "publish_time": "2026-09-16 10:00:00"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "价格列表查询成功",
+                    "value": {
+                      "Msg": "请求成功",
+                      "Code": 200,
+                      "Data": {
+                        "PageCounts": 12,
+                        "Counts": 235,
+                        "PageIndex": 1,
+                        "PageSize": 20,
+                        "List": [
+                          {
+                            "id": 500001,
+                            "product_id": 1001,
+                            "name": "芝麻灰",
+                            "category": "花岗岩",
+                            "color": "灰色",
+                            "label": "工程板",
+                            "is_standard": 1,
+                            "area": "福建泉州",
+                            "province_code": "350000",
+                            "province_name": "福建省",
+                            "city_code": "350500",
+                            "city_name": "泉州市",
+                            "county_code": "350525",
+                            "county_name": "永春县",
+                            "thickness": "18mm",
+                            "process": "光面",
+                            "difference": "A料",
+                            "min_price": 88,
+                            "max_price": 108,
+                            "price_average": 98,
+                            "updown_percent": 2.04,
+                            "updown_value": 2,
+                            "price_unit": "元/平方米",
+                            "trim_price": 3,
+                            "to_use": "室内墙地面",
+                            "plate": "大板",
+                            "status": 1,
+                            "create_time": "2026-09-16 09:30:00",
+                            "publish_time": "2026-09-16 10:00:00"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "price/client",
+      "description": "控制器目录：app/price/controllers/client"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "doc01_client_price_listInside_openapi__ClientPriceListInsideRequest": {
+        "type": "object",
+        "description": "见 paths 下 POST 请求 schema。"
+      },
+      "doc01_client_price_listInside_openapi__ClientPriceListInsideResponse": {
+        "type": "object",
+        "description": "见 paths 下 200 成功响应 schema。"
+      }
+    }
+  }
+}
