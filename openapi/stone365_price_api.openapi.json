@@ -241,6 +241,7 @@
                     },
                     "Data": {
                       "type": "object",
+                      "description": "分页结果容器，包含分页统计字段与价格记录列表。",
                       "required": [
                         "PageCounts",
                         "Counts",
@@ -274,6 +275,8 @@
                           "description": "已发布价格记录列表。",
                           "items": {
                             "type": "object",
+                            "title": "价格记录",
+                            "description": "单条已发布价格记录；以下字段均直接来自 xy_price 的前台输出。",
                             "required": [
                               "id",
                               "product_id",
@@ -469,156 +472,10 @@
                                 "description": "发布时间。",
                                 "example": "2026-09-16 10:00:00"
                               }
-                            },
-                            "example": {
-                              "id": 500001,
-                              "product_id": 1001,
-                              "name": "芝麻灰",
-                              "category": "花岗岩",
-                              "color": "灰色",
-                              "label": "工程板",
-                              "is_standard": 1,
-                              "area": "福建泉州",
-                              "province_code": "350000",
-                              "province_name": "福建省",
-                              "city_code": "350500",
-                              "city_name": "泉州市",
-                              "county_code": "350525",
-                              "county_name": "永春县",
-                              "thickness": "18mm",
-                              "process": "光面",
-                              "difference": "A料",
-                              "min_price": 88,
-                              "max_price": 108,
-                              "price_average": 98,
-                              "updown_percent": 2.04,
-                              "updown_value": 2,
-                              "price_unit": "元/平方米",
-                              "trim_price": 3,
-                              "to_use": "室内墙地面",
-                              "plate": "大板",
-                              "status": 1,
-                              "create_time": "2026-09-16 09:30:00",
-                              "publish_time": "2026-09-16 10:00:00"
                             }
-                          },
-                          "example": [
-                            {
-                              "id": 500001,
-                              "product_id": 1001,
-                              "name": "芝麻灰",
-                              "category": "花岗岩",
-                              "color": "灰色",
-                              "label": "工程板",
-                              "is_standard": 1,
-                              "area": "福建泉州",
-                              "province_code": "350000",
-                              "province_name": "福建省",
-                              "city_code": "350500",
-                              "city_name": "泉州市",
-                              "county_code": "350525",
-                              "county_name": "永春县",
-                              "thickness": "18mm",
-                              "process": "光面",
-                              "difference": "A料",
-                              "min_price": 88,
-                              "max_price": 108,
-                              "price_average": 98,
-                              "updown_percent": 2.04,
-                              "updown_value": 2,
-                              "price_unit": "元/平方米",
-                              "trim_price": 3,
-                              "to_use": "室内墙地面",
-                              "plate": "大板",
-                              "status": 1,
-                              "create_time": "2026-09-16 09:30:00",
-                              "publish_time": "2026-09-16 10:00:00"
-                            }
-                          ]
-                        }
-                      },
-                      "example": {
-                        "PageCounts": 12,
-                        "Counts": 235,
-                        "PageIndex": 1,
-                        "PageSize": 20,
-                        "List": [
-                          {
-                            "id": 500001,
-                            "product_id": 1001,
-                            "name": "芝麻灰",
-                            "category": "花岗岩",
-                            "color": "灰色",
-                            "label": "工程板",
-                            "is_standard": 1,
-                            "area": "福建泉州",
-                            "province_code": "350000",
-                            "province_name": "福建省",
-                            "city_code": "350500",
-                            "city_name": "泉州市",
-                            "county_code": "350525",
-                            "county_name": "永春县",
-                            "thickness": "18mm",
-                            "process": "光面",
-                            "difference": "A料",
-                            "min_price": 88,
-                            "max_price": 108,
-                            "price_average": 98,
-                            "updown_percent": 2.04,
-                            "updown_value": 2,
-                            "price_unit": "元/平方米",
-                            "trim_price": 3,
-                            "to_use": "室内墙地面",
-                            "plate": "大板",
-                            "status": 1,
-                            "create_time": "2026-09-16 09:30:00",
-                            "publish_time": "2026-09-16 10:00:00"
                           }
-                        ]
-                      }
-                    }
-                  },
-                  "example": {
-                    "Msg": "请求成功",
-                    "Code": 200,
-                    "Data": {
-                      "PageCounts": 12,
-                      "Counts": 235,
-                      "PageIndex": 1,
-                      "PageSize": 20,
-                      "List": [
-                        {
-                          "id": 500001,
-                          "product_id": 1001,
-                          "name": "芝麻灰",
-                          "category": "花岗岩",
-                          "color": "灰色",
-                          "label": "工程板",
-                          "is_standard": 1,
-                          "area": "福建泉州",
-                          "province_code": "350000",
-                          "province_name": "福建省",
-                          "city_code": "350500",
-                          "city_name": "泉州市",
-                          "county_code": "350525",
-                          "county_name": "永春县",
-                          "thickness": "18mm",
-                          "process": "光面",
-                          "difference": "A料",
-                          "min_price": 88,
-                          "max_price": 108,
-                          "price_average": 98,
-                          "updown_percent": 2.04,
-                          "updown_value": 2,
-                          "price_unit": "元/平方米",
-                          "trim_price": 3,
-                          "to_use": "室内墙地面",
-                          "plate": "大板",
-                          "status": 1,
-                          "create_time": "2026-09-16 09:30:00",
-                          "publish_time": "2026-09-16 10:00:00"
                         }
-                      ]
+                      }
                     }
                   }
                 },
