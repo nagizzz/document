@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T14:19:39.227431+08:00",
+  "generatedAt": "2026-09-20T15:47:43.881716+08:00",
   "sourceRoot": "D:\\Code Repositories\\stone365_user_api",
   "repositories": [
     {
@@ -56,7 +56,7 @@
       "file": "stone365_user_api.openapi.json",
       "sourceFileCount": 23,
       "pathCount": 22,
-      "sha256": "81a60c8e2cf13b79e33d30eec5f2c08bc9c7df532ea8640f97405b06b6907961"
+      "sha256": "b8839761064459cf140c32cb66c98d915717f83891fd091a18002d3149ed2e73"
     },
     {
       "repository": "ads_api",

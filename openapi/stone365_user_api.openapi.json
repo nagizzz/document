@@ -1647,6 +1647,13 @@
         "summary": "已登录用户建单",
         "description": "已登录用户创建矿通虚拟支付本地订单。接口要求 utoken 能解析出真实登录用户。\n\n## 请求规则\n1. productId 必填。\n2. openid 必填，用于后续微信支付与 queryOrder 查询微信订单。\n3. env 不传默认 0；0=现网，1=沙箱，建单、签名、查单必须保持同一环境。\n4. utoken 必填，用于识别真实登录用户。\n5. requestSource 建议沿用当前前端请求来源值，便于日志和兼容链路排查。\n\n## 支持的商品 ID（productId 取值）\n| productId | 权益标识 pro_id | 时长 | 价格 |\n|---|---|---|---|\n| calciumsvip_1year | calcium_svip | 1 年 | 588 |\n| calciumsvip_3year | calcium_svip | 3 年 | 1288 |\n| goldsvip_1year | gold_svip | 1 年 | 888 |\n| goldsvip_3year | gold_svip | 3 年 | 1888 |\n| phosphatesvip_1year | phosphate_svip | 1 年 | 888 |\n| phosphatesvip_3year | phosphate_svip | 3 年 | 1888 |\n| magnesitesvip_1year | magnesite_svip | 1 年 | 688 |\n| magnesitesvip_3year | magnesite_svip | 3 年 | 1388 |\n| bauxitesvip_1year | bauxite_svip | 1 年 | 888 |\n| bauxitesvip_3year | bauxite_svip | 3 年 | 1888 |\n| coalsvip_1year | coal_svip | 1 年 | 888 |\n| coalsvip_3year | coal_svip | 3 年 | 1888 |\n| sandsvip_1year | sand_svip | 1 年 | 588 |\n| sandsvip_3year | sand_svip | 3 年 | 1288 |\n| minesvip_1year | mine_svip | 1 年 | 688 |\n| minesvip_3year | mine_svip | 3 年 | 1388 |\n| graphitesvip_1year | graphite_svip | 1 年 | 588 |\n| graphitesvip_3year | graphite_svip | 3 年 | 1288 |\n| quartzsvip_1year | quartz_svip | 1 年 | 588 |\n| quartzsvip_3year | quartz_svip | 3 年 | 1288 |\n| ironsvip_1year | iron_svip | 1 年 | 888 |\n| ironsvip_3year | iron_svip | 3 年 | 1888 |\n| coppersvip_1year | copper_svip | 1 年 | 888 |\n| coppersvip_3year | copper_svip | 3 年 | 1888 |\n| silversvip_1year | silver_svip | 1 年 | 888 |\n| silversvip_3year | silver_svip | 3 年 | 1888 |\n| fluoritesvip_1year | fluorite_svip | 1 年 | 888 |\n| fluoritesvip_3year | fluorite_svip | 3 年 | 1888 |\n\n## 成功返回说明\n1. order_sn 为本地订单号，后续前端通常作为 outTradeNo 使用。\n2. order_amount 为本地订单金额，单位元。\n3. offer_id 与 product_id 直接回传给前端，便于拼接微信虚拟支付参数。",
         "operationId": "virtualPayCreateOrder",
+        "x-frontend-integration": {
+          "step": 2,
+          "before": "先调用 productConfig；从当前小程序登录态取得 openid 和有效 utoken。石图固定传 app=stone_xcx，石材产区图固定传 app=stone_area_xcx。",
+          "subscriptionProducts": "price_map_1month01=G012单产区包月18元（必须传 PM_ID）；price_map_month02=G012全国产区包月198元；price_map_12month=G012全国产区包年598元；proprice_1month=G007包月198元；proprice_12month=G007包年598元；price_12month=G023包年598元。",
+          "successAction": "保存 order_sn、order_amount、offer_id、product_id、app、app_id、env。order_sn 必须作为后续 signData.outTradeNo，不能改成 order_id。",
+          "next": "按微信规则只生成一次 signData 字符串，然后调用 getPaySig；建单按钮必须禁用到接口返回，避免重复订单。"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -1661,8 +1668,8 @@
                 "properties": {
                   "productId": {
                     "type": "string",
-                    "description": "虚拟支付商品 ID。必须是上方商品表中的一个有效值，例如 minesvip_1year。",
-                    "example": "示例productId"
+                    "description": "虚拟支付商品 ID。订阅商品从 productConfig 返回的键中选择，例如单产区包月为 price_map_1month01。必须与后续 signData.productId 完全一致。",
+                    "example": "price_map_1month01"
                   },
                   "app": {
                     "type": "string",
@@ -1697,16 +1704,20 @@
                   }
                 },
                 "example": {
-                  "productId": "示例productId",
-                  "openid": "示例openid",
+                  "productId": "price_map_1month01",
+                  "app": "stone_area_xcx",
+                  "PM_ID": 1001,
+                  "openid": "当前石材产区图小程序openid",
                   "env": 1,
                   "utoken": "<USER_TOKEN>",
                   "requestSource": 2
                 }
               },
               "example": {
-                "productId": "minesvip_1year",
-                "openid": "vp_login_openid_20260608140201",
+                "productId": "price_map_1month01",
+                "app": "stone_area_xcx",
+                "PM_ID": 1001,
+                "openid": "当前石材产区图小程序openid",
                 "env": 0,
                 "utoken": "<USER_TOKEN>",
                 "requestSource": 6
@@ -1767,13 +1778,13 @@
                         },
                         "app": {
                           "type": "string",
-                          "description": "实际用于支付、查单和回调的小程序配置标识。",
-                          "example": "stone_xcx"
+                          "description": "服务端实际锁定的小程序配置。必须与当前小程序一致；石图为 stone_xcx，石材产区图为 stone_area_xcx。",
+                          "example": "stone_area_xcx"
                         },
                         "app_id": {
                           "type": "string",
-                          "description": "实际小程序 AppID。",
-                          "example": "wxfd34053436d639e4"
+                          "description": "服务端实际锁定的小程序 AppID。前端用于诊断当前构建包是否使用了错误的小程序配置。",
+                          "example": "wx2f8960ea100f7eb3"
                         },
                         "env": {
                           "type": "integer",
@@ -1810,12 +1821,14 @@
                   "Msg": "成功",
                   "Code": 200,
                   "Data": {
-                    "order_sn": "20260608140202825766",
-                    "order_id": 26677,
-                    "order_amount": 688,
-                    "product_name": "石矿通svip",
-                    "offer_id": "1450545483",
-                    "product_id": "minesvip_1year",
+                    "order_sn": "20260920131215784386",
+                    "order_id": 30001,
+                    "order_amount": 18,
+                    "product_name": "单产区包月",
+                    "offer_id": "1450644749",
+                    "product_id": "price_map_1month01",
+                    "app": "stone_area_xcx",
+                    "app_id": "wx2f8960ea100f7eb3",
                     "env": 0
                   }
                 }
@@ -1868,6 +1881,13 @@
         "summary": "游客建单",
         "description": "未登录用户自动创建或复用游客账号后建单。写法对齐 ccement_user_api 的预创建订单（访客模式），前端应直接按下方字段树理解入参和出参。\n\n## 请求规则\n1. productId、openid 必填。\n2. unionid 有值时，优先按 unionid + openid 查找或创建游客账号。\n3. unionid 为空时，必须同时传 device_type 和 device_num，作为游客识别兜底。\n4. 返回中的 uid 必须由前端留存；后续 getPaySig 直接使用该 uid。\n5. openid、productId、env 会随订单一起保存，供 queryOrder 和后续支付链路复用。\n6. 当前支持的 productId 取值与 createOrder 完全一致，详见 createOrder 接口上方商品表。",
         "operationId": "virtualPayCreateVisitorOrder",
+        "x-frontend-integration": {
+          "step": 2,
+          "before": "仅在没有有效 utoken 时使用。先调用 productConfig，并取得当前小程序的 openid；石图传 app=stone_xcx，石材产区图传 app=stone_area_xcx。",
+          "identityRule": "优先传 unionid 以复用游客账号；没有 unionid 时，device_type 与 device_num 必须同时存在且保持稳定。单产区包月还必须传有效 PM_ID。",
+          "successAction": "必须保存 uid、order_sn、offer_id、product_id、app、app_id、env。uid 是下一步 getPaySig 的必传参数；order_sn 是 signData.outTradeNo。",
+          "next": "生成一次不可变的 signData 字符串，携带 uid 调用 getPaySig。"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -1881,8 +1901,8 @@
                 "properties": {
                   "productId": {
                     "type": "string",
-                    "description": "虚拟支付商品 ID。必须是 createOrder 商品表中的一个有效值，例如 minesvip_1year。",
-                    "example": "示例productId"
+                    "description": "虚拟支付商品 ID。订阅商品从 productConfig 返回的键中选择；必须与后续 signData.productId 一致。",
+                    "example": "proprice_1month"
                   },
                   "app": {
                     "type": "string",
@@ -1927,8 +1947,9 @@
                   }
                 },
                 "example": {
-                  "productId": "示例productId",
-                  "openid": "示例openid",
+                  "productId": "proprice_1month",
+                  "app": "stone_xcx",
+                  "openid": "当前石图小程序openid",
                   "unionid": "示例unionid",
                   "device_type": "示例device_type",
                   "device_num": "示例device_num",
@@ -1937,9 +1958,10 @@
                 }
               },
               "example": {
-                "productId": "minesvip_1year",
-                "openid": "vp_guest_openid_20260608153001",
-                "unionid": "vp_guest_unionid_20260608153001",
+                "productId": "proprice_1month",
+                "app": "stone_xcx",
+                "openid": "当前石图小程序openid",
+                "unionid": "当前用户unionid",
                 "env": 0,
                 "requestSource": 6,
                 "device_type": "示例device_type",
@@ -2004,6 +2026,16 @@
                           "description": "回显当前商品 ID，便于和本地商品列表项对应。",
                           "example": "示例product_id"
                         },
+                        "app": {
+                          "type": "string",
+                          "description": "服务端实际锁定的小程序配置。游客后续签名和查单均使用该配置，石图为 stone_xcx，石材产区图为 stone_area_xcx。",
+                          "example": "stone_xcx"
+                        },
+                        "app_id": {
+                          "type": "string",
+                          "description": "服务端实际锁定的小程序 AppID。若与当前小程序不一致，前端应停止支付并排查 app 参数。",
+                          "example": "wxfd34053436d639e4"
+                        },
                         "env": {
                           "type": "integer",
                           "description": "回显当前环境值。",
@@ -2041,13 +2073,15 @@
                   "Msg": "成功",
                   "Code": 200,
                   "Data": {
-                    "uid": 1012405,
-                    "order_sn": "20260608141601788976",
-                    "order_id": 26678,
-                    "order_amount": 688,
-                    "product_name": "石矿通svip",
-                    "offer_id": "1450545483",
-                    "product_id": "minesvip_1year",
+                    "uid": 1014335,
+                    "order_sn": "20260920131217391592",
+                    "order_id": 30002,
+                    "order_amount": 198,
+                    "product_name": "价格订阅包月",
+                    "offer_id": "1450644665",
+                    "product_id": "proprice_1month",
+                    "app": "stone_xcx",
+                    "app_id": "wxfd34053436d639e4",
                     "env": 0
                   }
                 }
@@ -2100,6 +2134,13 @@
         "summary": "获取支付签名",
         "description": "根据前端传入的 signData 生成微信虚拟支付 paySig。\n\n## 请求规则\n1. signData 必填，必须是前端最终发给微信虚拟支付的 JSON 字符串，并且必须包含 productId。\n2. 游客场景必须传 createVisitorOrder 返回的 uid；已登录场景若 utoken 能识别用户，可不传 uid。\n3. env 不传默认 0；应与建单接口保持一致。\n4. 返回中的 paySig 直接用于前端发起微信虚拟支付。",
         "operationId": "virtualPayGetPaySig",
+        "x-frontend-integration": {
+          "step": 3,
+          "before": "必须先完成建单。signData 使用建单返回的 offer_id、product_id、order_sn、order_amount 和 env 生成；goodsPrice 的单位为分，outTradeNo 必须等于 order_sn。",
+          "criticalRule": "将 JSON.stringify 后的 signData 原样传入本接口，并将同一个字符串原样传给 wx.requestVirtualPayment；拿到 paySig 后不得重新排序字段、重新 JSON.stringify 或改写任一字段。",
+          "identityRule": "游客必须传 createVisitorOrder 返回的 uid；已登录用户应传 utoken。后端不会返回 AppKey，也不允许前端自行计算 paySig。",
+          "next": "校验返回 product_id、app 与本地订单一致后，使用 paySig 调起 wx.requestVirtualPayment；客户端成功后进入 queryOrder 确认，不直接开通权益。"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -2117,8 +2158,8 @@
                   },
                   "signData": {
                     "type": "string",
-                    "description": "前端按微信虚拟支付要求拼出的 JSON 字符串，必须与最终发给微信的内容一致，且必须包含 productId。",
-                    "example": "示例signData"
+                    "description": "前端按微信虚拟支付要求拼出的 JSON 字符串。必须包含 offerId、buyQuantity=1、env、currencyType=CNY、productId、goodsPrice（分）、outTradeNo（建单返回的 order_sn）和 attach；必须与最终传给 wx.requestVirtualPayment 的字符串逐字一致。",
+                    "example": "{\"offerId\":\"1450644665\",\"buyQuantity\":1,\"env\":0,\"currencyType\":\"CNY\",\"productId\":\"proprice_1month\",\"goodsPrice\":19800,\"outTradeNo\":\"20260920131217391592\",\"attach\":\"20260920131217391592\"}"
                   },
                   "env": {
                     "type": "integer",
@@ -2185,6 +2226,16 @@
                           "type": "string",
                           "description": "回显当前商品 ID。",
                           "example": "示例product_id"
+                        },
+                        "app": {
+                          "type": "string",
+                          "description": "本次签名实际使用的小程序配置。前端应与建单保存的 app 比较，不一致时停止支付。",
+                          "example": "stone_xcx"
+                        },
+                        "app_id": {
+                          "type": "string",
+                          "description": "本次签名实际使用的小程序 AppID。",
+                          "example": "wxfd34053436d639e4"
                         }
                       },
                       "example": {
@@ -2208,9 +2259,11 @@
                   "Msg": "成功",
                   "Code": 200,
                   "Data": {
-                    "paySig": "d66e726169e462b68f21bfb1d8b1357815ef313d0ca6f5c1835232da8b173834",
-                    "offer_id": "1450545483",
-                    "product_id": "minesvip_1year"
+                    "paySig": "服务端返回的HMAC_SHA256支付签名",
+                    "offer_id": "1450644665",
+                    "product_id": "proprice_1month",
+                    "app": "stone_xcx",
+                    "app_id": "wxfd34053436d639e4"
                   }
                 }
               }
@@ -2260,7 +2313,12 @@
           "order/client"
         ],
         "summary": "获取虚拟支付道具配置",
-        "description": "仅返回道具与后台权益、时长、金额的公开映射，不返回 AppKey 等敏感支付配置。G012 的 price_map_1month01 为单产区包月，建单时还须传 PM_ID；另外两个 G012 道具分别为全国产区包月、包年。",
+        "description": "前端虚拟支付流程第 1 步。仅返回道具与后台权益、时长、金额的公开映射，不返回 AppKey 等敏感支付配置。调用成功后，前端选择一个 Data 的键作为后续 productId；展示价格以 Data[productId].price 为准。G012 的 price_map_1month01 为单产区包月，下一步建单必须传有效 PM_ID；另外两个 G012 道具分别为全国产区包月、包年，建单不传 PM_ID。选好商品后，已登录用户调用 createOrder，游客调用 createVisitorOrder。",
+        "x-frontend-integration": {
+          "step": 1,
+          "successAction": "保存 productId、price、service_time、service_unit 和 area_type；不要保存或猜测支付密钥。",
+          "next": "已登录用户进入 createOrder；无 utoken 的用户进入 createVisitorOrder。"
+        },
         "responses": {
           "200": {
             "description": "查询成功",
@@ -2374,6 +2432,13 @@
         "summary": "查询微信订单",
         "description": "查询微信虚拟支付订单状态，游客也可直接调用。\n\n## 请求规则\n1. productId 必填，用于选择商品映射和对应微信配置。\n2. outTradeNo 与 wxOrderId 二选一；推荐优先传 outTradeNo。\n3. openid 在本地订单已保存时可不传，但联调排障时建议前端显式传值。\n4. 当前查询结果分两层：wx_errcode、wx_errmsg、wx_order 表示微信侧结果；order 表示本地订单兜底信息。",
         "operationId": "virtualPayQueryOrder",
+        "x-frontend-integration": {
+          "step": 5,
+          "when": "wx.requestVirtualPayment success、支付取消/失败后需要确认状态、或支付页恢复时调用。优先传建单返回的 order_sn 作为 outTradeNo。",
+          "successAction": "只有 Data.order.O_PayStatus=1 才能刷新并展示已开通权益；wx_errcode、wx_errmsg 仅表示微信查单结果，不能单独视为权益已开通。",
+          "retry": "本地未支付时按 2、3、5、8 秒退避轮询，约 30 秒后提示用户稍后刷新；不要调用 /order/client/updateOrder，也不要对同一 outTradeNo 重复调起支付。",
+          "appRule": "已有订单忽略前端 app，始终使用建单时保存的小程序配置和环境；因此 app 不匹配时应排查建单上下文，而非强行覆盖。"
+        },
         "requestBody": {
           "required": true,
           "content": {
@@ -2416,17 +2481,17 @@
                   }
                 },
                 "example": {
-                  "productId": "示例productId",
-                  "outTradeNo": "示例outTradeNo",
+                  "productId": "proprice_1month",
+                  "outTradeNo": "建单接口返回的order_sn",
                   "wxOrderId": "示例wxOrderId",
                   "openid": "示例openid",
                   "env": 1
                 }
               },
               "example": {
-                "productId": "minesvip_1year",
-                "outTradeNo": "20260608141601788976",
-                "openid": "vp_guest_openid_20260608153001",
+                "productId": "proprice_1month",
+                "outTradeNo": "20260920131217391592",
+                "openid": "当前石图小程序openid",
                 "env": 0,
                 "wxOrderId": "示例wxOrderId"
               }
