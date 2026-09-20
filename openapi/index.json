@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-17T10:09:23.200596+08:00",
-  "sourceRoot": "D:\\Code Repositories\\stone365_price_api",
+  "generatedAt": "2026-09-20T14:19:39.227431+08:00",
+  "sourceRoot": "D:\\Code Repositories\\stone365_user_api",
   "repositories": [
     {
       "repository": "cbmnet_api",
@@ -31,13 +31,6 @@
       "sha256": "577664683a8470ca69031dd26b9f40e128a9f72f74c0955af7fe3aa4763f0321"
     },
     {
-      "repository": "stone365_user_api",
-      "file": "stone365_user_api.openapi.json",
-      "sourceFileCount": 22,
-      "pathCount": 21,
-      "sha256": "3effaa611548547c42ecfe65497ab6169ba1fd250f0fed674346d9ae970087ec"
-    },
-    {
       "repository": "ccement_user_api",
       "file": "ccement_user_api.openapi.json",
       "sourceFileCount": 10,
@@ -57,6 +50,13 @@
       "sourceFileCount": 1,
       "pathCount": 1,
       "sha256": "af92ab47a6a5d4090a7512c6e2b1f3ce5f889d06cdf1551cb649c8ae861a23d4"
+    },
+    {
+      "repository": "stone365_user_api",
+      "file": "stone365_user_api.openapi.json",
+      "sourceFileCount": 23,
+      "pathCount": 22,
+      "sha256": "81a60c8e2cf13b79e33d30eec5f2c08bc9c7df532ea8640f97405b06b6907961"
     },
     {
       "repository": "ads_api",
