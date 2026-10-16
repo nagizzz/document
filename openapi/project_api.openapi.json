@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.09.16",
+    "version": "2026.10.16",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -11237,6 +11237,92 @@
         ],
         "summary": "光伏电站周报专题列表页",
         "description": "powerstation 前台周报专题列表页。页面展示历史周报列表，页面数据来源为 /bids/admin/power-station-weekly-report-list 的分页结果。列表卡片常用字段为 id、detail_id、title、week_start、week_end、create_time、update_time。"
+      }
+    },
+    "/news/autocreate/company-daily": {
+      "post": {
+        "tags": [
+          "news"
+        ],
+        "summary": "批量生成企业采购招标日报",
+        "description": "内部批量触发接口。固定为天山材料和海螺水泥各执行一次，不支持指定单个企业。天山材料仍按中国建材集团有限公司、天山股份招标采购平台、祁连山水泥采购交易平台、中国建材集团采购平台过滤，但标题与导语展示为“中国建材”；海螺水泥按海螺阳光智慧采购平台过滤并保持原展示名称。每个企业固定检索 ccement 站点的设备类招标数据（type=tender），仅取指定日期，最多 30 条，再发布为水泥分类新闻。单个企业查询或发布失败会被服务端捕获并记录日志，循环继续执行，接口最终仍返回 Code=200；因此本响应只表示触发流程已结束，不能证明两篇新闻均已成功发布。路由未声明专用鉴权中间件，应仅由受控后台或任务调度调用。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "description": "可选。查询招标项目的日期，格式 YYYY-MM-DD；未传时服务端取前一天。两家企业共用该日期。",
+                    "example": "2026-09-20"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "examples": {
+                "specifiedDate": {
+                  "summary": "指定日报数据日期",
+                  "value": {
+                    "date": "2026-09-20"
+                  }
+                },
+                "previousDay": {
+                  "summary": "使用服务端默认前一天",
+                  "value": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "控制器执行完成。注意：即使某一家企业的新闻查询或发布失败，也会返回此成功结构；需结合新闻后台或服务端日志核验逐企业结果。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "Msg",
+                    "Code",
+                    "Data"
+                  ],
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "固定成功提示；不代表每个企业的新闻均已发布。",
+                      "example": "生成新闻成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "控制器返回码；正常完成循环后为 200。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "当前实现固定返回空对象，不含新闻 ID、文章 URL、企业级成功状态或失败原因。",
+                      "additionalProperties": false,
+                      "example": {}
+                    }
+                  }
+                },
+                "examples": {
+                  "triggerCompleted": {
+                    "summary": "触发流程完成的实际返回结构",
+                    "value": {
+                      "Msg": "生成新闻成功",
+                      "Code": 200,
+                      "Data": {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/news/autocreate/power-station-weekly": {
