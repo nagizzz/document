@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "ccement_user_api - APIPOST 聚合接口文档",
-    "version": "2026.09.07",
+    "version": "2026.10.20",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -375,7 +375,7 @@
           "home"
         ],
         "summary": "预创建订单",
-        "description": "已登录用户建单接口。支付前先创建待支付订单，返回 order_sn 作为后续 outTradeNo。\n\n## 关键规则\n1. uid 必须为真实注册用户。\n2. openid 必填，后端会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. env 不传默认 0；建单、getPaySig、queryOrder、微信支付请求必须使用同一环境。\n4. pay_type 仅支持 2=微信支付、3=Apple 内购。\n5. order_source 不接受前端传值，由后端按 productId 自动映射。\n6. order_amount 取商品 price，original_price 取商品 original_price；回调发货时会以微信 query_order 返回的 paid_fee/order_fee 覆盖实付金额。\n7. 前端仍建议在 wx.requestVirtualPayment 的 attach 中传 uid=xxx；有预建订单时服务端以订单 u_id 为准，attach 仅作为无预建订单兜底。\n8. 当 `enable_xpay_test_products=false` 时，测试版商品不会出现在商品列表里，且 getPaySig、createOrder、createVisitorOrder 会拒绝测试商品；deliverNotify 对测试商品回调只记录后返回成功。\n\n## 支持的道具 ID（productId 取值）\n| productId | 商品名称 | 价格 | 小程序 |\n|---|---|---|---|\n| xmt_cxc_svip_year | 项目通高级版1年 | ¥3999 | 百事通小程序 |\n| xmt_svip_year | 项目通高级会员一年-测试版 | ¥3999 | 百事通小程序 |\n| hqt_cxc_vip_year | 行情通小程序会员1年 | ¥2988 | 行情通小程序 |\n| hqt_cxc_CGT_year | 采购通会员1年 | ¥399 | 行情通小程序 |\n| hqt_cxc_data_year | 水泥数据会员1年 | ¥6888 | 行情通小程序 |\n| hqt_cxc_data_2months | 水泥数据会员2个月 | ¥1388 | 行情通小程序 |\n| hqt_cxc_company_year | 企业通会员1年 | ¥1298 | 行情通小程序 |\n| hqt_cxc_DJGvip_month | 行情通-多晶硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GYGvip_month | 行情通-工业硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_SZvip_month | 行情通-水渣会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_BLvip_month | 行情通-玻璃会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_DCPvip_month | 行情通-电池片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GPvip_month | 行情通-硅片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_ZJvip_month | 行情通-组件会员1个月 | ¥49 | 行情通小程序 |\n| price_year | 数字新能源光伏行情通1年 | ¥2999 | 数字新能源小程序 |\n| powerstation_3months | 数字新能源电站通3个月 | ¥300 | 数字新能源小程序 |\n| powerstation_1year | 光伏电站通一年 | ¥998 | 数字新能源小程序 |\n| bid_2months | 数字新能源项目通2个月 | ¥100 | 数字新能源小程序 |\n| bid_1year | 数字新能源项目通1年 | ¥399 | 数字新能源小程序 |\n| hnt_hqt_cxc_vip_year | 混凝土行情通会员1年 | ¥3799 | 混凝土行情通小程序 |\n| hnt_cxc_vip_year_cs | 混凝土行情通会员1年-测试版 | ¥3799 | 混凝土行情通小程序 |\n\n正式环境若已关闭测试商品开关，则上表中的两个测试版 productId 仅作为测试期留档，不应继续用于联调或上线调用。",
+        "description": "已登录用户建单接口。支付前先创建待支付订单，返回 order_sn 作为后续 outTradeNo。\n\n## 关键规则\n1. uid 必须为真实注册用户。\n2. openid 必填，后端会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. env 不传默认 0；建单、getPaySig、queryOrder、微信支付请求必须使用同一环境。\n4. pay_type 仅支持 2=微信支付、3=Apple 内购。\n5. order_source 不接受前端传值，由后端按 productId + from 自动映射（水泥购小程序需传 from=from_shop_mall，order_source=13；不传默认行情通，order_source=1）。\n6. order_amount 取商品 price，original_price 取商品 original_price；回调发货时会以微信 query_order 返回的 paid_fee/order_fee 覆盖实付金额。\n7. 前端仍建议在 wx.requestVirtualPayment 的 attach 中传 uid=xxx；有预建订单时服务端以订单 u_id 为准，attach 仅作为无预建订单兜底。\n8. 当 `enable_xpay_test_products=false` 时，测试版商品不会出现在商品列表里，且 getPaySig、createOrder、createVisitorOrder 会拒绝测试商品；deliverNotify 对测试商品回调只记录后返回成功。\n\n## 支持的道具 ID（productId 取值）\n| productId | 商品名称 | 价格 | 小程序 |\n|---|---|---|---|\n| xmt_cxc_svip_year | 项目通高级版1年 | ¥3999 | 百事通小程序 |\n| xmt_svip_year | 项目通高级会员一年-测试版 | ¥3999 | 百事通小程序 |\n| hqt_cxc_vip_year | 行情通小程序会员1年 | ¥2988 | 行情通小程序 |\n| hqt_cxc_CGT_year | 采购通会员1年 | ¥399 | 行情通小程序 / 水泥购小程序（传 from=from_shop_mall） |\n| hqt_cxc_data_year | 水泥数据会员1年 | ¥6888 | 行情通小程序 |\n| hqt_cxc_data_2months | 水泥数据会员2个月 | ¥1388 | 行情通小程序 |\n| hqt_cxc_company_year | 企业通会员1年 | ¥1298 | 行情通小程序 |\n| hqt_cxc_DJGvip_month | 行情通-多晶硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GYGvip_month | 行情通-工业硅会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_SZvip_month | 行情通-水渣会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_BLvip_month | 行情通-玻璃会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_DCPvip_month | 行情通-电池片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_GPvip_month | 行情通-硅片会员1个月 | ¥49 | 行情通小程序 |\n| hqt_cxc_ZJvip_month | 行情通-组件会员1个月 | ¥49 | 行情通小程序 |\n| price_year | 数字新能源光伏行情通1年 | ¥2999 | 数字新能源小程序 |\n| powerstation_3months | 数字新能源电站通3个月 | ¥300 | 数字新能源小程序 |\n| powerstation_1year | 光伏电站通一年 | ¥998 | 数字新能源小程序 |\n| bid_2months | 数字新能源项目通2个月 | ¥100 | 数字新能源小程序 |\n| bid_1year | 数字新能源项目通1年 | ¥399 | 数字新能源小程序 |\n| hnt_hqt_cxc_vip_year | 混凝土行情通会员1年 | ¥3799 | 混凝土行情通小程序 |\n| hnt_cxc_vip_year_cs | 混凝土行情通会员1年-测试版 | ¥3799 | 混凝土行情通小程序 |\n\n正式环境若已关闭测试商品开关，则上表中的两个测试版 productId 仅作为测试期留档，不应继续用于联调或上线调用。",
         "operationId": "createOrder",
         "requestBody": {
           "required": true,
@@ -415,16 +415,25 @@
                     "type": "integer",
                     "default": 0,
                     "description": "微信虚拟支付环境。0=现网正式环境，1=沙箱环境；需与 getPaySig 和 wx.requestVirtualPayment 使用的 env 保持一致。"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "来源标识，可选。水泥购小程序购买采购通会员时必须传 from_shop_mall，以区分与行情通小程序共用同一道具 ID 的场景；不传默认按行情通小程序处理。",
+                    "enum": [
+                      "from_shop_mall"
+                    ],
+                    "example": "from_shop_mall"
                   }
                 }
               },
               "example": {
                 "uid": "843388",
                 "openid": "oxxxxxxxxxxxxxxxxxxxxxxxx",
-                "productId": "xmt_cxc_svip_year",
+                "productId": "hqt_cxc_CGT_year",
                 "user_remark": "企业采购年度会员",
                 "pay_type": 2,
-                "env": 0
+                "env": 0,
+                "from": "from_shop_mall"
               }
             }
           }
@@ -500,7 +509,7 @@
           "home"
         ],
         "summary": "预创建订单（访客模式）",
-        "description": "未登录用户建单接口。后端根据 openid + unionid 查找或注册游客账号，再创建待支付订单。\n\n## 关键规则\n1. 返回的 uid 必须由前端写入 attach，格式 uid={uid}，否则发货回调无法识别用户。\n2. openid/env/productId 会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. from 只影响游客注册逻辑，不影响 order_source。\n4. pay_type 仍只支持 2、3。\n5. productId 支持的道具 ID 与取值规则同 createOrder，详见 createOrder 接口说明。",
+        "description": "未登录用户建单接口。后端根据 openid + unionid 查找或注册游客账号，再创建待支付订单。\n\n## 关键规则\n1. 返回的 uid 必须由前端写入 attach，格式 uid={uid}，否则发货回调无法识别用户。\n2. openid/env/productId 会写入订单 order_extra_params.wechat_virtual_pay，用于回调和 queryOrder 服务端查询微信订单。\n3. from 通常只影响游客注册逻辑；但当 productId=hqt_cxc_CGT_year 且 from=from_shop_mall 时，order_source 会映射为 13（水泥购小程序），不传默认 1（行情通小程序）。\n4. pay_type 仍只支持 2、3。\n5. productId 支持的道具 ID 与取值规则同 createOrder，详见 createOrder 接口说明。",
         "operationId": "createVisitorOrder",
         "requestBody": {
           "required": true,
@@ -543,7 +552,11 @@
                   },
                   "from": {
                     "type": "string",
-                    "description": "来源标识，仅影响游客注册逻辑，不影响 order_source 映射。通常用于区分小程序入口、活动入口或特定注册来源。"
+                    "description": "来源标识，可选。通常用于区分小程序入口、活动入口或特定注册来源；当 productId=hqt_cxc_CGT_year 且 from=from_shop_mall 时，后端按水泥购小程序处理（order_source=13，使用水泥购 AppKey），不传默认按行情通小程序处理（order_source=1）。",
+                    "enum": [
+                      "from_shop_mall"
+                    ],
+                    "example": "from_shop_mall"
                   }
                 }
               },
@@ -748,7 +761,7 @@
           "home"
         ],
         "summary": "获取支付签名",
-        "description": "前端将 wx.requestVirtualPayment 全量参数序列化为 signData 后调用本接口，获取 paySig。\n\n## 关键规则\n1. signData 必须与最终调用 wx.requestVirtualPayment 的内容完全一致，包括字段顺序。\n2. env=0 走现网，env=1 走沙箱。\n3. paySig 算法为 HMAC-SHA256(appKey, 'requestVirtualPayment' + '&' + signData)。",
+        "description": "前端将 wx.requestVirtualPayment 全量参数序列化为 signData 后调用本接口，获取 paySig。\n\n## 关键规则\n1. signData 必须与最终调用 wx.requestVirtualPayment 的内容完全一致，包括字段顺序。\n2. env=0 走现网，env=1 走沙箱。\n3. paySig 算法为 HMAC-SHA256(appKey, 'requestVirtualPayment' + '&' + signData)。\n4. 水泥购小程序购买采购通会员（productId=hqt_cxc_CGT_year）时，必须传 from=from_shop_mall，后端会用水泥购小程序的 AppKey 计算 paySig；不传默认用行情通小程序 AppKey。",
         "operationId": "getPaySig",
         "requestBody": {
           "required": true,
@@ -773,13 +786,22 @@
                     "type": "integer",
                     "default": 0,
                     "description": "0=现网，1=沙箱。"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "来源标识，可选。水泥购小程序购买采购通会员（productId=hqt_cxc_CGT_year）时必须传 from_shop_mall，后端按水泥购小程序 AppKey 计算 paySig；不传默认按行情通小程序处理。",
+                    "enum": [
+                      "from_shop_mall"
+                    ],
+                    "example": "from_shop_mall"
                   }
                 }
               },
               "example": {
                 "uid": "843388",
-                "signData": "{\"mode\":\"goods_payment\",\"offerId\":\"1450512918\",\"buyQuantity\":1,\"currencyType\":\"real_money\",\"platform\":\"android\",\"productId\":\"xmt_cxc_svip_year\",\"nonceStr\":\"abc123\",\"timeStamp\":1713600000,\"outTradeNo\":\"20260422143012123456abcd\",\"env\":0,\"attach\":\"uid=843388\"}",
-                "env": 0
+                "signData": "{\"mode\":\"goods_payment\",\"offerId\":\"1450628734\",\"buyQuantity\":1,\"currencyType\":\"real_money\",\"platform\":\"android\",\"productId\":\"hqt_cxc_CGT_year\",\"nonceStr\":\"abc123\",\"timeStamp\":1713600000,\"outTradeNo\":\"20260422143012123456abcd\",\"env\":0,\"attach\":\"uid=843388\"}",
+                "env": 0,
+                "from": "from_shop_mall"
               }
             }
           }
@@ -839,7 +861,7 @@
           "home"
         ],
         "summary": "查询微信订单状态",
-        "description": "服务端按微信 query_order 文档查询微信侧订单状态，不再查询或合并本地订单。\n\n## 请求规则\n1. productId 必填，用于选择对应小程序 AppKey 与 access_token。\n2. openid 可选；前端传入时优先使用，未传时服务端会按 outTradeNo 从本地订单 order_extra_params.wechat_virtual_pay.openid 读取。\n3. outTradeNo 与 wxOrderId 至少传一个；优先使用 outTradeNo 作为微信请求体 order_id。\n4. env 可选；未传且 outTradeNo 对应订单保存了 env 时，优先使用订单保存的 env。\n\n## 微信订单状态 status\n0=订单初始化，1=订单创建成功，2=订单已经支付待发货，3=订单发货中，4=订单已发货，5=订单已经退款，6=订单已经关闭，7=订单退款失败，8=用户退款完成，9=回收广告金完成，10=分账回退完成。\n\n## 微信订单类型 order_type\n0=普通虚拟支付，1=普通退款，7=苹果 iOS 支付，8=苹果 iOS 退款。",
+        "description": "服务端按微信 query_order 文档查询微信侧订单状态，不再查询或合并本地订单。\n\n## 请求规则\n1. productId 必填，用于选择对应小程序 AppKey 与 access_token。\n2. openid 可选；前端传入时优先使用，未传时服务端会按 outTradeNo 从本地订单 order_extra_params.wechat_virtual_pay.openid 读取。\n3. outTradeNo 与 wxOrderId 至少传一个；优先使用 outTradeNo 作为微信请求体 order_id。\n4. env 可选；未传且 outTradeNo 对应订单保存了 env 时，优先使用订单保存的 env。\n5. from 可选兜底参数；服务端优先从订单扩展参数读取建单时保存的配置标识（config_key），正常情况无需前端传 from。仅当历史订单未保存 config_key 且 productId=hqt_cxc_CGT_year 时，传 from=from_shop_mall 可让后端按水泥购小程序 AppKey 查询。\n\n## 微信订单状态 status\n0=订单初始化，1=订单创建成功，2=订单已经支付待发货，3=订单发货中，4=订单已发货，5=订单已经退款，6=订单已经关闭，7=订单退款失败，8=用户退款完成，9=回收广告金完成，10=分账回退完成。\n\n## 微信订单类型 order_type\n0=普通虚拟支付，1=普通退款，7=苹果 iOS 支付，8=苹果 iOS 退款。",
         "operationId": "queryOrder",
         "requestBody": {
           "required": true,
@@ -871,6 +893,14 @@
                     "type": "integer",
                     "default": 0,
                     "description": "微信虚拟支付环境。0=现网正式环境，1=沙箱环境。当前联调默认用 0。"
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "来源标识，可选兜底参数。服务端优先从订单扩展参数读取建单时保存的 config_key，正常情况无需传；仅历史订单无 config_key 且 productId=hqt_cxc_CGT_year 时，传 from_shop_mall 按水泥购小程序 AppKey 查询。",
+                    "enum": [
+                      "from_shop_mall"
+                    ],
+                    "example": "from_shop_mall"
                   }
                 }
               },
