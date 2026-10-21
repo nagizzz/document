@@ -2730,7 +2730,7 @@
           "approval"
         ],
         "summary": "批量修正项目名称和项目编码",
-        "description": "上传 Excel 批量更新 data_invite_tender_additions、project_info 和 project_section_info 的 project_name、project_code。\n\n业务规则：\n1. 系统优先读取工作表“项目名称编码修正”；该工作表不存在时读取当前活动工作表。首行必须包含“原项目名称”“新项目名称”“原项目编码”“新项目编码”四列，名称两列必填，编码两列允许为空。\n2. project_info 仅匹配 project_name 等于原项目名称，且 data_source=1，或 data_source=2 并且当前 project_code 非空的记录；符合条件的同名项目会全部更新，原项目编码不限制 project_info 的匹配范围。\n3. data_invite_tender_additions 按原项目名称和原项目编码精确匹配；原项目编码为空时匹配空字符串或 NULL。更新时会将原项目名称写入 original_project_name，再更新项目名称和项目编码。\n4. 每个命中的 project_info 均通过 project_id 查询关联 project_section_info，并同步更新项目名称和项目编码。\n5. 执行前会校验整份文件。任一行未匹配项目、同一原名称和原编码组合重复、或多行命中同一 project_info 时，返回 errors 且不修改任何数据。实际写入在同一事务内完成。\n6. 200 返回中 errors 为空表示已提交；errors 非空表示仅完成校验，所有更新计数均为 0。",
+        "description": "上传 Excel 批量更新 data_invite_tender_additions、project_info 和 project_section_info 的 project_name、project_code。\n\n业务规则：\n1. 系统优先读取工作表“项目名称编码修正”；该工作表不存在时读取当前活动工作表。首行必须包含“原项目名称”“新项目名称”“原项目编码”“新项目编码”四列，名称两列必填，编码两列允许为空。新项目编码为空时，仅更新名称，保留每条命中记录原有的项目编码。\n2. project_info 仅匹配 project_name 等于原项目名称，且 data_source=1，或 data_source=2 并且当前 project_code 非空的记录；符合条件的同名项目会全部更新，原项目编码不限制 project_info 的匹配范围。\n3. data_invite_tender_additions 按原项目名称和原项目编码精确匹配；原项目编码为空时匹配空字符串或 NULL。更新时会将原项目名称写入 original_project_name，再更新项目名称；仅新项目编码非空时才更新项目编码。\n4. 每个命中的 project_info 均通过 project_id 查询关联 project_section_info，并同步更新项目名称；仅新项目编码非空时同步更新项目编码。\n5. 执行前会校验整份文件。任一行未匹配项目、同一原名称和原编码组合重复、或多行命中同一 project_info 时，返回 errors 且不修改任何数据。实际写入在同一事务内完成。\n6. 200 返回中 errors 为空表示已提交；errors 非空表示仅完成校验，所有更新计数均为 0。",
         "requestBody": {
           "required": true,
           "content": {
