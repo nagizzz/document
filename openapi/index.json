@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T11:48:42.070276+08:00",
+  "generatedAt": "2026-11-17T10:20:05.573620+08:00",
   "sourceRoot": "D:\\Code Repositories",
   "repositories": [
     {
@@ -7,56 +7,56 @@
       "file": "cbmnet_api.openapi.json",
       "sourceFileCount": 6,
       "pathCount": 6,
-      "sha256": "77c8c92cbe6fa00cd57943d0297252bed67d53faa75367ca59b9cb295ac2681d"
+      "sha256": "800406ed564cd17113795a430007504b28e051ccf38fcb0cb8cfba48c8a4b289"
     },
     {
       "repository": "ccement_enterprise_api",
       "file": "ccement_enterprise_api.openapi.json",
       "sourceFileCount": 45,
       "pathCount": 45,
-      "sha256": "e666fa588aed6d5a0216569cbe96c901f0272a17f3aee853dd260dc42c26a584"
+      "sha256": "8caa25fb452c142e2fd86b99f8d9b1e1f93f6c583dabb5c6001c74902938b405"
     },
     {
       "repository": "ccement_user_api",
       "file": "ccement_user_api.openapi.json",
       "sourceFileCount": 10,
       "pathCount": 10,
-      "sha256": "cb909705ffcc5872b04bff6a17108fdd29bdcee00a4e6b3db7c347df2c958387"
+      "sha256": "350163fa254ff133305a376eb6f2015191698ee0bc6a43ea3cb21299c3229bc8"
     },
     {
       "repository": "ccement_user_behavior_api",
       "file": "ccement_user_behavior_api.openapi.json",
       "sourceFileCount": 10,
       "pathCount": 10,
-      "sha256": "71aaac8427de9b419971c46f262dd485139457537eada6caaac84513fcb8fbed"
+      "sha256": "53085893dcae66a402ed064d699998becb1f12fc107fb9d4f6d11d4dad4834ff"
     },
     {
       "repository": "project_api",
       "file": "project_api.openapi.json",
-      "sourceFileCount": 40,
-      "pathCount": 39,
-      "sha256": "19548f0b15774d6eea54194946c3adb8b449ee3735debc37439a5237e0632eff"
+      "sourceFileCount": 45,
+      "pathCount": 44,
+      "sha256": "0b90e1c2fba0654b0ad4150b259329a3844fe63762e5ef3cc315fcf3a9583670"
     },
     {
       "repository": "stone365_member_web",
       "file": "stone365_member_web.openapi.json",
       "sourceFileCount": 13,
       "pathCount": 13,
-      "sha256": "af196dfe373b5e58ca0fb22c595707f8c0609100a883e2560e1f390836cbb740"
+      "sha256": "7e4b807fd8056e6d66d3591e78fc89e6ae2df3429f7b2078a303f78bf50fb1e9"
     },
     {
       "repository": "stone365_price_api",
       "file": "stone365_price_api.openapi.json",
       "sourceFileCount": 1,
       "pathCount": 1,
-      "sha256": "2bcd9785ed97eec528efc8e454278a58c6505dd7c1ef6898c2c1d288f9628bb2"
+      "sha256": "d12de92f121292704a37c5c7850ce1e48c7607f7d5fc2a941b7d6c25c3117256"
     },
     {
       "repository": "stone365_user_api",
       "file": "stone365_user_api.openapi.json",
-      "sourceFileCount": 23,
-      "pathCount": 22,
-      "sha256": "97d77b3aab6d69532f46c28e83a9d32dfd6c94a781799075131b195f437bcada"
+      "sourceFileCount": 24,
+      "pathCount": 23,
+      "sha256": "df93949e22004c467c063d7899cab78f80c4e74edbdd3511be73dafdd2cbc502"
     },
     {
       "repository": "ads_api",

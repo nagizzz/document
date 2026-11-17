@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.10.21",
+    "version": "2026.11.17",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -6838,7 +6838,7 @@
           "datatender"
         ],
         "summary": "数字新能源电站统计",
-        "description": "按光伏电站项目口径统计数字新能源看板数据。固定使用招中标项目列表的电站筛选口径，默认统计信息类别 type=2/3、发布状态 publish_status=1、处理状态 dispose_status=1、二级分类 sub_data_sorts=1。\n\n关键规则 / 字段口径 / 取值说明：\n1. provinces 返回最近 30 个自然日全国各省的汇总数据，包括装机总容量 total_capacity（MW）、项目总数量 total_projects（个）、中标总金额 total_amount（亿元），以及对应三项指标的全国排名 total_projects_rank / total_capacity_rank / total_amount_rank；该统计不受当前传入省份限制。\n2. national_total 返回最近 30 天全国汇总数据，包括 total_projects、total_capacity、total_amount，基于当前返回的全国各省列表合计得出。\n3. trend_7_days 固定统计最近 7 个自然日，按 release_date 落日汇总；传 province_code 或 province 后返回对应省份数据，未传则返回全国数据。\n4. trend_4_weeks 固定统计当前周之前的前 4 个完整自然周，不包含当前周；每 7 天汇总一次，传 province_code 或 province 后返回对应省份数据，未传则返回全国数据。\n5. trend_7_days 与 trend_4_weeks 三条线分别为：total_capacity 装机容量总数（MW）、total_projects 中标项目总数（个）、total_amount 中标金额总数（亿元）。\n6. type_counts 为最近 7 天类型占比，按当前统计范围内的电站项目类型 project_type 统计数量占比；空类型归入“未分类”。\n7. scale_counts 为最近 7 天规模占比，仅统计 capacity > 0 的项目；分档为 0<装机容量<1MW、1MW≤装机容量<10MW、10MW≤装机容量<50MW、50MW≤装机容量<100MW、100MW≤装机容量。\n8. 最新中标电站列表默认返回最新 10 条，仅保留装机容量 capacity > 0 的数据。\n9. items.capacity、items.result_cost_yi、items.winning_unit_price 返回值保留 4 位小数；若值为 0，则返回字符串 /。\n10. items.project_type 优先返回项目业务类型 project_type；若源数据为空，则回退为 item_type 对应的项目类型名称。",
+        "description": "按光伏电站项目口径统计数字新能源看板数据。固定使用招中标项目列表的电站筛选口径，默认统计信息类别 type=2/3、发布状态 publish_status=1、处理状态 dispose_status=1、二级分类 sub_data_sorts=1。\n\n关键规则 / 字段口径 / 取值说明：\n1. provinces 返回最近 365 个自然日全国各省的汇总数据，包括装机总容量 total_capacity（MW）、项目总数量 total_projects（个）、中标总金额 total_amount（亿元），以及对应三项指标的全国排名 total_projects_rank / total_capacity_rank / total_amount_rank；该统计不受当前传入省份限制。\n2. national_total 返回最近 365 天全国汇总数据，包括 total_projects、total_capacity、total_amount，基于当前返回的全国各省列表合计得出。\n3. trend_7_days 固定统计最近 7 个自然日，按 release_date 落日汇总；传 province_code 或 province 后返回对应省份数据，未传则返回全国数据。\n4. trend_4_weeks 固定统计当前周之前的前 4 个完整自然周，不包含当前周；每 7 天汇总一次，传 province_code 或 province 后返回对应省份数据，未传则返回全国数据。\n5. trend_7_days 与 trend_4_weeks 三条线分别为：total_capacity 装机容量总数（MW）、total_projects 中标项目总数（个）、total_amount 中标金额总数（亿元）。\n6. type_counts 为最近 7 天类型占比，按当前统计范围内的电站项目类型 project_type 统计数量占比；空类型归入“未分类”。\n7. scale_counts 为最近 7 天规模占比，仅统计 capacity > 0 的项目；分档为 0<装机容量<1MW、1MW≤装机容量<10MW、10MW≤装机容量<50MW、50MW≤装机容量<100MW、100MW≤装机容量。\n8. 最新中标电站列表默认返回最新 10 条，仅保留装机容量 capacity > 0 的数据。\n9. items.capacity、items.result_cost_yi、items.winning_unit_price 返回值保留 4 位小数；若值为 0，则返回字符串 /。\n10. items.project_type 优先返回项目业务类型 project_type；若源数据为空，则回退为 item_type 对应的项目类型名称。",
         "requestBody": {
           "required": false,
           "content": {
@@ -6878,7 +6878,7 @@
                   },
                   "province_code": {
                     "type": "string",
-                    "description": "省份编码。传入后返回对应省份的 30 天趋势和最新项目。优先级高于 province。",
+                    "description": "省份编码。支持数组、逗号分隔字符串或单值，仅数字编码生效，回显取首个有效编码。传入后返回对应省份的趋势和最新项目，不影响 provinces 全国省份地图。优先级高于 province。",
                     "example": ""
                   },
                   "province": {
@@ -7041,30 +7041,30 @@
                         },
                         "national_total": {
                           "type": "object",
-                          "description": "最近 30 天全国汇总数据。基于当前返回的全国各省列表合计得出。",
+                          "description": "最近 365 天全国汇总数据。基于当前返回的全国各省列表合计得出。",
                           "properties": {
                             "total_projects": {
                               "type": "integer",
-                              "description": "最近 30 天全国项目总数。",
+                              "description": "最近 365 天全国项目总数。",
                               "example": 3568
                             },
                             "total_capacity": {
                               "type": "number",
                               "format": "double",
-                              "description": "最近 30 天全国装机总容量，单位 MW，保留 4 位小数。",
+                              "description": "最近 365 天全国装机总容量，单位 MW，保留 4 位小数。",
                               "example": 182635.42
                             },
                             "total_amount": {
                               "type": "number",
                               "format": "double",
-                              "description": "最近 30 天全国中标总金额，单位亿元，保留 4 位小数。",
+                              "description": "最近 365 天全国中标总金额，单位亿元，保留 4 位小数。",
                               "example": 2463.21
                             }
                           }
                         },
                         "provinces": {
                           "type": "array",
-                          "description": "最近 30 天全国各省汇总数据。省份未传时用于全国地图，传省份时也保持返回全国各省数据。",
+                          "description": "最近 365 天全国各省汇总数据。省份未传时用于全国地图，传省份时也保持返回全国各省数据。",
                           "items": {
                             "type": "object",
                             "properties": {
@@ -7080,34 +7080,34 @@
                               },
                               "total_projects": {
                                 "type": "integer",
-                                "description": "最近 30 天该省项目总数。",
+                                "description": "最近 365 天该省项目总数。",
                                 "example": 128
                               },
                               "total_capacity": {
                                 "type": "number",
                                 "format": "double",
-                                "description": "最近 30 天该省装机总容量，单位 MW，保留 4 位小数。",
+                                "description": "最近 365 天该省装机总容量，单位 MW，保留 4 位小数。",
                                 "example": 1826.3542
                               },
                               "total_amount": {
                                 "type": "number",
                                 "format": "double",
-                                "description": "最近 30 天该省中标总金额，单位亿元，保留 4 位小数。",
+                                "description": "最近 365 天该省中标总金额，单位亿元，保留 4 位小数。",
                                 "example": 24.6321
                               },
                               "total_projects_rank": {
                                 "type": "integer",
-                                "description": "最近 30 天该省项目总数全国排名。数值相同则排名相同。",
+                                "description": "最近 365 天该省项目总数全国排名。数值相同则排名相同。",
                                 "example": 1
                               },
                               "total_capacity_rank": {
                                 "type": "integer",
-                                "description": "最近 30 天该省装机总容量全国排名。数值相同则排名相同。",
+                                "description": "最近 365 天该省装机总容量全国排名。数值相同则排名相同。",
                                 "example": 2
                               },
                               "total_amount_rank": {
                                 "type": "integer",
-                                "description": "最近 30 天该省中标总金额全国排名。数值相同则排名相同。",
+                                "description": "最近 365 天该省中标总金额全国排名。数值相同则排名相同。",
                                 "example": 3
                               }
                             }
@@ -7250,6 +7250,11 @@
                                 "type": "string",
                                 "description": "项目类型。优先返回业务类型 project_type；为空时回退 item_type 对应名称。",
                                 "example": "集中式光伏电站"
+                              },
+                              "item_type": {
+                                "type": "string",
+                                "description": "项目类型标签，枚举 item_type 对应的中文名；无法识别时为空字符串。",
+                                "example": "EPC总承包"
                               },
                               "capacity": {
                                 "type": "string",
@@ -8430,6 +8435,11 @@
                     "description": "可选，周结束日期上限，格式 YYYY-MM-DD。",
                     "example": "2026-05-31"
                   },
+                  "status": {
+                    "type": "string",
+                    "description": "可选，周报状态精确筛选。当前落库只有 generated；传其他取值返回空列表且不报错。",
+                    "example": "generated"
+                  },
                   "page": {
                     "type": "integer",
                     "description": "页码，从 1 开始。",
@@ -8491,6 +8501,11 @@
                         "PageSize": {
                           "type": "integer",
                           "description": "每页条数。",
+                          "example": 2
+                        },
+                        "PageMax": {
+                          "type": "integer",
+                          "description": "最大页码，取值与 PageCounts 相同。",
                           "example": 2
                         },
                         "DataList": {
@@ -8589,22 +8604,25 @@
                         "Counts": 4,
                         "PageIndex": 1,
                         "PageSize": 2,
-                        "DataList": {
-                          "id": 68218711869307,
-                          "report_type": "epc",
-                          "report_type_name": "EPC总承包",
-                          "week_start": "2026-05-25",
-                          "week_end": "2026-05-31",
-                          "title": "光伏电站EPC总承包项目统计周报（2026.5.25~2026.5.31）",
-                          "project_total": 12,
-                          "amount_total_yi": 17.7414,
-                          "capacity_total_gw": 0.96,
-                          "status": "generated",
-                          "detail_id": "2606231158386",
-                          "created_by": "system",
-                          "create_time": "2026-06-23 11:58:38",
-                          "update_time": "2026-06-24 09:38:53"
-                        }
+                        "PageMax": 2,
+                        "DataList": [
+                          {
+                            "id": 68218711869307,
+                            "report_type": "epc",
+                            "report_type_name": "EPC总承包",
+                            "week_start": "2026-05-25",
+                            "week_end": "2026-05-31",
+                            "title": "光伏电站EPC总承包项目统计周报（2026.5.25~2026.5.31）",
+                            "project_total": 12,
+                            "amount_total_yi": 17.7414,
+                            "capacity_total_gw": 0.96,
+                            "status": "generated",
+                            "detail_id": "2606231158386",
+                            "created_by": "system",
+                            "create_time": "2026-06-23 11:58:38",
+                            "update_time": "2026-06-24 09:38:53"
+                          }
+                        ]
                       }
                     }
                   }
@@ -10223,7 +10241,7 @@
           "datatender"
         ],
         "summary": "招中标前台项目列表",
-        "description": "用于前台分页查询招中标项目列表。\n\n关键规则：\n1. `web_id` 为必传筛选条件，支持单值、逗号分隔字符串或数组；不传时后端直接返回空分页。\n2. 前台接口固定附加 `publish=1`（已发布）条件，中台未发布数据不会返回。\n3. 默认排序字段是 `release_date`，未显式传排序方式时按倒序返回较新的公告。\n4. 当前环境默认优先走 ClickHouse；测试环境会自动切到 MySQL，但入参与返回口径保持一致。\n5. 列表返回字段直接复用 `DataTender::toFront()`，因此会同时返回主表字段、附表字段以及正文 `content`。\n6. 多个筛选条件叠加时为 AND 关系；`keyword` 多个关键词之间也是 AND；`match_fields` 仅控制关键词匹配范围。\n7. 角色类筛选（如 `company_name`、`company_id`）若未传 `role`，默认同时匹配招标单位、代理单位和中标单位。\n8. 金额与时间区间参数均支持只传一侧，前端应优先传标准日期字符串和数值字符串。\n\n`type` 取值说明：\n- `1`：招标\n- `2`：中标\n- `3`：中标候选人\n- `4`：其他\n\n`web_id` 取值说明：\n- `1`：水泥网\n- `2`：水泥商城\n- `3`：数字新能源\n- `4`：研究院\n- `5`：石材网\n- `6`：砂师兄\n- `7`：项目通\n- `99`：其他\n\n`item_type` 取值说明：\n- `1`：总承包\n- `2`：勘察设计\n- `3`：建筑施工\n- `4`：装修/改造/养护/维修\n- `5`：设备采购/设备安装\n- `6`：监理/检测/审计/咨询\n- `7`：其他\n- `8`：EPC总承包\n- `9`：PC总承包\n- `10`：DB总承包\n- `11`：其他总承包\n- `12`：光储一体总承包\n\n`data_sorts` 取值说明：\n- `1`：光伏\n- `2`：储能\n- `3`：氢能\n- `4`：工程项目\n- `5`：建材项目\n- `6`：设备项目\n- `7`：石材\n- `8`：项目通\n\n`sub_data_sorts` 常用取值说明：\n- `1`：光伏电站\n- `2`：信息化服务\n- `3`：光伏组件\n- `4`：光伏逆变器\n- `15`：水泥/混凝土及制品\n- `16`：砂石骨料/砖瓦及墙体材料\n- `23`：电力及新能源材料\n- `32`：稀土/功能材料及电子材料\n\n`content_type` 取值说明：\n- `1`：文本\n- `2`：文件",
+        "description": "用于前台分页查询招中标项目列表。\n\n关键规则：\n1. `web_id` 为必传筛选条件，支持单值、逗号分隔字符串或数组；不传时后端直接返回空分页。\n2. 前台接口固定附加 `publish=1`（已发布）条件，中台未发布数据不会返回。\n3. 默认排序字段是 `release_date`，未显式传排序方式时按倒序返回较新的公告。\n4. 数据源由 `DATABASE_TYPE` 决定，开发与正式环境当前均为 `3`（Elasticsearch）；ClickHouse 与 MySQL 为可切换的等价实现，入参与返回口径保持一致。\n5. 列表返回字段直接复用 `DataTender::toFront()`，因此会同时返回主表字段、附表字段以及正文 `content`。\n6. 多个筛选条件叠加时为 AND 关系；`keyword` 多个关键词之间也是 AND，且每个关键词至少 2 个字符；`match_fields` 仅控制关键词匹配范围，未传时不再全列检索。\n7. 角色类筛选（如 `company_name`、`company_id`）若未传 `role`，默认同时匹配招标单位、代理单位和中标单位。\n8. 金额与时间区间参数均支持只传一侧，前端应优先传标准日期字符串和数值字符串。\n\n`type` 取值说明：\n- `1`：招标\n- `2`：中标\n- `3`：中标候选人\n- `4`：其他\n\n`web_id` 取值说明：\n- `1`：水泥网\n- `2`：水泥商城\n- `3`：数字新能源\n- `4`：研究院\n- `5`：石材网\n- `6`：砂师兄\n- `7`：项目通\n- `99`：其他\n\n`item_type` 取值说明：\n- `1`：总承包\n- `2`：勘察设计\n- `3`：建筑施工\n- `4`：装修/改造/养护/维修\n- `5`：设备采购/设备安装\n- `6`：监理/检测/审计/咨询\n- `7`：其他\n- `8`：EPC总承包\n- `9`：PC总承包\n- `10`：DB总承包\n- `11`：其他总承包\n- `12`：光储一体总承包\n\n`data_sorts` 取值说明：\n- `1`：光伏\n- `2`：储能\n- `3`：氢能\n- `4`：工程项目\n- `5`：建材项目\n- `6`：设备项目\n- `7`：石材\n- `8`：项目通\n\n`sub_data_sorts` 常用取值说明：\n- `1`：光伏电站\n- `2`：信息化服务\n- `3`：光伏组件\n- `4`：光伏逆变器\n- `15`：水泥/混凝土及制品\n- `16`：砂石骨料/砖瓦及墙体材料\n- `23`：电力及新能源材料\n- `32`：稀土/功能材料及电子材料\n\n`content_type` 取值说明：\n- `1`：文本\n- `2`：文件",
         "requestBody": {
           "required": true,
           "content": {
@@ -10274,7 +10292,7 @@
                   "keyword": {
                     "type": "string",
                     "example": "光伏,EPC",
-                    "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。匹配范围由 `match_fields` 决定。"
+                    "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。每个关键词至少 2 个字符，含更短关键词时返回 Code 400。匹配范围由 `match_fields` 决定。"
                   },
                   "keywords": {
                     "type": "string",
@@ -10284,7 +10302,7 @@
                   "match_fields": {
                     "type": "string",
                     "example": "title,content,winner",
-                    "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认同时匹配这些字段。"
+                    "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认只匹配 `title`、`winner`、`tenderee`、`agent` 四列；`content` 走 Elasticsearch 数据源时由服务端开关 `ES_SEARCH_CONTENT` 决定（无需传 `search_content`），走 MySQL / ClickHouse 数据源时仍需 `search_content=true`；显式传入本参数且不含 `content` 时不检索正文；`product` 必须显式传入。"
                   },
                   "company_name": {
                     "type": "string",
@@ -10412,6 +10430,11 @@
                     "example": "2026-06-01 00:00:00",
                     "description": "发布时间起始值，匹配主表 `release_date >= release_start`。"
                   },
+                  "release_year": {
+                    "type": "integer",
+                    "example": 2026,
+                    "description": "发布时间年份筛选，仅可传一个四位年份。传入后会覆盖 `release_start` 与 `release_end`，查询该年 `01-01 00:00:00` 至 `12-31 23:59:59` 的全部数据，且不受默认 60 天范围限制。"
+                  },
                   "release_end": {
                     "type": "string",
                     "format": "date-time",
@@ -10481,6 +10504,28 @@
                     "type": "integer",
                     "example": 1,
                     "description": "是否筛选 `project_name` 为空的数据。传任意非空值时会追加 `project_name = ''`。"
+                  },
+                  "project_pn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "P001",
+                      "P002"
+                    ],
+                    "description": "项目主体编号精确筛选。支持单个字符串、字符串数组或逗号分隔字符串；空值会忽略、重复值会去重，多个有效编号为 OR 关系。不要与 `no_project_pn` 同时传递。"
+                  },
+                  "section_pn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "A001",
+                      "A002"
+                    ],
+                    "description": "标段编号精确筛选。支持单个字符串、字符串数组或逗号分隔字符串；空值会忽略、重复值会去重，多个有效编号为 OR 关系。不要与 `no_section_pn` 同时传递。"
                   },
                   "min_capacity": {
                     "type": "number",
@@ -10727,7 +10772,7 @@
                   "keyword": {
                     "type": "string",
                     "example": "光伏,EPC",
-                    "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。匹配范围由 `match_fields` 决定。"
+                    "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。每个关键词至少 2 个字符，含更短关键词时返回 Code 400。匹配范围由 `match_fields` 决定。"
                   },
                   "keywords": {
                     "type": "string",
@@ -10737,7 +10782,7 @@
                   "match_fields": {
                     "type": "string",
                     "example": "title,content,winner",
-                    "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认同时匹配这些字段。"
+                    "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认只匹配 `title`、`winner`、`tenderee`、`agent` 四列；`content` 走 Elasticsearch 数据源时由服务端开关 `ES_SEARCH_CONTENT` 决定（无需传 `search_content`），走 MySQL / ClickHouse 数据源时仍需 `search_content=true`；显式传入本参数且不含 `content` 时不检索正文；`product` 必须显式传入。"
                   },
                   "company_name": {
                     "type": "string",
@@ -10865,6 +10910,11 @@
                     "example": "2026-06-01 00:00:00",
                     "description": "发布时间起始值，匹配主表 `release_date >= release_start`。"
                   },
+                  "release_year": {
+                    "type": "integer",
+                    "example": 2026,
+                    "description": "发布时间年份筛选，仅可传一个四位年份。传入后会覆盖 `release_start` 与 `release_end`，查询该年 `01-01 00:00:00` 至 `12-31 23:59:59` 的全部数据，且不受默认 60 天范围限制。"
+                  },
                   "release_end": {
                     "type": "string",
                     "format": "date-time",
@@ -10934,6 +10984,28 @@
                     "type": "integer",
                     "example": 1,
                     "description": "是否筛选 `project_name` 为空的数据。传任意非空值时会追加 `project_name = ''`。"
+                  },
+                  "project_pn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "P001",
+                      "P002"
+                    ],
+                    "description": "项目主体编号精确筛选。支持单个字符串、字符串数组或逗号分隔字符串；空值会忽略、重复值会去重，多个有效编号为 OR 关系。不要与 `no_project_pn` 同时传递。"
+                  },
+                  "section_pn": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "A001",
+                      "A002"
+                    ],
+                    "description": "标段编号精确筛选。支持单个字符串、字符串数组或逗号分隔字符串；空值会忽略、重复值会去重，多个有效编号为 OR 关系。不要与 `no_section_pn` 同时传递。"
                   },
                   "min_capacity": {
                     "type": "number",
@@ -11851,6 +11923,2600 @@
         }
       }
     },
+    "/power-station/collect/filing-project/create": {
+      "post": {
+        "tags": [
+          "powerstation"
+        ],
+        "summary": "新建建档立卡光伏项目",
+        "description": "供采集端新增建档立卡光伏项目，全部业务字段必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。\n\n去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：服务端使用 `Province + City + County` 匹配既有三级行政区；成功后写入标准省、市、区/县名称及其编码。任一级未匹配到编码时不写入数据，请先核对采集名称。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ProjectCode",
+                  "Title",
+                  "Scale",
+                  "Location",
+                  "Province",
+                  "City",
+                  "County",
+                  "PublishDate"
+                ],
+                "properties": {
+                  "ProjectCode": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "项目编码；与 Title 共同构成唯一去重键。",
+                    "example": "PV-20261117-001"
+                  },
+                  "Title": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
+                    "example": "杭州市西湖区屋顶分布式光伏项目"
+                  },
+                  "Scale": {
+                    "type": "string",
+                    "pattern": "^\\d+(?:\\.\\d{1,4})?$",
+                    "description": "装机容量。仅支持非负数，最多四位小数；写库时固定为四位小数。",
+                    "example": "12.5000"
+                  },
+                  "Location": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目所在地详细描述。",
+                    "example": "浙江省杭州市西湖区文三路90号"
+                  },
+                  "Province": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "省级行政区名称，用于查询 province_code。",
+                    "example": "浙江省"
+                  },
+                  "City": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "市级行政区名称，用于查询 city_code。",
+                    "example": "杭州市"
+                  },
+                  "County": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "区/县级行政区名称，用于查询 county_code。",
+                    "example": "西湖区"
+                  },
+                  "PublishDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "发布时间，须为可解析日期时间。",
+                    "example": "2026-11-17 09:30:00"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "完整新建请求",
+                  "value": {
+                    "ProjectCode": "PV-20261117-001",
+                    "Title": "杭州市西湖区屋顶分布式光伏项目",
+                    "Scale": "12.5000",
+                    "Location": "浙江省杭州市西湖区文三路90号",
+                    "Province": "浙江省",
+                    "City": "杭州市",
+                    "County": "西湖区",
+                    "PublishDate": "2026-11-17 09:30:00"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "新建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "新建成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码，200 表示成功。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "新建结果。",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "新建记录主键；更新时必须传入。",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "新建成功",
+                    "value": {
+                      "Msg": "新建成功",
+                      "Code": 200,
+                      "Data": {
+                        "id": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/power-station/collect/filing-project/update": {
+      "post": {
+        "tags": [
+          "powerstation"
+        ],
+        "summary": "更新建档立卡光伏项目",
+        "description": "供采集端更新已创建的建档立卡光伏项目。必须传入新建接口返回的 `id`，以及完整业务字段；不支持仅传部分字段的局部更新。\n\n更新前会重新查询省、市、区/县三级编码，并校验更新后的 `Title + ProjectCode` 组合不能与其他记录重复。目标 id 不存在、地区任一级未匹配或唯一组合冲突时，整次更新不落库。`Scale` 仍固定按四位小数存储。",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "ProjectCode",
+                  "Title",
+                  "Scale",
+                  "Location",
+                  "Province",
+                  "City",
+                  "County",
+                  "PublishDate"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "新建接口返回的记录主键。",
+                    "example": 1
+                  },
+                  "ProjectCode": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "项目编码；与 Title 共同构成唯一去重键。",
+                    "example": "PV-20261117-001"
+                  },
+                  "Title": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
+                    "example": "杭州市西湖区屋顶分布式光伏项目（一期）"
+                  },
+                  "Scale": {
+                    "type": "string",
+                    "pattern": "^\\d+(?:\\.\\d{1,4})?$",
+                    "description": "装机容量，最多四位小数；写库时固定为四位小数。",
+                    "example": "15.0000"
+                  },
+                  "Location": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目所在地详细描述。",
+                    "example": "浙江省杭州市西湖区文三路90号"
+                  },
+                  "Province": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "省级行政区名称，用于重新查询 province_code。",
+                    "example": "浙江省"
+                  },
+                  "City": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "市级行政区名称，用于重新查询 city_code。",
+                    "example": "杭州市"
+                  },
+                  "County": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "区/县级行政区名称，用于重新查询 county_code。",
+                    "example": "西湖区"
+                  },
+                  "PublishDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "发布时间，须为可解析日期时间。",
+                    "example": "2026-11-17 10:00:00"
+                  }
+                }
+              },
+              "examples": {
+                "default": {
+                  "summary": "完整更新请求",
+                  "value": {
+                    "id": 1,
+                    "ProjectCode": "PV-20261117-001",
+                    "Title": "杭州市西湖区屋顶分布式光伏项目（一期）",
+                    "Scale": "15.0000",
+                    "Location": "浙江省杭州市西湖区文三路90号",
+                    "Province": "浙江省",
+                    "City": "杭州市",
+                    "County": "西湖区",
+                    "PublishDate": "2026-11-17 10:00:00"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "结果说明。",
+                      "example": "更新成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码，200 表示成功。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "更新结果。",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "description": "已更新记录主键。",
+                          "example": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "更新成功",
+                    "value": {
+                      "Msg": "更新成功",
+                      "Code": 200,
+                      "Data": {
+                        "id": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/power-station/front/stats": {
+      "post": {
+        "tags": [
+          "powerstation"
+        ],
+        "summary": "光伏电站项目统计",
+        "description": "按光伏电站项目口径输出省份汇总、全国汇总、7 天趋势、4 周趋势、类型占比、规模占比和最新中标电站列表，服务数字新能源电站看板。\n\n固定口径：\n1. 路由固定 append `sub_data_sorts=1`（光伏电站二级分类），前端无需传，传了也会被覆盖。\n2. 默认附加 `type=[2,3]`（中标、中标候选人）、`publish_status=1`、`dispose_status=1`、`match_fields=title`。\n3. `provinces` 与 `national_total` 固定统计最近 365 个自然日（截止昨天）的全国各省数据，且会主动清空 `province`、`province_code`、`city`、`city_code`、`county`、`county_code` 条件，因此传省份只会影响 `current_province_*` 回显、`trend_*`、`type_counts`、`scale_counts` 和 `items`，不会把省份地图缩成单省。\n4. `trend_7_days` 固定最近 7 个自然日；`trend_4_weeks` 固定当前周之前的 4 个完整自然周，不含当前周。\n5. `type_counts`、`scale_counts` 复用 7 天窗口；`scale_counts` 只统计 `capacity > 0` 的项目，五档区间固定返回，左闭右开。\n6. `items` 只返回 `capacity > 0` 的项目，按 `release_date`、`id` 双倒序取最新 10 条，不分页；`page`、`page_size` 对本接口无效。\n7. 数值列表类入参（`province_code`、`city_code`、`county_code`、`type`、`item_type`、`exclude_ids`、`data_sorts`、`sub_data_sorts`）的 0 值与空值一律按未传处理，即不生成过滤条件；省份编码 0 就是全国，与 MySQL 数据源同口径。\n\n时间窗口的两个例外（与 MySQL 源同口径）：\n1. `release_year` 为四位年份时，会覆盖上述所有统计窗口的起止日期，全部改为该自然年，用于看板查看历史年度数据；此时 365 天、7 天、4 周窗口都不再生效。\n2. 不传 `scene=detail` 时，检索条件默认受最近 60 天窗口限制（`DataTenderSearchCriteria::DEFAULT_RELEASE_DAYS`），而 `items` 列表查询不显式设置起止日期，因此受该 60 天约束；需要最新项目列表覆盖更早数据时请传 `scene=detail`。\n\n数据源与缓存：\n1. 数据源默认取服务端 `DATABASE_TYPE`（1=mysql，3=elasticsearch，本接口不支持 2=clickhouse）；可用 `data_source` 或 `database_type` 按请求覆盖，便于双源对照。\n2. Elasticsearch 查询异常时默认直接报错，仅当服务端 `ES_FALLBACK_MYSQL=1` 才静默回落 MySQL 源。\n3. 路由挂了 `DataCache` 中间件：`APP_DEBUG=true` 时不缓存；正常情况命中缓存直接返回，缓存 1800 秒（结果为空时 60 秒）；联调需要绕过缓存时传 `noCache=1`。\n4. 响应外层为 `Msg`、`Code`、`Data`，`Code=200` 表示成功。\n\n`type` 取值说明：\n- `1`：招标\n- `2`：中标\n- `3`：中标候选人\n- `4`：其他\n\n`item_type` 取值说明：\n- `8`：EPC总承包\n- `9`：PC总承包\n- `10`：DB总承包\n- `11`：其他总承包\n- `12`：光储一体总承包\n\n`data_source` / `database_type` 取值说明：\n- `mysql` 或 `1`：MySQL 数据源\n- `elasticsearch`、`elastic`、`es` 或 `3`：Elasticsearch 数据源\n- 其他值（含 `2`/`clickhouse`）返回 `Code 400` 数据源参数错误",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data_source": {
+                    "type": "string",
+                    "description": "数据源开关，仅本接口用于双源灰度对照。可选 `mysql`、`elasticsearch`/`elastic`/`es`，也接受数字 1、3；不传时取服务端 `DATABASE_TYPE`。传入 ClickHouse（2）等不支持的取值返回 `Code 400`。",
+                    "example": "es"
+                  },
+                  "database_type": {
+                    "type": "integer",
+                    "description": "数据源开关的数字形式，与招中标中台列表入参同名。`data_source` 未传时生效：1=mysql，3=elasticsearch。",
+                    "example": 3
+                  },
+                  "scene": {
+                    "type": "string",
+                    "description": "检索场景。传 `detail` 时跳过默认最近 60 天的发布时间窗口限制，`items` 可返回更早的最新中标电站；其他值或不传均保留 60 天窗口。",
+                    "example": "detail"
+                  },
+                  "release_year": {
+                    "type": "string",
+                    "description": "发布年份，仅可传一个四位年份。传入后覆盖全部统计窗口的起止日期，按该自然年 `01-01 00:00:00` 至 `12-31 23:59:59` 统计。",
+                    "example": "2026"
+                  },
+                  "release_start": {
+                    "type": "string",
+                    "description": "发布时间起始，匹配 `release_date >= release_start`。仅作用于 `items` 等未内置窗口的查询；`release_year` 传入时被覆盖。",
+                    "example": "2026-06-01"
+                  },
+                  "release_end": {
+                    "type": "string",
+                    "description": "发布时间截止，匹配 `release_date <= release_end`。仅作用于 `items` 等未内置窗口的查询；`release_year` 传入时被覆盖。",
+                    "example": "2026-11-12"
+                  },
+                  "type": {
+                    "type": "array",
+                    "description": "信息类别数组。默认 [2,3]，2=中标，3=中标候选人，通常无需传。",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "2",
+                        "3"
+                      ]
+                    },
+                    "example": [
+                      "2",
+                      "3"
+                    ]
+                  },
+                  "keyword": {
+                    "type": "string",
+                    "description": "关键词，支持逗号分隔多个（多词之间为 AND）。本接口沿用中台电站统计口径，未加 /bids/front/list 的“单个关键词至少 2 字符”限制；match_fields 默认为 title，单字关键词在两个数据源下均为子串匹配，检索成本较高，前端不建议开放短关键词。",
+                    "example": "光伏组件"
+                  },
+                  "match_fields": {
+                    "type": "string",
+                    "description": "关键词匹配字段，逗号分隔或多值。可选 `title`、`content`、`winner`、`agent`、`tenderee`、`product`（`product` 必须显式传）。本接口默认已固定为 `title`，需要放宽检索列时显式传入。",
+                    "example": "title"
+                  },
+                  "keyword_search_mode": {
+                    "type": "string",
+                    "description": "关键词匹配模式，仅 MySQL 数据源生效：`like`=LIKE 模糊匹配，`fulltext`=全文索引匹配。Elasticsearch 数据源由服务端索引配置决定。",
+                    "example": "like"
+                  },
+                  "province": {
+                    "type": "array",
+                    "description": "省份名称，支持数组或逗号分隔字符串。MySQL 源按 `province_name` 精确匹配；Elasticsearch 源按索引 `province_name` 精确 terms 匹配，需传索引里的完整写法。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "江苏"
+                    ]
+                  },
+                  "province_code": {
+                    "type": "array",
+                    "description": "省份编码，支持数组、逗号分隔字符串或单值，仅非零数字编码生效；`0`、`'0'`、`[0]` 与不传、传空等价，均表示不限省份（全国），不会生成过滤条件。影响 `current_province_code`、`current_province_name` 回显以及趋势、占比、最新项目；不影响 `provinces` 全国省份地图。回显取首个有效编码。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "320000"
+                    ]
+                  },
+                  "city": {
+                    "type": "array",
+                    "description": "城市名称，支持数组或逗号分隔字符串。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  },
+                  "city_code": {
+                    "type": "array",
+                    "description": "城市编码，支持数组或逗号分隔字符串，仅非零数字编码生效；0 值与空值一律忽略，表示不限城市。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  },
+                  "county": {
+                    "type": "array",
+                    "description": "区县名称，支持数组或逗号分隔字符串。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  },
+                  "county_code": {
+                    "type": "array",
+                    "description": "区县编码，支持数组或逗号分隔字符串，仅非零数字编码生效；0 值与空值一律忽略，表示不限区县。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  },
+                  "min_capacity": {
+                    "type": "number",
+                    "description": "装机容量下限，单位 MW，匹配附表 `capacity >= min_capacity`。",
+                    "example": 10
+                  },
+                  "max_capacity": {
+                    "type": "number",
+                    "description": "装机容量上限，单位 MW，匹配附表 `capacity <= max_capacity`。",
+                    "example": 100
+                  },
+                  "winning_amount_from": {
+                    "type": "number",
+                    "description": "中标金额下限，单位元，匹配主表 `result_cost >= winning_amount_from`。",
+                    "example": 1000000
+                  },
+                  "winning_amount_to": {
+                    "type": "number",
+                    "description": "中标金额上限，单位元。只传上限时隐含 `result_cost > 0`。",
+                    "example": 500000000
+                  },
+                  "budge_from": {
+                    "type": "number",
+                    "description": "预算金额下限，单位元，匹配主表 `cost >= budge_from`。",
+                    "example": 100
+                  },
+                  "budge_to": {
+                    "type": "number",
+                    "description": "预算金额上限，单位元。",
+                    "example": ""
+                  },
+                  "project_name": {
+                    "type": "string",
+                    "description": "项目名称模糊匹配，匹配附表 `project_name`。",
+                    "example": ""
+                  },
+                  "tenderee": {
+                    "type": "string",
+                    "description": "招标单位名称模糊匹配。",
+                    "example": ""
+                  },
+                  "agent": {
+                    "type": "string",
+                    "description": "代理单位名称模糊匹配。",
+                    "example": ""
+                  },
+                  "winner": {
+                    "type": "string",
+                    "description": "中标单位名称模糊匹配。",
+                    "example": ""
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "description": "企业名称，未传 `role` 时同时匹配招标、代理、中标三类单位。",
+                    "example": ""
+                  },
+                  "tenderee_id": {
+                    "type": "array",
+                    "description": "招标单位 ID，支持多值。",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "example": []
+                  },
+                  "winner_id": {
+                    "type": "array",
+                    "description": "中标单位 ID，支持多值。",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "example": []
+                  },
+                  "power_station_industry": {
+                    "type": "string",
+                    "description": "光伏行业分类，与 `industry` 同义，按行业字段模糊匹配。",
+                    "example": ""
+                  },
+                  "item_type": {
+                    "type": "array",
+                    "description": "项目类型，支持多值。常见：8=EPC总承包，9=PC总承包，10=DB总承包，12=光储一体总承包。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": [
+                      "8"
+                    ]
+                  },
+                  "power_station_id": {
+                    "type": "string",
+                    "description": "关联电站 ID。",
+                    "example": ""
+                  },
+                  "power_station_name": {
+                    "type": "string",
+                    "description": "关联电站名称。",
+                    "example": ""
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "来源站点标识。",
+                    "example": ""
+                  },
+                  "web_type": {
+                    "type": "array",
+                    "description": "来源站点，与 `web_id` 同义（`web_id` 优先），支持单值、逗号串或数组。3=数字新能源。",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": []
+                  },
+                  "agented": {
+                    "type": "integer",
+                    "description": "有无代理单位：1=仅有代理，2=仅无代理，0/不传=不过滤。",
+                    "example": 0
+                  },
+                  "contactable": {
+                    "type": "integer",
+                    "description": "有无联系方式：1=仅招标或代理电话非空，2=仅两者都为空，0/不传=不过滤。",
+                    "example": 0
+                  },
+                  "creator_uname": {
+                    "type": "string",
+                    "description": "创建者用户名。传 `OA` 时按采集来源 `creator_type=collect` 过滤。",
+                    "example": ""
+                  },
+                  "publish_status": {
+                    "type": "integer",
+                    "description": "发布状态。默认 1=已发布。",
+                    "example": 1
+                  },
+                  "dispose_status": {
+                    "type": "integer",
+                    "description": "处理状态。默认 1=已处理。",
+                    "example": 1
+                  },
+                  "exclude_ids": {
+                    "type": "array",
+                    "description": "排除的项目 ID 集合。",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "example": []
+                  },
+                  "noCache": {
+                    "type": "integer",
+                    "description": "绕过 `DataCache` 中间件缓存，联调对照数据时传 1。",
+                    "example": 1
+                  }
+                }
+              },
+              "example": {
+                "scene": "detail",
+                "release_year": "2026",
+                "province_code": [
+                  "320000"
+                ],
+                "data_source": "es"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "提示信息。命中缓存时为“请求成功，缓存命中”。",
+                      "example": "请求成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "业务状态码，200=成功；参数不合法或数据源不支持时为 400。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "统计结果。九个键的顺序与 MySQL 源实现完全一致。",
+                      "properties": {
+                        "current_province_code": {
+                          "type": "string",
+                          "description": "当前统计省份编码，取自入参 `province_code` 的首个有效数字编码；为空表示全国。",
+                          "example": "320000"
+                        },
+                        "current_province_name": {
+                          "type": "string",
+                          "description": "当前统计范围名称。传 `province_code` 时按区划表取省份名称；否则取入参 `province` 首个值；两者都未传时固定为全国。",
+                          "example": "江苏"
+                        },
+                        "national_total": {
+                          "type": "object",
+                          "description": "全国汇总。由本次返回的各省 `provinces` 合计得出（先按省四舍五入到 4 位小数再求和），与省份地图口径严格自洽。",
+                          "properties": {
+                            "total_projects": {
+                              "type": "integer",
+                              "description": "统计窗口内全国电站项目总数，单位个。",
+                              "example": 235
+                            },
+                            "total_capacity": {
+                              "type": "number",
+                              "format": "double",
+                              "description": "统计窗口内全国装机总容量，单位 MW，保留 4 位小数。",
+                              "example": 13689.19
+                            },
+                            "total_amount": {
+                              "type": "number",
+                              "format": "double",
+                              "description": "统计窗口内全国中标总金额，入库单位万元，出参换算为亿元，保留 4 位小数。",
+                              "example": 276.8773
+                            }
+                          }
+                        },
+                        "provinces": {
+                          "type": "array",
+                          "description": "全国各省汇总，固定统计最近 365 个自然日（截止昨天），不受入参省份条件影响。按区划表 `parent_code=11001` 全量返回并剔除香港、澳门、台湾，固定 31 项，无数据省份补 0，顺序为区划表顺序。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "province_code": {
+                                "type": "string",
+                                "description": "省份编码。",
+                                "example": "320000"
+                              },
+                              "province_name": {
+                                "type": "string",
+                                "description": "省份名称，取自区划表短名。",
+                                "example": "江苏"
+                              },
+                              "total_projects": {
+                                "type": "integer",
+                                "description": "该省项目总数，单位个。",
+                                "example": 23
+                              },
+                              "total_capacity": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该省装机总容量，单位 MW，保留 4 位小数。",
+                                "example": 820.14
+                              },
+                              "total_amount": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该省中标总金额，单位亿元，保留 4 位小数。",
+                                "example": 22.8372
+                              },
+                              "total_projects_rank": {
+                                "type": "integer",
+                                "description": "该省项目总数全国排名，数值越大排名越靠前，数值相同排名相同（并列）。",
+                                "example": 1
+                              },
+                              "total_capacity_rank": {
+                                "type": "integer",
+                                "description": "该省装机总容量全国排名，规则同上。",
+                                "example": 9
+                              },
+                              "total_amount_rank": {
+                                "type": "integer",
+                                "description": "该省中标总金额全国排名，规则同上。",
+                                "example": 3
+                              }
+                            }
+                          }
+                        },
+                        "trend_7_days": {
+                          "type": "array",
+                          "description": "最近 7 个自然日趋势（昨天往前推 7 天，含昨天），数组长度固定 7，缺失日期补 0。传省份条件时为该省数据，否则为全国。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "day": {
+                                "type": "string",
+                                "description": "统计日期，格式 yyyy-MM-dd，按 `release_date` 落日。",
+                                "example": "2026-08-31"
+                              },
+                              "total_capacity": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "当日装机容量总数，单位 MW，保留 4 位小数。",
+                                "example": 188.5632
+                              },
+                              "total_projects": {
+                                "type": "integer",
+                                "description": "当日中标项目总数，单位个。",
+                                "example": 12
+                              },
+                              "total_amount": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "当日中标总金额，单位亿元，保留 4 位小数。",
+                                "example": 3.2845
+                              }
+                            }
+                          }
+                        },
+                        "trend_4_weeks": {
+                          "type": "array",
+                          "description": "当前周之前的 4 个完整自然周（周一至周日）趋势，不含当前周，数组长度固定 4，先按日补 0 再按 7 天一组累加。传省份条件时为该省数据，否则为全国。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "week_start": {
+                                "type": "string",
+                                "description": "统计周开始日期（周一），格式 yyyy-MM-dd。",
+                                "example": "2026-10-12"
+                              },
+                              "week_end": {
+                                "type": "string",
+                                "description": "统计周结束日期（周日），格式 yyyy-MM-dd。",
+                                "example": "2026-10-18"
+                              },
+                              "total_capacity": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该周装机容量总数，单位 MW，保留 4 位小数。",
+                                "example": 1388.5632
+                              },
+                              "total_projects": {
+                                "type": "integer",
+                                "description": "该周中标项目总数，单位个。",
+                                "example": 42
+                              },
+                              "total_amount": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该周中标总金额，单位亿元，保留 4 位小数。",
+                                "example": 13.2845
+                              }
+                            }
+                          }
+                        },
+                        "type_counts": {
+                          "type": "array",
+                          "description": "电站类型占比，取当前筛选条件与 7 天窗口内的项目，按电站类型整串分组（一条记录多个类型按整串计一次，不拆分），按数量倒序返回；类型为空归入“未分类”。入参带 `release_year` 时分组范围随之改为该自然年。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "电站类型名称。",
+                                "example": "BAPV（屋顶电站）"
+                              },
+                              "count": {
+                                "type": "integer",
+                                "description": "该类型项目数量。",
+                                "example": 122
+                              },
+                              "value": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该类型数量占比，单位百分比，保留 2 位小数；分母为本次参与分组的类型合计。",
+                                "example": 51.91
+                              }
+                            }
+                          }
+                        },
+                        "scale_counts": {
+                          "type": "array",
+                          "description": "装机容量规模占比，仅统计 `capacity > 0` 的项目，固定返回五个区间（区间顺序固定，无命中的区间 count=0、value=0），区间左闭右开。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "装机容量区间名称。",
+                                "example": "1MW≤装机容量<10MW"
+                              },
+                              "count": {
+                                "type": "integer",
+                                "description": "落在该区间的项目数量。",
+                                "example": 104
+                              },
+                              "value": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "该区间数量占比，单位百分比，保留 2 位小数；分母为 `capacity > 0` 的项目合计。",
+                                "example": 45.61
+                              }
+                            }
+                          }
+                        },
+                        "items": {
+                          "type": "array",
+                          "description": "最新中标电站列表，仅返回 `capacity > 0` 的项目，按 `release_date`、`id` 双倒序取最新 10 条，不分页。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "description": "招中标项目 ID。",
+                                "example": 7978444
+                              },
+                              "project_name": {
+                                "type": "string",
+                                "description": "项目名称，优先附表 `project_name`，缺失时回退标题 `title`。",
+                                "example": "徐州徐工精密工业科技有限公司5.25MW分布式光伏发电项目"
+                              },
+                              "project_type": {
+                                "type": "string",
+                                "description": "电站类型。优先原值 `project_type`；为空时回退为 `item_type` 对应的项目类型名称。",
+                                "example": "BAPV（屋顶电站）"
+                              },
+                              "item_type": {
+                                "type": "string",
+                                "description": "项目类型标签，枚举 `item_type` 对应的中文名；无法识别时为空字符串。",
+                                "example": "EPC总承包"
+                              },
+                              "capacity": {
+                                "type": [
+                                  "number",
+                                  "string"
+                                ],
+                                "description": "装机容量，单位 MW，保留 4 位小数；值为 0 时返回字符串 `/`。列表已过滤 `capacity > 0`，正常不会出现 `/`。",
+                                "example": 5.25
+                              },
+                              "result_cost_yi": {
+                                "type": [
+                                  "number",
+                                  "string"
+                                ],
+                                "description": "中标金额，入库万元换算为亿元，保留 4 位小数；值为 0 时返回字符串 `/`。",
+                                "example": 0.1189
+                              },
+                              "winning_unit_price": {
+                                "type": [
+                                  "number",
+                                  "string"
+                                ],
+                                "description": "中标单价，单位元/W，保留 4 位小数；值为 0 时返回字符串 `/`。",
+                                "example": 2.27
+                              },
+                              "release_date": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "发布时间，格式 yyyy-MM-dd HH:mm:ss；源数据为空时返回 null。",
+                                "example": "2026-08-28 13:36:59"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/power-station/front/weekly-report-detail": {
+      "post": {
+        "tags": [
+          "powerstation"
+        ],
+        "summary": "查询光伏电站周报详情",
+        "description": "按周报主键 `id` 或详情主键 `detail_id` 返回完整结构化详情，可直接映射全国概况、趋势图、省份榜单、大区分布和其他总承包模块页面。\n\n定位规则：\n1. `id` 与 `detail_id` 二选一，`id` 优先；两者同时传时按 `id` 查询，`detail_id` 被忽略。\n2. 两者都不传（或都是空值）返回 `Code 400`、`Msg 参数错误`，HTTP 状态码仍是 200。\n3. 主表按 `update_time` 倒序、`id` 倒序取第一条，因此重跑同一周后再次查询会拿到最新快照。\n4. 主表查不到，或 `detail_id` 在详情表查不到时，`detail` 各节点返回空数组/空字符串而不是报错，前端需要兼容。\n5. `id`、`unid` 为雪花 ID，超出 JS 安全整数范围，按字符串处理或仅透传。\n\n口径与约束：\n1. 数据源固定为 MySQL 周报快照表 `power_station_weekly_reports`、`power_station_weekly_report_details`，与中台接口读同一份数据。\n2. 所有统计都在生成环节按电站项目口径（`type=[2,3]`、`publish_status=1`、`dispose_status=1`、`sub_data_sorts=1`）算好落库，本接口不回查主表、不受检索类入参影响。\n3. `trend.daily` 固定 4 个点：以本周 `week_start` 往前推 21 天为起点，切 4 个 7 天区间，每周单独去重统计，最后一点即本周。\n4. `province_rank.project_top1` 不是严格 1 条，而是与项目数最多的省份并列的所有省份；`amount_top3`、`capacity_top3` 各取前 3 条。\n5. `region` 只返回有数据的大区，无数据大区不出现在数组里；`region[].items` 不含 `province_code`，而 `national_items.items[]` 含 `province_code`。\n6. `national_items` 与 `other_contracting` 是同一份“其他总承包”快照的两个键名，内容完全相同，新前端建议读 `other_contracting`。\n7. `geo_ai_content` 由新闻自动生成接口回写，未生成时为 `\"\"`。\n\n缓存：路由挂了 `DataCache` 中间件，`APP_DEBUG=true` 时不缓存；正常情况下命中缓存直接返回，缓存 1800 秒，命中时 `Msg` 为“请求成功，缓存命中”、`Data` 与首次请求一致，前端不应拿 `Msg` 做业务判断。同一条周报被重新生成后，需等缓存过期或带 `noCache=1` 才能看到新内容。\n\n`information_type` 取值说明：\n- `2`：中标（`information_type_name` 为“中标”）\n- `3`：中标候选人（`information_type_name` 为“候选人”）\n- `1`：招标，`0`：其他；周报列表口径固定只含 2、3，正常不会出现在本接口返回中。\n\n`report_type` 取值说明：\n- `epc`：EPC总承包\n- `other_contracting`：其他总承包",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "周报主表主键，来自列表接口 `Data.DataList[].id`。与 `detail_id` 二选一，且优先级更高。",
+                    "example": 69447239272185
+                  },
+                  "detail_id": {
+                    "type": "string",
+                    "description": "周报详情主键，15 位数字字符串，来自列表接口 `Data.DataList[].detail_id`。与 `id` 二选一。",
+                    "example": "2611121633123"
+                  },
+                  "noCache": {
+                    "type": "integer",
+                    "description": "可选，绕过 `DataCache` 中间件的响应缓存，联调用；传 1 生效。",
+                    "example": 1
+                  }
+                }
+              },
+              "example": {
+                "detail_id": "2611121633123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200。业务结果由 `Code` 区分：200 成功；400 参数错误（`id`、`detail_id` 均缺失）；404 信息不存在（周报主记录查不到）。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "接口提示信息，成功为“请求成功”，缺参为“参数错误”，查不到为“信息不存在”。",
+                      "example": "请求成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "接口状态码。200 表示成功。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "description": "周报主表字段与 `detail` 详情快照。",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "format": "int64",
+                          "description": "周报主表主键 ID。",
+                          "example": 69447239272185
+                        },
+                        "report_type": {
+                          "type": "string",
+                          "description": "周报类型标识。`epc`/`other_contracting`。",
+                          "enum": [
+                            "epc",
+                            "other_contracting"
+                          ],
+                          "example": "epc"
+                        },
+                        "report_type_name": {
+                          "type": "string",
+                          "description": "周报类型中文名称；未知枚举时为空字符串。",
+                          "example": "EPC总承包"
+                        },
+                        "week_start": {
+                          "type": "string",
+                          "description": "统计周开始日期，格式 `Y-m-d`。",
+                          "example": "2026-08-24"
+                        },
+                        "week_end": {
+                          "type": "string",
+                          "description": "统计周结束日期，格式 `Y-m-d`。",
+                          "example": "2026-08-30"
+                        },
+                        "title": {
+                          "type": "string",
+                          "description": "周报标题。",
+                          "example": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）"
+                        },
+                        "project_total": {
+                          "type": "integer",
+                          "description": "本周项目总数，单位个。",
+                          "example": 6
+                        },
+                        "amount_total_yi": {
+                          "type": "number",
+                          "format": "double",
+                          "description": "本周中标总金额，单位亿元，保留 4 位小数。",
+                          "example": 12.1285
+                        },
+                        "capacity_total_gw": {
+                          "type": "number",
+                          "format": "double",
+                          "description": "本周中标总装机容量，单位 GW，保留 4 位小数。",
+                          "example": 0.4205
+                        },
+                        "status": {
+                          "type": "string",
+                          "description": "周报状态，当前固定为 generated。",
+                          "example": "generated"
+                        },
+                        "detail_id": {
+                          "type": "string",
+                          "description": "周报详情主键 ID，15 位数字字符串。",
+                          "example": "2611121633123"
+                        },
+                        "created_by": {
+                          "type": "string",
+                          "description": "周报生成人，定时/接口生成为 system。",
+                          "example": "system"
+                        },
+                        "create_time": {
+                          "type": "string",
+                          "description": "主表创建时间，格式 `Y-m-d H:i:s`。",
+                          "example": "2026-11-12 16:33:12"
+                        },
+                        "update_time": {
+                          "type": "string",
+                          "description": "主表更新时间，格式 `Y-m-d H:i:s`。",
+                          "example": "2026-11-12 16:33:12"
+                        },
+                        "detail": {
+                          "type": "object",
+                          "description": "详情快照。所属详情表记录缺失时，本对象仍返回，其中 `id` 为空字符串、`report_id` 为 0，各 JSON 节点序列化为空数组 `[]`。",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "description": "详情表主键，15 位数字字符串。",
+                              "example": "2611121633123"
+                            },
+                            "report_id": {
+                              "type": "integer",
+                              "format": "int64",
+                              "description": "关联的周报主表 ID。",
+                              "example": 69447239272185
+                            },
+                            "overview": {
+                              "type": "object",
+                              "description": "本周全国概况，与主表汇总值同源，额外给出 MW 口径。",
+                              "properties": {
+                                "report_type": {
+                                  "type": "string",
+                                  "description": "概况所属周报类型，主周报固定 epc。",
+                                  "example": "epc"
+                                },
+                                "report_type_name": {
+                                  "type": "string",
+                                  "example": "EPC总承包"
+                                },
+                                "week_start": {
+                                  "type": "string",
+                                  "example": "2026-08-24"
+                                },
+                                "week_end": {
+                                  "type": "string",
+                                  "example": "2026-08-30"
+                                },
+                                "title": {
+                                  "type": "string",
+                                  "example": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）"
+                                },
+                                "project_total": {
+                                  "type": "integer",
+                                  "description": "本周项目总数，单位个。",
+                                  "example": 6
+                                },
+                                "amount_total_yi": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "description": "本周中标总金额，单位亿元。",
+                                  "example": 12.1285
+                                },
+                                "capacity_total_gw": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "description": "本周中标总装机容量，单位 GW。",
+                                  "example": 0.4205
+                                },
+                                "capacity_total_mw": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "description": "本周中标总装机容量，单位 MW，等于 GW 值乘 1000 后保留 4 位小数。",
+                                  "example": 420.46
+                                }
+                              }
+                            },
+                            "trend": {
+                              "type": "object",
+                              "description": "趋势图数据。",
+                              "properties": {
+                                "daily": {
+                                  "type": "array",
+                                  "description": "近 4 周趋势，固定 4 个点，起点为本周 `week_start` 往前推 21 天，按周起始日升序。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "day": {
+                                        "type": "string",
+                                        "description": "该点起始日期，与 `week_start` 相同，格式 `Y-m-d`。",
+                                        "example": "2026-08-24"
+                                      },
+                                      "week_start": {
+                                        "type": "string",
+                                        "description": "统计周开始日期，格式 `Y-m-d`。",
+                                        "example": "2026-08-24"
+                                      },
+                                      "week_end": {
+                                        "type": "string",
+                                        "description": "统计周结束日期（起始日 +6 天），格式 `Y-m-d`。",
+                                        "example": "2026-08-30"
+                                      },
+                                      "label": {
+                                        "type": "string",
+                                        "description": "图表横轴标签，格式 `n.j-n.j`，月日不补零。",
+                                        "example": "8.24-8.30"
+                                      },
+                                      "capacity_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该周中标装机容量合计，单位 MW，保留 4 位小数。",
+                                        "example": 420.46
+                                      },
+                                      "amount_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该周中标金额合计，单位万元，保留 2 位小数。",
+                                        "example": 121284.86
+                                      }
+                                    }
+                                  }
+                                },
+                                "key_provinces": {
+                                  "type": "array",
+                                  "description": "重点省份柱状图数据，等于 `province_rank.key_provinces`（按装机容量降序前 4 省）。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "province_code": {
+                                        "type": "string",
+                                        "description": "省份行政区划编码。",
+                                        "example": "140000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "description": "省份名称，取招中标主表写法。",
+                                        "example": "山西省"
+                                      },
+                                      "capacity_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周装机容量，单位 MW。",
+                                        "example": 400
+                                      },
+                                      "amount_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位万元。",
+                                        "example": 117753.66
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "province_rank": {
+                              "type": "object",
+                              "description": "省份榜单。所有条目只统计 `province_name` 去空格后非空的项目。",
+                              "properties": {
+                                "amount_top3": {
+                                  "type": "array",
+                                  "description": "按中标金额降序前 3 省。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "province_code": {
+                                        "type": "string",
+                                        "description": "省份行政区划编码。",
+                                        "example": "140000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "description": "省份名称。",
+                                        "example": "山西省"
+                                      },
+                                      "project_total": {
+                                        "type": "integer",
+                                        "description": "该省本周项目数。",
+                                        "example": 1
+                                      },
+                                      "amount_total_yi": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位亿元。",
+                                        "example": 11.7754
+                                      },
+                                      "amount_total_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位万元。",
+                                        "example": 117753.66
+                                      },
+                                      "capacity_total_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周装机容量，单位 MW。",
+                                        "example": 400
+                                      }
+                                    }
+                                  }
+                                },
+                                "project_top1": {
+                                  "type": "array",
+                                  "description": "项目数最多的省份；并列时全部返回，因此数组长度可能大于 1。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "province_code": {
+                                        "type": "string",
+                                        "description": "省份行政区划编码。",
+                                        "example": "140000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "description": "省份名称。",
+                                        "example": "山西省"
+                                      },
+                                      "project_total": {
+                                        "type": "integer",
+                                        "description": "该省本周项目数。",
+                                        "example": 1
+                                      },
+                                      "amount_total_yi": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位亿元。",
+                                        "example": 11.7754
+                                      },
+                                      "amount_total_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位万元。",
+                                        "example": 117753.66
+                                      },
+                                      "capacity_total_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周装机容量，单位 MW。",
+                                        "example": 400
+                                      }
+                                    }
+                                  }
+                                },
+                                "capacity_top3": {
+                                  "type": "array",
+                                  "description": "按装机容量降序前 3 省。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "province_code": {
+                                        "type": "string",
+                                        "description": "省份行政区划编码。",
+                                        "example": "140000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "description": "省份名称。",
+                                        "example": "山西省"
+                                      },
+                                      "project_total": {
+                                        "type": "integer",
+                                        "description": "该省本周项目数。",
+                                        "example": 1
+                                      },
+                                      "amount_total_yi": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位亿元。",
+                                        "example": 11.7754
+                                      },
+                                      "amount_total_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周中标金额，单位万元。",
+                                        "example": 117753.66
+                                      },
+                                      "capacity_total_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "该省本周装机容量，单位 MW。",
+                                        "example": 400
+                                      }
+                                    }
+                                  }
+                                },
+                                "key_provinces": {
+                                  "type": "array",
+                                  "description": "按装机容量降序前 4 省，用于趋势图柱状；结构同 `trend.key_provinces`。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "province_code": {
+                                        "type": "string",
+                                        "example": "140000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "example": "山西省"
+                                      },
+                                      "capacity_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "example": 400
+                                      },
+                                      "amount_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "example": 117753.66
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "region": {
+                              "type": "array",
+                              "description": "大区分布。只返回有数据的大区，无数据大区不出现在数组中；项内 `items` 不含 `province_code`。",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "region_name": {
+                                    "type": "string",
+                                    "description": "大区名称，如 华北地区、华东地区、中南地区。",
+                                    "example": "华北地区"
+                                  },
+                                  "total_capacity_mw": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "description": "该大区本周装机容量合计，单位 MW，为明细项累加后保留 4 位小数。",
+                                    "example": 400
+                                  },
+                                  "total_amount_yi": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "description": "该大区本周中标金额合计，单位亿元。由明细项的万元值换算累加，可能与全国总额存在分位尾差。",
+                                    "example": 11.7754
+                                  },
+                                  "items": {
+                                    "type": "array",
+                                    "description": "该大区项目明细，按 `province_name` 升序、`id` 倒序。",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "integer",
+                                          "format": "int64",
+                                          "description": "招中标主表 ID，可跳转 `/power-station/front/detail` 或 `/bids/front/detail`。",
+                                          "example": 7978859
+                                        },
+                                        "unid": {
+                                          "type": "string",
+                                          "description": "招中标主表唯一编号。",
+                                          "example": "688156619376287"
+                                        },
+                                        "province_code": {
+                                          "type": "string",
+                                          "description": "省份编码。仅 `national_items.items[]`/`other_contracting.items[]` 返回，`region[].items` 不含该字段。",
+                                          "example": "120000"
+                                        },
+                                        "province_name": {
+                                          "type": "string",
+                                          "description": "省份名称。",
+                                          "example": "天津市"
+                                        },
+                                        "project_type": {
+                                          "type": "string",
+                                          "description": "项目类型原文，取主表 `project_type` 去空格；为空时返回空字符串。",
+                                          "example": "BAPV（屋顶电站）"
+                                        },
+                                        "project_name": {
+                                          "type": "string",
+                                          "description": "项目名称，优先取附表 `project_name`，为空时回退主表 `title`。",
+                                          "example": "天宁工业园、水厂、泵站3.695MWp分布式光伏发电项目（1标段）"
+                                        },
+                                        "capacity_mw": {
+                                          "type": "number",
+                                          "format": "double",
+                                          "description": "装机容量，单位 MW，保留 4 位小数；附表无值时为 0。",
+                                          "example": 3.7
+                                        },
+                                        "amount_wan": {
+                                          "type": "number",
+                                          "format": "double",
+                                          "description": "中标金额，单位万元，保留 2 位小数。",
+                                          "example": 2535
+                                        },
+                                        "unit_price_yuan_per_w": {
+                                          "type": "number",
+                                          "format": "double",
+                                          "description": "中标单价，单位元/瓦，取附表 `winning_unit_price`，保留 4 位小数。",
+                                          "example": 6.86
+                                        },
+                                        "winning_unit": {
+                                          "type": "string",
+                                          "description": "中标单位，取主表 `result_company`；联合体中标时为逗号（中文或英文）分隔的多家单位全称。",
+                                          "example": "中国电建集团贵阳勘测设计研究院有限公司"
+                                        },
+                                        "information_type": {
+                                          "type": "integer",
+                                          "description": "信息类别：2=中标，3=中标候选人。周报口径固定只含这两类。",
+                                          "enum": [
+                                            2,
+                                            3
+                                          ],
+                                          "example": 3
+                                        },
+                                        "information_type_name": {
+                                          "type": "string",
+                                          "description": "信息类别中文名：中标、候选人。",
+                                          "example": "候选人"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "national_items": {
+                              "type": "object",
+                              "description": "其他总承包模块，保留该键名用于兼容旧前端；内容与 `other_contracting` 完全相同。",
+                              "properties": {
+                                "overview": {
+                                  "type": "object",
+                                  "description": "其他总承包本周概况，结构同 `detail.overview`，`report_type` 为 other_contracting。"
+                                },
+                                "trend": {
+                                  "type": "object",
+                                  "description": "其他总承包趋势数据，结构同 `detail.trend`。"
+                                },
+                                "province_rank": {
+                                  "type": "object",
+                                  "description": "其他总承包省份榜单，结构同 `detail.province_rank`。"
+                                },
+                                "items": {
+                                  "type": "array",
+                                  "description": "其他总承包全国项目明细，按 `release_date` 倒序、`id` 倒序；与 `region[].items` 不同，这里包含 `province_code`。",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "description": "招中标主表 ID，可跳转 `/power-station/front/detail` 或 `/bids/front/detail`。",
+                                        "example": 7978859
+                                      },
+                                      "unid": {
+                                        "type": "string",
+                                        "description": "招中标主表唯一编号。",
+                                        "example": "688156619376287"
+                                      },
+                                      "province_code": {
+                                        "type": "string",
+                                        "description": "省份编码。仅 `national_items.items[]`/`other_contracting.items[]` 返回，`region[].items` 不含该字段。",
+                                        "example": "120000"
+                                      },
+                                      "province_name": {
+                                        "type": "string",
+                                        "description": "省份名称。",
+                                        "example": "天津市"
+                                      },
+                                      "project_type": {
+                                        "type": "string",
+                                        "description": "项目类型原文，取主表 `project_type` 去空格；为空时返回空字符串。",
+                                        "example": "BAPV（屋顶电站）"
+                                      },
+                                      "project_name": {
+                                        "type": "string",
+                                        "description": "项目名称，优先取附表 `project_name`，为空时回退主表 `title`。",
+                                        "example": "天宁工业园、水厂、泵站3.695MWp分布式光伏发电项目（1标段）"
+                                      },
+                                      "capacity_mw": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "装机容量，单位 MW，保留 4 位小数；附表无值时为 0。",
+                                        "example": 3.7
+                                      },
+                                      "amount_wan": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "中标金额，单位万元，保留 2 位小数。",
+                                        "example": 2535
+                                      },
+                                      "unit_price_yuan_per_w": {
+                                        "type": "number",
+                                        "format": "double",
+                                        "description": "中标单价，单位元/瓦，取附表 `winning_unit_price`，保留 4 位小数。",
+                                        "example": 6.86
+                                      },
+                                      "winning_unit": {
+                                        "type": "string",
+                                        "description": "中标单位，取主表 `result_company`；联合体中标时为逗号（中文或英文）分隔的多家单位全称。",
+                                        "example": "中国电建集团贵阳勘测设计研究院有限公司"
+                                      },
+                                      "information_type": {
+                                        "type": "integer",
+                                        "description": "信息类别：2=中标，3=中标候选人。周报口径固定只含这两类。",
+                                        "enum": [
+                                          2,
+                                          3
+                                        ],
+                                        "example": 3
+                                      },
+                                      "information_type_name": {
+                                        "type": "string",
+                                        "description": "信息类别中文名：中标、候选人。",
+                                        "example": "候选人"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "other_contracting": {
+                              "type": "object",
+                              "description": "其他总承包模块，与 `national_items` 同一份数据，推荐新前端优先读取该字段。"
+                            },
+                            "geo_ai_content": {
+                              "type": "string",
+                              "description": "GEO 长文本内容，由新闻自动生成接口回写；未生成时为空字符串。",
+                              "example": ""
+                            },
+                            "create_time": {
+                              "type": "string",
+                              "description": "详情记录创建时间，格式 `Y-m-d H:i:s`。",
+                              "example": "2026-11-12 16:33:12"
+                            },
+                            "update_time": {
+                              "type": "string",
+                              "description": "详情记录更新时间，格式 `Y-m-d H:i:s`。",
+                              "example": "2026-11-12 16:33:12"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "actualDetail": {
+                    "summary": "开发环境 2026-11-12 真实返回（周报 2026.8.24~2026.8.30，detail_id=2611121633123）",
+                    "value": {
+                      "Msg": "请求成功",
+                      "Code": 200,
+                      "Data": {
+                        "id": 69447239272185,
+                        "report_type": "epc",
+                        "report_type_name": "EPC总承包",
+                        "week_start": "2026-08-24",
+                        "week_end": "2026-08-30",
+                        "title": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）",
+                        "project_total": 6,
+                        "amount_total_yi": 12.1285,
+                        "capacity_total_gw": 0.4205,
+                        "status": "generated",
+                        "detail_id": "2611121633123",
+                        "created_by": "system",
+                        "create_time": "2026-11-12 16:33:12",
+                        "update_time": "2026-11-12 16:33:12",
+                        "detail": {
+                          "id": "2611121633123",
+                          "report_id": 69447239272185,
+                          "overview": {
+                            "report_type": "epc",
+                            "report_type_name": "EPC总承包",
+                            "week_start": "2026-08-24",
+                            "week_end": "2026-08-30",
+                            "title": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）",
+                            "project_total": 6,
+                            "amount_total_yi": 12.1285,
+                            "capacity_total_gw": 0.4205,
+                            "capacity_total_mw": 420.46
+                          },
+                          "trend": {
+                            "daily": [
+                              {
+                                "day": "2026-08-03",
+                                "week_start": "2026-08-03",
+                                "week_end": "2026-08-09",
+                                "label": "8.3-8.9",
+                                "capacity_mw": 1104.15,
+                                "amount_wan": 247252.88
+                              },
+                              {
+                                "day": "2026-08-10",
+                                "week_start": "2026-08-10",
+                                "week_end": "2026-08-16",
+                                "label": "8.10-8.16",
+                                "capacity_mw": 362.15,
+                                "amount_wan": 82295.99
+                              },
+                              {
+                                "day": "2026-08-17",
+                                "week_start": "2026-08-17",
+                                "week_end": "2026-08-23",
+                                "label": "8.17-8.23",
+                                "capacity_mw": 773.79,
+                                "amount_wan": 208936.2
+                              },
+                              {
+                                "day": "2026-08-24",
+                                "week_start": "2026-08-24",
+                                "week_end": "2026-08-30",
+                                "label": "8.24-8.30",
+                                "capacity_mw": 420.46,
+                                "amount_wan": 121284.86
+                              }
+                            ],
+                            "key_provinces": [
+                              {
+                                "province_code": "140000",
+                                "province_name": "山西省",
+                                "capacity_mw": 400,
+                                "amount_wan": 117753.66
+                              },
+                              {
+                                "province_code": "440000",
+                                "province_name": "广东省",
+                                "capacity_mw": 7,
+                                "amount_wan": 0
+                              },
+                              {
+                                "province_code": "320000",
+                                "province_name": "江苏省",
+                                "capacity_mw": 5.25,
+                                "amount_wan": 1189.22
+                              },
+                              {
+                                "province_code": "410000",
+                                "province_name": "河南省",
+                                "capacity_mw": 4.27,
+                                "amount_wan": 1391.95
+                              }
+                            ]
+                          },
+                          "province_rank": {
+                            "amount_top3": [
+                              {
+                                "province_code": "140000",
+                                "province_name": "山西省",
+                                "project_total": 1,
+                                "amount_total_yi": 11.7754,
+                                "amount_total_wan": 117753.66,
+                                "capacity_total_mw": 400
+                              },
+                              {
+                                "province_code": "410000",
+                                "province_name": "河南省",
+                                "project_total": 1,
+                                "amount_total_yi": 0.1392,
+                                "amount_total_wan": 1391.95,
+                                "capacity_total_mw": 4.27
+                              },
+                              {
+                                "province_code": "320000",
+                                "province_name": "江苏省",
+                                "project_total": 1,
+                                "amount_total_yi": 0.1189,
+                                "amount_total_wan": 1189.22,
+                                "capacity_total_mw": 5.25
+                              }
+                            ],
+                            "project_top1": [
+                              {
+                                "province_code": "440000",
+                                "province_name": "广东省",
+                                "project_total": 2,
+                                "amount_total_yi": 0,
+                                "amount_total_wan": 0,
+                                "capacity_total_mw": 7
+                              }
+                            ],
+                            "capacity_top3": [
+                              {
+                                "province_code": "140000",
+                                "province_name": "山西省",
+                                "project_total": 1,
+                                "amount_total_yi": 11.7754,
+                                "amount_total_wan": 117753.66,
+                                "capacity_total_mw": 400
+                              },
+                              {
+                                "province_code": "440000",
+                                "province_name": "广东省",
+                                "project_total": 2,
+                                "amount_total_yi": 0,
+                                "amount_total_wan": 0,
+                                "capacity_total_mw": 7
+                              },
+                              {
+                                "province_code": "320000",
+                                "province_name": "江苏省",
+                                "project_total": 1,
+                                "amount_total_yi": 0.1189,
+                                "amount_total_wan": 1189.22,
+                                "capacity_total_mw": 5.25
+                              }
+                            ],
+                            "key_provinces": [
+                              {
+                                "province_code": "140000",
+                                "province_name": "山西省",
+                                "capacity_mw": 400,
+                                "amount_wan": 117753.66
+                              },
+                              {
+                                "province_code": "440000",
+                                "province_name": "广东省",
+                                "capacity_mw": 7,
+                                "amount_wan": 0
+                              },
+                              {
+                                "province_code": "320000",
+                                "province_name": "江苏省",
+                                "capacity_mw": 5.25,
+                                "amount_wan": 1189.22
+                              },
+                              {
+                                "province_code": "410000",
+                                "province_name": "河南省",
+                                "capacity_mw": 4.27,
+                                "amount_wan": 1391.95
+                              }
+                            ]
+                          },
+                          "region": [
+                            {
+                              "region_name": "华北地区",
+                              "total_capacity_mw": 400,
+                              "total_amount_yi": 11.7754,
+                              "items": [
+                                {
+                                  "id": 7978859,
+                                  "unid": "688156619376287",
+                                  "province_name": "山西省",
+                                  "project_type": "集中式光伏电站",
+                                  "project_name": "华电（原平）新能源有限公司原平能源转型与生态治理风光示范基地(一期40万千瓦光伏)EPC工程总承包",
+                                  "capacity_mw": 400,
+                                  "amount_wan": 117753.66,
+                                  "unit_price_yuan_per_w": 2.94,
+                                  "winning_unit": "中国电建集团贵阳勘测设计研究院有限公司",
+                                  "information_type": 2,
+                                  "information_type_name": "中标"
+                                }
+                              ]
+                            },
+                            {
+                              "region_name": "中南地区",
+                              "total_capacity_mw": 11.27,
+                              "total_amount_yi": 0.1392,
+                              "items": [
+                                {
+                                  "id": 7957877,
+                                  "unid": "687898841932210",
+                                  "province_name": "广东省",
+                                  "project_type": "BAPV（屋顶电站）",
+                                  "project_name": "朝阳家俱3700kW分布式光伏发电项目",
+                                  "capacity_mw": 3.7,
+                                  "amount_wan": 0,
+                                  "unit_price_yuan_per_w": 0,
+                                  "winning_unit": "江西安能晟电力科技有限公司",
+                                  "information_type": 3,
+                                  "information_type_name": "候选人"
+                                },
+                                {
+                                  "id": 7957876,
+                                  "unid": "687898841763128",
+                                  "province_name": "广东省",
+                                  "project_type": "BAPV（屋顶电站）",
+                                  "project_name": "肇庆新华兴实业（二期）屋顶3300KW分布式光伏发电项目",
+                                  "capacity_mw": 3.3,
+                                  "amount_wan": 0,
+                                  "unit_price_yuan_per_w": 0,
+                                  "winning_unit": "江西安能晟电力科技有限公司",
+                                  "information_type": 3,
+                                  "information_type_name": "候选人"
+                                },
+                                {
+                                  "id": 7976472,
+                                  "unid": "688146204269740",
+                                  "province_name": "河南省",
+                                  "project_type": "BAPV（屋顶电站）",
+                                  "project_name": "中化新能源风神轮胎（焦作）分布式光伏项目",
+                                  "capacity_mw": 4.27,
+                                  "amount_wan": 1391.95,
+                                  "unit_price_yuan_per_w": 3.26,
+                                  "winning_unit": "江苏常凯建设发展有限公司,成都初方电力设计有限公司,郑州科锐同源电力设计有限公司,河南省启源电力勘测设计有限公司",
+                                  "information_type": 3,
+                                  "information_type_name": "候选人"
+                                }
+                              ]
+                            },
+                            {
+                              "region_name": "华东地区",
+                              "total_capacity_mw": 9.19,
+                              "total_amount_yi": 0.2139,
+                              "items": [
+                                {
+                                  "id": 7978444,
+                                  "unid": "688154829383719",
+                                  "province_name": "江苏省",
+                                  "project_type": "BAPV（屋顶电站）",
+                                  "project_name": "徐州徐工精密工业科技有限公司5.25MW分布式光伏发电项目",
+                                  "capacity_mw": 5.25,
+                                  "amount_wan": 1189.22,
+                                  "unit_price_yuan_per_w": 2.27,
+                                  "winning_unit": "徐州华美电力工程有限责任公司",
+                                  "information_type": 2,
+                                  "information_type_name": "中标"
+                                },
+                                {
+                                  "id": 7920053,
+                                  "unid": "687639474423663",
+                                  "province_name": "福建省",
+                                  "project_type": "BAPV（屋顶电站）",
+                                  "project_name": "福建公司龙岩电厂银图实业3.94095MWP分布式光伏发电项目",
+                                  "capacity_mw": 3.94,
+                                  "amount_wan": 950.03,
+                                  "unit_price_yuan_per_w": 2.41,
+                                  "winning_unit": "湖南金森电力建设集团有限公司",
+                                  "information_type": 2,
+                                  "information_type_name": "中标"
+                                }
+                              ]
+                            }
+                          ],
+                          "national_items": {
+                            "overview": {
+                              "report_type": "other_contracting",
+                              "report_type_name": "其他总承包",
+                              "week_start": "2026-08-24",
+                              "week_end": "2026-08-30",
+                              "title": "光伏电站其他总承包项目统计周报（2026.8.24~2026.8.30）",
+                              "project_total": 4,
+                              "amount_total_yi": 7.2552,
+                              "capacity_total_gw": 0.2937,
+                              "capacity_total_mw": 293.7
+                            },
+                            "trend": {
+                              "daily": [
+                                {
+                                  "day": "2026-08-03",
+                                  "week_start": "2026-08-03",
+                                  "week_end": "2026-08-09",
+                                  "label": "8.3-8.9",
+                                  "capacity_mw": 1157.79,
+                                  "amount_wan": 214137.79
+                                },
+                                {
+                                  "day": "2026-08-10",
+                                  "week_start": "2026-08-10",
+                                  "week_end": "2026-08-16",
+                                  "label": "8.10-8.16",
+                                  "capacity_mw": 962.3,
+                                  "amount_wan": 251043.36
+                                },
+                                {
+                                  "day": "2026-08-17",
+                                  "week_start": "2026-08-17",
+                                  "week_end": "2026-08-23",
+                                  "label": "8.17-8.23",
+                                  "capacity_mw": 228.67,
+                                  "amount_wan": 51091.73
+                                },
+                                {
+                                  "day": "2026-08-24",
+                                  "week_start": "2026-08-24",
+                                  "week_end": "2026-08-30",
+                                  "label": "8.24-8.30",
+                                  "capacity_mw": 293.7,
+                                  "amount_wan": 72551.59
+                                }
+                              ],
+                              "key_provinces": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 33000
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 22066
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "capacity_mw": 90,
+                                  "amount_wan": 14950.59
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "capacity_mw": 3.7,
+                                  "amount_wan": 2535
+                                }
+                              ]
+                            },
+                            "province_rank": {
+                              "amount_top3": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                }
+                              ],
+                              "project_top1": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "project_total": 1,
+                                  "amount_total_yi": 0.2535,
+                                  "amount_total_wan": 2535,
+                                  "capacity_total_mw": 3.7
+                                }
+                              ],
+                              "capacity_top3": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                }
+                              ],
+                              "key_provinces": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 33000
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 22066
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "capacity_mw": 90,
+                                  "amount_wan": 14950.59
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "capacity_mw": 3.7,
+                                  "amount_wan": 2535
+                                }
+                              ]
+                            },
+                            "items": [
+                              {
+                                "id": 7737148,
+                                "unid": "685743710830404",
+                                "province_code": "120000",
+                                "province_name": "天津市",
+                                "project_type": "BAPV（屋顶电站）",
+                                "project_name": "天宁工业园、水厂、泵站3.695MWp分布式光伏发电项目（1标段）",
+                                "capacity_mw": 3.7,
+                                "amount_wan": 2535,
+                                "unit_price_yuan_per_w": 6.86,
+                                "winning_unit": "中建八局天津建设工程有限公司,中建五局第三建设有限公司,中建三局集团有限公司,中国五冶集团有限公司,天津安装工程有限公司,浙江省邮电工程建设有限公司,天津天源国电电力技术有限公司,天津诚昇能源科技有限公司,中国二十二冶集团有限公司",
+                                "information_type": 3,
+                                "information_type_name": "候选人"
+                              },
+                              {
+                                "id": 7973932,
+                                "unid": "688063002515858",
+                                "province_code": "130000",
+                                "province_name": "河北省",
+                                "project_type": "集中式光伏电站",
+                                "project_name": "华能河北分公司围场100MW光伏发电项目",
+                                "capacity_mw": 100,
+                                "amount_wan": 22066,
+                                "unit_price_yuan_per_w": 2.2066,
+                                "winning_unit": "中国电建集团重庆工程有限公司",
+                                "information_type": 2,
+                                "information_type_name": "中标"
+                              },
+                              {
+                                "id": 7919209,
+                                "unid": "687635011935612",
+                                "province_code": "650000",
+                                "province_name": "新疆维吾尔自治区",
+                                "project_type": "农光/渔光/牧光互补",
+                                "project_name": "南疆兵团第一师天盈石化绿电直连项目",
+                                "capacity_mw": 100,
+                                "amount_wan": 33000,
+                                "unit_price_yuan_per_w": 3.3,
+                                "winning_unit": "中电建宁夏工程有限公司,中国能源建设集团浙江火电建设有限公司,上海勘测设计研究院有限公司,中国能源建设集团江苏省电力建设第三工程有限公司,中国联合工程有限公司",
+                                "information_type": 3,
+                                "information_type_name": "候选人"
+                              },
+                              {
+                                "id": 7918032,
+                                "unid": "687630088129009",
+                                "province_code": "430000",
+                                "province_name": "湖南省",
+                                "project_type": "集中式光伏电站",
+                                "project_name": "衡阳京能清洁能源有限责任公司耒阳市余庆街道办事处光伏项目",
+                                "capacity_mw": 90,
+                                "amount_wan": 14950.59,
+                                "unit_price_yuan_per_w": 1.66,
+                                "winning_unit": "兴能电力建设有限公司",
+                                "information_type": 2,
+                                "information_type_name": "中标"
+                              }
+                            ]
+                          },
+                          "other_contracting": {
+                            "overview": {
+                              "report_type": "other_contracting",
+                              "report_type_name": "其他总承包",
+                              "week_start": "2026-08-24",
+                              "week_end": "2026-08-30",
+                              "title": "光伏电站其他总承包项目统计周报（2026.8.24~2026.8.30）",
+                              "project_total": 4,
+                              "amount_total_yi": 7.2552,
+                              "capacity_total_gw": 0.2937,
+                              "capacity_total_mw": 293.7
+                            },
+                            "trend": {
+                              "daily": [
+                                {
+                                  "day": "2026-08-03",
+                                  "week_start": "2026-08-03",
+                                  "week_end": "2026-08-09",
+                                  "label": "8.3-8.9",
+                                  "capacity_mw": 1157.79,
+                                  "amount_wan": 214137.79
+                                },
+                                {
+                                  "day": "2026-08-10",
+                                  "week_start": "2026-08-10",
+                                  "week_end": "2026-08-16",
+                                  "label": "8.10-8.16",
+                                  "capacity_mw": 962.3,
+                                  "amount_wan": 251043.36
+                                },
+                                {
+                                  "day": "2026-08-17",
+                                  "week_start": "2026-08-17",
+                                  "week_end": "2026-08-23",
+                                  "label": "8.17-8.23",
+                                  "capacity_mw": 228.67,
+                                  "amount_wan": 51091.73
+                                },
+                                {
+                                  "day": "2026-08-24",
+                                  "week_start": "2026-08-24",
+                                  "week_end": "2026-08-30",
+                                  "label": "8.24-8.30",
+                                  "capacity_mw": 293.7,
+                                  "amount_wan": 72551.59
+                                }
+                              ],
+                              "key_provinces": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 33000
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 22066
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "capacity_mw": 90,
+                                  "amount_wan": 14950.59
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "capacity_mw": 3.7,
+                                  "amount_wan": 2535
+                                }
+                              ]
+                            },
+                            "province_rank": {
+                              "amount_top3": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                }
+                              ],
+                              "project_top1": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "project_total": 1,
+                                  "amount_total_yi": 0.2535,
+                                  "amount_total_wan": 2535,
+                                  "capacity_total_mw": 3.7
+                                }
+                              ],
+                              "capacity_top3": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "project_total": 1,
+                                  "amount_total_yi": 3.3,
+                                  "amount_total_wan": 33000,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 2.2066,
+                                  "amount_total_wan": 22066,
+                                  "capacity_total_mw": 100
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "project_total": 1,
+                                  "amount_total_yi": 1.4951,
+                                  "amount_total_wan": 14950.59,
+                                  "capacity_total_mw": 90
+                                }
+                              ],
+                              "key_provinces": [
+                                {
+                                  "province_code": "650000",
+                                  "province_name": "新疆维吾尔自治区",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 33000
+                                },
+                                {
+                                  "province_code": "130000",
+                                  "province_name": "河北省",
+                                  "capacity_mw": 100,
+                                  "amount_wan": 22066
+                                },
+                                {
+                                  "province_code": "430000",
+                                  "province_name": "湖南省",
+                                  "capacity_mw": 90,
+                                  "amount_wan": 14950.59
+                                },
+                                {
+                                  "province_code": "120000",
+                                  "province_name": "天津市",
+                                  "capacity_mw": 3.7,
+                                  "amount_wan": 2535
+                                }
+                              ]
+                            },
+                            "items": [
+                              {
+                                "id": 7737148,
+                                "unid": "685743710830404",
+                                "province_code": "120000",
+                                "province_name": "天津市",
+                                "project_type": "BAPV（屋顶电站）",
+                                "project_name": "天宁工业园、水厂、泵站3.695MWp分布式光伏发电项目（1标段）",
+                                "capacity_mw": 3.7,
+                                "amount_wan": 2535,
+                                "unit_price_yuan_per_w": 6.86,
+                                "winning_unit": "中建八局天津建设工程有限公司,中建五局第三建设有限公司,中建三局集团有限公司,中国五冶集团有限公司,天津安装工程有限公司,浙江省邮电工程建设有限公司,天津天源国电电力技术有限公司,天津诚昇能源科技有限公司,中国二十二冶集团有限公司",
+                                "information_type": 3,
+                                "information_type_name": "候选人"
+                              },
+                              {
+                                "id": 7973932,
+                                "unid": "688063002515858",
+                                "province_code": "130000",
+                                "province_name": "河北省",
+                                "project_type": "集中式光伏电站",
+                                "project_name": "华能河北分公司围场100MW光伏发电项目",
+                                "capacity_mw": 100,
+                                "amount_wan": 22066,
+                                "unit_price_yuan_per_w": 2.2066,
+                                "winning_unit": "中国电建集团重庆工程有限公司",
+                                "information_type": 2,
+                                "information_type_name": "中标"
+                              },
+                              {
+                                "id": 7919209,
+                                "unid": "687635011935612",
+                                "province_code": "650000",
+                                "province_name": "新疆维吾尔自治区",
+                                "project_type": "农光/渔光/牧光互补",
+                                "project_name": "南疆兵团第一师天盈石化绿电直连项目",
+                                "capacity_mw": 100,
+                                "amount_wan": 33000,
+                                "unit_price_yuan_per_w": 3.3,
+                                "winning_unit": "中电建宁夏工程有限公司,中国能源建设集团浙江火电建设有限公司,上海勘测设计研究院有限公司,中国能源建设集团江苏省电力建设第三工程有限公司,中国联合工程有限公司",
+                                "information_type": 3,
+                                "information_type_name": "候选人"
+                              },
+                              {
+                                "id": 7918032,
+                                "unid": "687630088129009",
+                                "province_code": "430000",
+                                "province_name": "湖南省",
+                                "project_type": "集中式光伏电站",
+                                "project_name": "衡阳京能清洁能源有限责任公司耒阳市余庆街道办事处光伏项目",
+                                "capacity_mw": 90,
+                                "amount_wan": 14950.59,
+                                "unit_price_yuan_per_w": 1.66,
+                                "winning_unit": "兴能电力建设有限公司",
+                                "information_type": 2,
+                                "information_type_name": "中标"
+                              }
+                            ]
+                          },
+                          "geo_ai_content": "",
+                          "create_time": "2026-11-12 16:33:12",
+                          "update_time": "2026-11-12 16:33:12"
+                        }
+                      }
+                    }
+                  },
+                  "notFound": {
+                    "summary": "id 与 detail_id 都查不到主记录（HTTP 仍为 200，Data 为空数组）",
+                    "value": {
+                      "Msg": "信息不存在",
+                      "Code": 404,
+                      "Data": []
+                    }
+                  },
+                  "missingParam": {
+                    "summary": "id 与 detail_id 均未传（HTTP 仍为 200，Data 为空数组）",
+                    "value": {
+                      "Msg": "参数错误",
+                      "Code": 400,
+                      "Data": []
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/power-station/front/weekly-report-list": {
+      "post": {
+        "tags": [
+          "powerstation"
+        ],
+        "summary": "分页查询光伏电站周报列表",
+        "description": "按周报类型、周起止范围和状态分页查询已落库的周报列表，按 `week_start` 倒序、同周内按 `id` 倒序。`week_start`、`week_end` 是列表表字段的直接比较（分别为 `>=` 和 `<=`），不会重算统计。\n\n口径与约束：\n1. 数据源固定为 MySQL 周报快照表 `power_station_weekly_reports`，与中台接口读同一份数据；无数据源开关，ES 切换不影响本接口。\n2. 与生成环节一样复用电站项目口径（`type=[2,3]`、`publish_status=1`、`dispose_status=1`、`sub_data_sorts=1`），但该口径固化在生成的 JSON 快照里，本接口只回显结果。\n3. 路由注册为 `post|get`，GET 时同名字段走查询串，行为一致；文档按项目约定只展开 POST。\n4. 列表返回的 `detail_id` 可直接作为 `/power-station/front/weekly-report-detail` 的 `detail_id` 入参。\n\n参数校验（与中台同一份 `PowerStationWeeklyReportValidate` 的 `list` 场景）：\n1. `report_type` 只接受 `epc`、`other_contracting`，其他值抛校验异常，表现为 HTTP 500 异常页而非 `Code 400` 信封（开发环境 `APP_DEBUG=true`）。\n2. `week_start`、`week_end` 必须是 `Y-m-d`，格式错误同样抛校验异常走 HTTP 500。\n3. `page`、`page_size` 必须是整数；传入 0 或负数时按默认值处理（`page=1`、`page_size=20`），不报错。\n\n分页与返回：\n1. 默认 `page=1`、`page_size=20`。\n2. `Data.Counts` 为过滤后的总记录数，`Data.PageCounts`/`Data.PageMax` 为总页数（向上取整，最小为 1），`Data.PageIndex` 为当前页码，`Data.PageSize` 为生效的每页条数。\n3. 响应外层为 `Msg`、`Code`、`Data`，`Code=200` 表示成功。\n\n缓存：路由挂了 `DataCache` 中间件，`APP_DEBUG=true` 时不缓存；正常情况下命中缓存直接返回，缓存 1800 秒（结果为空时 60 秒），联调需要绕过缓存时传 `noCache=1`。命中缓存时 `Msg` 为“请求成功，缓存命中”，`Data` 与首次请求一致，前端不应拿 `Msg` 做业务判断。\n\n`report_type` 取值说明：\n- `epc`：EPC总承包，标题前缀“光伏电站EPC总承包项目统计周报”，对应 `item_type=8`。\n- `other_contracting`：其他总承包，标题前缀“光伏电站其他总承包项目统计周报”，对应 `item_type` 为 PC 总承包、DB 总承包、其他总承包、光储一体总承包。\n- 当前每周只生成 1 份 `epc` 主周报，`other_contracting` 内容作为详情中的附加模块返回，因此按 `other_contracting` 过滤列表通常为空。\n\n`status` 取值说明：\n- `generated`：已生成，当前唯一落库取值；精确匹配，传其他值返回空列表而不是报错。",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "report_type": {
+                    "type": "string",
+                    "description": "可选，周报类型精确筛选。只接受 `epc`、`other_contracting`；不传时返回全部类型。非枚举值会抛校验异常（HTTP 500）。",
+                    "enum": [
+                      "epc",
+                      "other_contracting"
+                    ],
+                    "example": "epc"
+                  },
+                  "week_start": {
+                    "type": "string",
+                    "description": "可选，周开始日期下限，匹配 `week_start >= 入参`，格式 `Y-m-d`。格式错误会抛校验异常（HTTP 500）。",
+                    "example": "2026-08-17"
+                  },
+                  "week_end": {
+                    "type": "string",
+                    "description": "可选，周结束日期上限，匹配 `week_end <= 入参`，格式 `Y-m-d`。与 `week_start` 可同时传入取区间。",
+                    "example": "2026-08-31"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "可选，周报状态精确筛选。当前只有 `generated`；传不存在的值返回空列表，不报错。该参数在中台文档未列出，但两个入口的实现一致。",
+                    "example": "generated"
+                  },
+                  "page": {
+                    "type": "integer",
+                    "description": "页码，从 1 开始；小于 1 或非整数（如 0）时按 1 处理。",
+                    "example": 1
+                  },
+                  "page_size": {
+                    "type": "integer",
+                    "description": "每页条数，默认 20；小于 1 时按 20 处理。",
+                    "example": 20
+                  },
+                  "noCache": {
+                    "type": "integer",
+                    "description": "可选，绕过 `DataCache` 中间件的响应缓存，联调用；传 1 生效。",
+                    "example": 1
+                  }
+                }
+              },
+              "example": {
+                "report_type": "epc",
+                "week_start": "2026-08-01",
+                "week_end": "2026-08-31",
+                "page": 1,
+                "page_size": 20
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "请求成功。返回统一分页结构，`Data.DataList` 为当前页周报数组，按 `week_start` 倒序、同周内按 `id` 倒序。",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Msg": {
+                      "type": "string",
+                      "description": "接口提示信息。",
+                      "example": "请求成功"
+                    },
+                    "Code": {
+                      "type": "integer",
+                      "description": "接口状态码。200 表示成功。",
+                      "example": 200
+                    },
+                    "Data": {
+                      "type": "object",
+                      "properties": {
+                        "PageCounts": {
+                          "type": "integer",
+                          "description": "总页数，等于 ceil(Counts/PageSize)，最小为 1。",
+                          "example": 2
+                        },
+                        "Counts": {
+                          "type": "integer",
+                          "description": "满足过滤条件的总记录数。",
+                          "example": 3
+                        },
+                        "PageIndex": {
+                          "type": "integer",
+                          "description": "当前页码，等于生效后的 `page`。",
+                          "example": 1
+                        },
+                        "PageSize": {
+                          "type": "integer",
+                          "description": "当前生效的每页条数，等于处理后的 `page_size`。",
+                          "example": 2
+                        },
+                        "PageMax": {
+                          "type": "integer",
+                          "description": "最大页码，取值与 `PageCounts` 相同。",
+                          "example": 2
+                        },
+                        "DataList": {
+                          "type": "array",
+                          "description": "周报列表数据。无数据时为空数组。",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer",
+                                "description": "周报主表主键 ID，可作为详情接口的 `id` 入参。雪花 ID，超出 JS 安全整数范围，前端按字符串处理或仅透传。",
+                                "format": "int64",
+                                "example": 69447239272185
+                              },
+                              "report_type": {
+                                "type": "string",
+                                "description": "周报类型标识。`epc`/`other_contracting`。",
+                                "enum": [
+                                  "epc",
+                                  "other_contracting"
+                                ],
+                                "example": "epc"
+                              },
+                              "report_type_name": {
+                                "type": "string",
+                                "description": "周报类型中文名称。`epc` 对应 EPC总承包，`other_contracting` 对应 其他总承包；`report_type` 为未知枚举时返回空字符串。",
+                                "example": "EPC总承包"
+                              },
+                              "week_start": {
+                                "type": "string",
+                                "description": "统计周开始日期，格式 `Y-m-d`。",
+                                "example": "2026-08-24"
+                              },
+                              "week_end": {
+                                "type": "string",
+                                "description": "统计周结束日期，格式 `Y-m-d`。",
+                                "example": "2026-08-30"
+                              },
+                              "title": {
+                                "type": "string",
+                                "description": "周报标题，生成时按“前缀（M.D~M.D）”拼接。",
+                                "example": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）"
+                              },
+                              "project_total": {
+                                "type": "integer",
+                                "description": "本周项目总数，单位个。",
+                                "example": 6
+                              },
+                              "amount_total_yi": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "本周中标总金额，单位亿元，四舍五入保留 4 位小数。",
+                                "example": 12.1285
+                              },
+                              "capacity_total_gw": {
+                                "type": "number",
+                                "format": "double",
+                                "description": "本周中标总装机容量，单位 GW，四舍五入保留 4 位小数。",
+                                "example": 0.4205
+                              },
+                              "status": {
+                                "type": "string",
+                                "description": "周报状态，当前固定为 generated。",
+                                "example": "generated"
+                              },
+                              "detail_id": {
+                                "type": "string",
+                                "description": "周报详情主键 ID，15 位数字字符串，可作为详情接口的 `detail_id` 入参。",
+                                "example": "2611121633123"
+                              },
+                              "created_by": {
+                                "type": "string",
+                                "description": "周报生成人，定时/接口生成为 system。",
+                                "example": "system"
+                              },
+                              "create_time": {
+                                "type": "string",
+                                "description": "创建时间，格式 `Y-m-d H:i:s`。",
+                                "example": "2026-11-12 16:33:12"
+                              },
+                              "update_time": {
+                                "type": "string",
+                                "description": "更新时间，格式 `Y-m-d H:i:s`。重跑同一周会更新该字段。",
+                                "example": "2026-11-12 16:33:12"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "Msg": "请求成功",
+                  "Code": 200,
+                  "Data": {
+                    "PageCounts": 2,
+                    "Counts": 3,
+                    "PageIndex": 1,
+                    "PageSize": 2,
+                    "PageMax": 2,
+                    "DataList": [
+                      {
+                        "id": 69447239272185,
+                        "report_type": "epc",
+                        "report_type_name": "EPC总承包",
+                        "week_start": "2026-08-24",
+                        "week_end": "2026-08-30",
+                        "title": "光伏电站EPC总承包项目统计周报（2026.8.24~2026.8.30）",
+                        "project_total": 6,
+                        "amount_total_yi": 12.1285,
+                        "capacity_total_gw": 0.4205,
+                        "status": "generated",
+                        "detail_id": "2611121633123",
+                        "created_by": "system",
+                        "create_time": "2026-11-12 16:33:12",
+                        "update_time": "2026-11-12 16:33:12"
+                      },
+                      {
+                        "id": 69447240624971,
+                        "report_type": "epc",
+                        "report_type_name": "EPC总承包",
+                        "week_start": "2026-08-17",
+                        "week_end": "2026-08-23",
+                        "title": "光伏电站EPC总承包项目统计周报（2026.8.17~2026.8.23）",
+                        "project_total": 15,
+                        "amount_total_yi": 20.8936,
+                        "capacity_total_gw": 0.7738,
+                        "status": "generated",
+                        "detail_id": "2611121633265",
+                        "created_by": "system",
+                        "create_time": "2026-11-12 16:33:26",
+                        "update_time": "2026-11-12 16:33:26"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/subscribe/front/project-push-detail": {
       "post": {
         "tags": [
@@ -12268,6 +14934,10 @@
     {
       "name": "news",
       "description": "控制器目录：news"
+    },
+    {
+      "name": "powerstation",
+      "description": "控制器目录：powerstation"
     },
     {
       "name": "subscribe",
@@ -17946,7 +20616,7 @@
           "keyword": {
             "type": "string",
             "example": "光伏,EPC",
-            "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。匹配范围由 `match_fields` 决定。"
+            "description": "关键词搜索。支持逗号分隔多个关键词；多个关键词之间为 AND。每个关键词至少 2 个字符，含更短关键词时返回 Code 400。匹配范围由 `match_fields` 决定。"
           },
           "keywords": {
             "type": "string",
@@ -17956,7 +20626,7 @@
           "match_fields": {
             "type": "string",
             "example": "title,content,winner",
-            "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认同时匹配这些字段。"
+            "description": "关键词匹配范围。可选值：`title`、`content`、`winner`、`agent`、`tenderee`、`product`。未传时默认只匹配 `title`、`winner`、`tenderee`、`agent` 四列；`content` 走 Elasticsearch 数据源时由服务端开关 `ES_SEARCH_CONTENT` 决定（无需传 `search_content`），走 MySQL / ClickHouse 数据源时仍需 `search_content=true`；显式传入本参数且不含 `content` 时不检索正文；`product` 必须显式传入。"
           },
           "company_name": {
             "type": "string",
@@ -18084,6 +20754,11 @@
             "example": "2026-06-01 00:00:00",
             "description": "发布时间起始值，匹配主表 `release_date >= release_start`。"
           },
+          "release_year": {
+            "type": "integer",
+            "example": 2026,
+            "description": "发布时间年份筛选，仅可传一个四位年份。传入后会覆盖 `release_start` 与 `release_end`，查询该年 `01-01 00:00:00` 至 `12-31 23:59:59` 的全部数据，且不受默认 60 天范围限制。"
+          },
           "release_end": {
             "type": "string",
             "format": "date-time",
@@ -18153,6 +20828,17 @@
             "type": "integer",
             "example": 1,
             "description": "是否筛选 `project_name` 为空的数据。传任意非空值时会追加 `project_name = ''`。"
+          },
+          "project_pn": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "P001",
+              "P002"
+            ],
+            "description": "项目主体编号精确筛选。支持单个字符串、字符串数组或逗号分隔字符串；空值会忽略、重复值会去重，多个有效编号为 OR 关系。不要与 `no_project_pn` 同时传递。"
           },
           "min_capacity": {
             "type": "number",
