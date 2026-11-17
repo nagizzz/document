@@ -11929,7 +11929,7 @@
           "powerstation"
         ],
         "summary": "新建建档立卡光伏项目",
-        "description": "供采集端新增建档立卡光伏项目，全部业务字段必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。\n\n去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：服务端使用 `Province + City + County` 匹配既有三级行政区；成功后写入标准省、市、区/县名称及其编码。任一级未匹配到编码时不写入数据，请先核对采集名称。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
+        "description": "供采集端新增建档立卡光伏项目，`ProjectCode`、`Title`、`Scale`、`Location`、`PublishDate` 必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。\n\n去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：`Province`、`City`、`County` 均可不传，原始名称会按传入值保存。仅当 `Province` 有值时查询省编码；仅当 `Province`、`City` 均有值时查询市编码；仅当三级均有值时查询区/县编码。缺少上级时，下级不发起查询、编码留空；允许市或区/县名称单独入库。满足查询前置条件但没有匹配项时同样正常写入原始名称，对应编码留空。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
         "requestBody": {
           "required": true,
           "content": {
@@ -11941,9 +11941,6 @@
                   "Title",
                   "Scale",
                   "Location",
-                  "Province",
-                  "City",
-                  "County",
                   "PublishDate"
                 ],
                 "properties": {
@@ -11974,19 +11971,19 @@
                   "Province": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "省级行政区名称，用于查询 province_code。",
+                    "description": "可选。省级名称；有值时查询 province_code。省为空时不查询 City、County。",
                     "example": "浙江省"
                   },
                   "City": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "市级行政区名称，用于查询 city_code。",
+                    "description": "可选。仅 Province 有值时查询 city_code；否则仅原样保存、city_code 为空。",
                     "example": "杭州市"
                   },
                   "County": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "区/县级行政区名称，用于查询 county_code。",
+                    "description": "可选。仅 Province、City 均有值时查询 county_code；否则仅原样保存、county_code 为空。",
                     "example": "西湖区"
                   },
                   "PublishDate": {
@@ -12008,6 +12005,17 @@
                     "Province": "浙江省",
                     "City": "杭州市",
                     "County": "西湖区",
+                    "PublishDate": "2026-11-17 09:30:00"
+                  }
+                },
+                "city_only": {
+                  "summary": "仅提供城市名称",
+                  "value": {
+                    "ProjectCode": "PV-20261117-002",
+                    "Title": "城市级建档立卡光伏项目",
+                    "Scale": "1.2000",
+                    "Location": "杭州市",
+                    "City": "杭州市",
                     "PublishDate": "2026-11-17 09:30:00"
                   }
                 }
@@ -12070,7 +12078,7 @@
           "powerstation"
         ],
         "summary": "更新建档立卡光伏项目",
-        "description": "供采集端更新已创建的建档立卡光伏项目。必须传入新建接口返回的 `id`，以及完整业务字段；不支持仅传部分字段的局部更新。\n\n更新前会重新查询省、市、区/县三级编码，并校验更新后的 `Title + ProjectCode` 组合不能与其他记录重复。目标 id 不存在、地区任一级未匹配或唯一组合冲突时，整次更新不落库。`Scale` 仍固定按四位小数存储。",
+        "description": "供采集端更新已创建的建档立卡光伏项目。必须传入新建接口返回的 `id`，以及完整业务字段；不支持仅传部分字段的局部更新。\n\n`Province`、`City`、`County` 可任选传入：省有值才查询省编码，省市都有值才查询市编码，三级都有值才查询区/县编码。缺少上级时不查询下级，原始名称仍保存、对应编码留空；满足查询前置条件但名称无法匹配时同样照常保存原始名称、编码留空。仅目标 id 不存在或 `Title + ProjectCode` 与其他记录重复时，整次更新不落库。`Scale` 仍固定按四位小数存储。",
         "requestBody": {
           "required": true,
           "content": {
@@ -12083,9 +12091,6 @@
                   "Title",
                   "Scale",
                   "Location",
-                  "Province",
-                  "City",
-                  "County",
                   "PublishDate"
                 ],
                 "properties": {
@@ -12122,19 +12127,19 @@
                   "Province": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "省级行政区名称，用于重新查询 province_code。",
+                    "description": "可选。有值时查询 province_code；为空时不查询 City、County。",
                     "example": "浙江省"
                   },
                   "City": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "市级行政区名称，用于重新查询 city_code。",
+                    "description": "可选。仅 Province 有值时查询 city_code；否则编码为空。",
                     "example": "杭州市"
                   },
                   "County": {
                     "type": "string",
                     "maxLength": 50,
-                    "description": "区/县级行政区名称，用于重新查询 county_code。",
+                    "description": "可选。仅 Province、City 均有值时查询 county_code；否则编码为空。",
                     "example": "西湖区"
                   },
                   "PublishDate": {

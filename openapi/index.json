@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17T10:20:05.573620+08:00",
+  "generatedAt": "2026-11-17T10:31:05.940849+08:00",
   "sourceRoot": "D:\\Code Repositories",
   "repositories": [
     {
@@ -35,7 +35,7 @@
       "file": "project_api.openapi.json",
       "sourceFileCount": 45,
       "pathCount": 44,
-      "sha256": "0b90e1c2fba0654b0ad4150b259329a3844fe63762e5ef3cc315fcf3a9583670"
+      "sha256": "635123cf816b9e45c5482b8a018ed538ffdc961a20b9a35cb9c96032605b370c"
     },
     {
       "repository": "stone365_member_web",
