@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "project_api - APIPOST 聚合接口文档",
-    "version": "2026.11.17",
+    "version": "2026.11.18",
     "description": "由本机 OpenAPI 聚合服务自动生成。请勿手工编辑此文件。"
   },
   "paths": {
@@ -11929,94 +11929,139 @@
           "powerstation"
         ],
         "summary": "新建建档立卡光伏项目",
-        "description": "供采集端新增建档立卡光伏项目，`ProjectCode`、`Title`、`Scale`、`Location`、`PublishDate` 必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。\n\n去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：`Province`、`City`、`County` 均可不传，原始名称会按传入值保存。仅当 `Province` 有值时查询省编码；仅当 `Province`、`City` 均有值时查询市编码；仅当三级均有值时查询区/县编码。缺少上级时，下级不发起查询、编码留空；允许市或区/县名称单独入库。满足查询前置条件但没有匹配项时同样正常写入原始名称，对应编码留空。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
+        "description": "供采集端新增建档立卡光伏项目。请求体固定使用同步记录结构，业务字段只从请求顶层 `DataDict` 读取；`WashData_Id`、`Type`、`TraceId`、`SyncId_LogId`、`SendUrl`、`Notes` 等外层字段不入库。\n\n`DataDict.ProjectCode`、`Title`、`Scale`、`Location`、`PublishDate` 必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。`MonthlyTotal` 可传空字符串或不传，数据库存 NULL；非空时必须为非负整数，表示条数。去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：`Province`、`City`、`County` 均可不传，原始名称会按传入值保存。仅当 `Province` 有值时查询省编码；仅当 `Province`、`City` 均有值时查询市编码；仅当三级均有值时查询区/县编码。缺少上级时，下级不发起查询、编码留空；允许市或区/县名称单独入库。满足查询前置条件但没有匹配项时同样正常写入原始名称，对应编码留空。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "ProjectCode",
-                  "Title",
-                  "Scale",
-                  "Location",
-                  "PublishDate"
-                ],
                 "properties": {
-                  "ProjectCode": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "description": "项目编码；与 Title 共同构成唯一去重键。",
-                    "example": "PV-20261117-001"
+                  "WashData_Id": {
+                    "type": "integer",
+                    "description": "清洗记录 ID；不入库。",
+                    "example": 222363496742926
                   },
-                  "Title": {
-                    "type": "string",
-                    "maxLength": 500,
-                    "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
-                    "example": "杭州市西湖区屋顶分布式光伏项目"
+                  "Type": {
+                    "type": "integer",
+                    "description": "同步类型；不入库。",
+                    "example": 1
                   },
-                  "Scale": {
-                    "type": "string",
-                    "pattern": "^\\d+(?:\\.\\d{1,4})?$",
-                    "description": "装机容量。仅支持非负数，最多四位小数；写库时固定为四位小数。",
-                    "example": "12.5000"
+                  "TraceId": {
+                    "type": "integer",
+                    "description": "采集链路追踪 ID；不入库。",
+                    "example": 222363496480784
                   },
-                  "Location": {
-                    "type": "string",
-                    "maxLength": 500,
-                    "description": "项目所在地详细描述。",
-                    "example": "浙江省杭州市西湖区文三路90号"
+                  "SyncId_LogId": {
+                    "type": "integer",
+                    "description": "同步日志 ID；不入库。",
+                    "example": 222363496742924
                   },
-                  "Province": {
+                  "SendUrl": {
                     "type": "string",
-                    "maxLength": 50,
-                    "description": "可选。省级名称；有值时查询 province_code。省为空时不查询 City、County。",
-                    "example": "浙江省"
+                    "description": "采集端回调地址；不入库。",
+                    "example": "http://project.api.test.cbmnet.cn/power-station/collect/filing-project/create"
                   },
-                  "City": {
+                  "Notes": {
                     "type": "string",
-                    "maxLength": 50,
-                    "description": "可选。仅 Province 有值时查询 city_code；否则仅原样保存、city_code 为空。",
-                    "example": "杭州市"
+                    "description": "同步说明；不入库。",
+                    "example": "建档立卡光伏项目数据同步"
                   },
-                  "County": {
-                    "type": "string",
-                    "maxLength": 50,
-                    "description": "可选。仅 Province、City 均有值时查询 county_code；否则仅原样保存、county_code 为空。",
-                    "example": "西湖区"
-                  },
-                  "PublishDate": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "发布时间，须为可解析日期时间。",
-                    "example": "2026-11-17 09:30:00"
+                  "DataDict": {
+                    "type": "object",
+                    "description": "唯一的业务字段来源。",
+                    "required": [
+                      "ProjectCode",
+                      "Title",
+                      "Scale",
+                      "Location",
+                      "PublishDate"
+                    ],
+                    "properties": {
+                      "ProjectCode": {
+                        "type": "string",
+                        "maxLength": 100,
+                        "description": "项目编码；与 Title 共同构成唯一去重键。",
+                        "example": "PPD2505371724019V"
+                      },
+                      "Title": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
+                        "example": "巨野县分布式光伏电站项目"
+                      },
+                      "Scale": {
+                        "type": "string",
+                        "pattern": "^\\d+(?:\\.\\d{1,4})?$",
+                        "description": "装机容量。最多四位小数；写库时固定为四位小数。",
+                        "example": "0.019"
+                      },
+                      "MonthlyTotal": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "nullable": true,
+                        "description": "可选月总量（条数）。空字符串或不传时保存为 NULL。",
+                        "example": 120000
+                      },
+                      "Location": {
+                        "type": "string",
+                        "maxLength": 500,
+                        "description": "项目所在地详细描述。",
+                        "example": "山东省菏泽市巨野县"
+                      },
+                      "Province": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "description": "可选。省为空时不查询 City、County。",
+                        "example": "山东省"
+                      },
+                      "City": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "description": "可选。仅 Province 有值时查询 city_code。",
+                        "example": "菏泽市"
+                      },
+                      "County": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "description": "可选。仅 Province、City 均有值时查询 county_code。",
+                        "example": "巨野县"
+                      },
+                      "PublishDate": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "发布时间。",
+                        "example": "2025-10-01 00:00:00"
+                      }
+                    }
                   }
                 }
               },
               "examples": {
                 "default": {
-                  "summary": "完整新建请求",
+                  "summary": "采集平台同步记录",
                   "value": {
-                    "ProjectCode": "PV-20261117-001",
-                    "Title": "杭州市西湖区屋顶分布式光伏项目",
-                    "Scale": "12.5000",
-                    "Location": "浙江省杭州市西湖区文三路90号",
-                    "Province": "浙江省",
-                    "City": "杭州市",
-                    "County": "西湖区",
-                    "PublishDate": "2026-11-17 09:30:00"
-                  }
-                },
-                "city_only": {
-                  "summary": "仅提供城市名称",
-                  "value": {
-                    "ProjectCode": "PV-20261117-002",
-                    "Title": "城市级建档立卡光伏项目",
-                    "Scale": "1.2000",
-                    "Location": "杭州市",
-                    "City": "杭州市",
-                    "PublishDate": "2026-11-17 09:30:00"
+                    "WashData_Id": 222363496742926,
+                    "Type": 1,
+                    "TraceId": 222363496480784,
+                    "SyncId_LogId": 222363496742924,
+                    "SendUrl": "http://project.api.test.cbmnet.cn/power-station/collect/filing-project/create",
+                    "Notes": "建档立卡光伏项目数据同步",
+                    "DataDict": {
+                      "Title": "巨野县分布式光伏电站项目",
+                      "SiteType": "政府网站",
+                      "Scale": "0.019",
+                      "PublishDate": "2025-10-01 00:00:00",
+                      "Province": "山东省",
+                      "ProjectCode": "PPD2505371724019V",
+                      "MonthlyTotal": "",
+                      "Location": "山东省菏泽市巨野县",
+                      "IfNedTranslate": 0,
+                      "DataType": 1,
+                      "DataSort": "",
+                      "County": "巨野县",
+                      "City": "菏泽市"
+                    }
                   }
                 }
               }
@@ -12078,7 +12123,7 @@
           "powerstation"
         ],
         "summary": "更新建档立卡光伏项目",
-        "description": "供采集端更新已创建的建档立卡光伏项目。必须传入新建接口返回的 `id`，以及完整业务字段；不支持仅传部分字段的局部更新。\n\n`Province`、`City`、`County` 可任选传入：省有值才查询省编码，省市都有值才查询市编码，三级都有值才查询区/县编码。缺少上级时不查询下级，原始名称仍保存、对应编码留空；满足查询前置条件但名称无法匹配时同样照常保存原始名称、编码留空。仅目标 id 不存在或 `Title + ProjectCode` 与其他记录重复时，整次更新不落库。`Scale` 仍固定按四位小数存储。",
+        "description": "供采集端更新已创建的建档立卡光伏项目。必须传入新建接口返回的 `id`，以及完整业务字段；不支持仅传部分字段的局部更新。`MonthlyTotal` 为可选非负整数，表示条数；不传时保持原值，传空字符串时保存为 NULL。\n\n`Province`、`City`、`County` 可任选传入：省有值才查询省编码，省市都有值才查询市编码，三级都有值才查询区/县编码。缺少上级时不查询下级，原始名称仍保存、对应编码留空；满足查询前置条件但名称无法匹配时同样照常保存原始名称、编码留空。仅目标 id 不存在或 `Title + ProjectCode` 与其他记录重复时，整次更新不落库。`Scale` 仍固定按四位小数存储。",
         "requestBody": {
           "required": true,
           "content": {
@@ -12117,6 +12162,13 @@
                     "pattern": "^\\d+(?:\\.\\d{1,4})?$",
                     "description": "装机容量，最多四位小数；写库时固定为四位小数。",
                     "example": "15.0000"
+                  },
+                  "MonthlyTotal": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "nullable": true,
+                    "description": "可选月总量（条数）。不传时保留原值；传空字符串时保存为 NULL。",
+                    "example": 120000
                   },
                   "Location": {
                     "type": "string",
@@ -12158,6 +12210,7 @@
                     "ProjectCode": "PV-20261117-001",
                     "Title": "杭州市西湖区屋顶分布式光伏项目（一期）",
                     "Scale": "15.0000",
+                    "MonthlyTotal": 120000,
                     "Location": "浙江省杭州市西湖区文三路90号",
                     "Province": "浙江省",
                     "City": "杭州市",
