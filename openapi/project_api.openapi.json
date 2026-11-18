@@ -11929,139 +11929,115 @@
           "powerstation"
         ],
         "summary": "新建建档立卡光伏项目",
-        "description": "供采集端新增建档立卡光伏项目。请求体固定使用同步记录结构，业务字段只从请求顶层 `DataDict` 读取；`WashData_Id`、`Type`、`TraceId`、`SyncId_LogId`、`SendUrl`、`Notes` 等外层字段不入库。\n\n`DataDict.ProjectCode`、`Title`、`Scale`、`Location`、`PublishDate` 必传，Content-Type 为 application/json。`Scale` 仅接受非负数字及最多四位小数；服务端会按四位小数写入（例如 `12.5` 存为 `12.5000`）。`MonthlyTotal` 可传空字符串或不传，数据库存 NULL；非空时必须为非负整数，表示条数。去重规则：项目名称 `Title` 与项目编码 `ProjectCode` 的组合全库唯一；组合重复时不新增。\n\n地区规则：`Province`、`City`、`County` 均可不传，原始名称会按传入值保存。仅当 `Province` 有值时查询省编码；仅当 `Province`、`City` 均有值时查询市编码；仅当三级均有值时查询区/县编码。缺少上级时，下级不发起查询、编码留空；允许市或区/县名称单独入库。满足查询前置条件但没有匹配项时同样正常写入原始名称，对应编码留空。\n\n成功返回的 `Data.id` 是后续更新接口的唯一定位字段。响应外层 `Code=200` 表示成功。",
+        "description": "供采集端新增建档立卡光伏项目。请求体直接使用顶层业务字段，不要求 DataDict 包装，也不再兼容 FieldDict、SyncCloudDict 等旧结构。SiteType、IfNedTranslate、DataType、DataSort 是采集附带字段，接口接收但不入库。\n\nProjectCode、Title、Scale、Location、PublishDate 必传。Scale 仅接受非负数字及最多四位小数，写库时固定为四位小数。MonthlyTotal 可传空字符串或不传，数据库存 NULL；非空时必须为非负整数，表示条数。项目名称 Title 与项目编码 ProjectCode 组合唯一，重复时不新增。\n\nProvince、City、County 均可不传。只有省有值时才查询省编码；只有省市都有值时才查询市编码；三级都有值时才查询区/县编码。缺少上级或无法匹配时均保留原始名称、编码留空且不报错。",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "ProjectCode",
+                  "Title",
+                  "Scale",
+                  "Location",
+                  "PublishDate"
+                ],
                 "properties": {
-                  "WashData_Id": {
-                    "type": "integer",
-                    "description": "清洗记录 ID；不入库。",
-                    "example": 222363496742926
+                  "Title": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
+                    "example": "明山隧道萍乡侧隧道广场630kWp光储项目"
                   },
-                  "Type": {
+                  "SiteType": {
+                    "type": "string",
+                    "description": "采集来源类型；不入库。",
+                    "example": "政府网站"
+                  },
+                  "Scale": {
+                    "type": "string",
+                    "pattern": "^\\d+(?:\\.\\d{1,4})?$",
+                    "description": "装机容量，最多四位小数；写库时固定为四位小数。",
+                    "example": "0.63"
+                  },
+                  "PublishDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "发布时间。",
+                    "example": "2026-03-01 00:00:00"
+                  },
+                  "Province": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "可选。省为空时不查询 City、County。",
+                    "example": "江西省"
+                  },
+                  "ProjectCode": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "description": "项目编码；与 Title 共同构成唯一去重键。",
+                    "example": "PPD2412360322001F"
+                  },
+                  "MonthlyTotal": {
                     "type": "integer",
-                    "description": "同步类型；不入库。",
+                    "minimum": 0,
+                    "nullable": true,
+                    "description": "可选月总量（条数）。空字符串或不传时保存为 NULL。",
+                    "example": 120000
+                  },
+                  "Location": {
+                    "type": "string",
+                    "maxLength": 500,
+                    "description": "项目所在地详细描述。",
+                    "example": "江西省萍乡市上栗县"
+                  },
+                  "IfNedTranslate": {
+                    "type": "integer",
+                    "description": "采集翻译标识；不入库。",
+                    "example": 0
+                  },
+                  "DataType": {
+                    "type": "integer",
+                    "description": "采集数据类型；不入库。",
                     "example": 1
                   },
-                  "TraceId": {
-                    "type": "integer",
-                    "description": "采集链路追踪 ID；不入库。",
-                    "example": 222363496480784
-                  },
-                  "SyncId_LogId": {
-                    "type": "integer",
-                    "description": "同步日志 ID；不入库。",
-                    "example": 222363496742924
-                  },
-                  "SendUrl": {
+                  "DataSort": {
                     "type": "string",
-                    "description": "采集端回调地址；不入库。",
-                    "example": "http://project.api.test.cbmnet.cn/power-station/collect/filing-project/create"
+                    "description": "采集数据分类；不入库。",
+                    "example": ""
                   },
-                  "Notes": {
+                  "County": {
                     "type": "string",
-                    "description": "同步说明；不入库。",
-                    "example": "建档立卡光伏项目数据同步"
+                    "maxLength": 50,
+                    "description": "可选。仅 Province、City 均有值时查询 county_code。",
+                    "example": "上栗县"
                   },
-                  "DataDict": {
-                    "type": "object",
-                    "description": "唯一的业务字段来源。",
-                    "required": [
-                      "ProjectCode",
-                      "Title",
-                      "Scale",
-                      "Location",
-                      "PublishDate"
-                    ],
-                    "properties": {
-                      "ProjectCode": {
-                        "type": "string",
-                        "maxLength": 100,
-                        "description": "项目编码；与 Title 共同构成唯一去重键。",
-                        "example": "PPD2505371724019V"
-                      },
-                      "Title": {
-                        "type": "string",
-                        "maxLength": 500,
-                        "description": "项目名称；与 ProjectCode 共同构成唯一去重键。",
-                        "example": "巨野县分布式光伏电站项目"
-                      },
-                      "Scale": {
-                        "type": "string",
-                        "pattern": "^\\d+(?:\\.\\d{1,4})?$",
-                        "description": "装机容量。最多四位小数；写库时固定为四位小数。",
-                        "example": "0.019"
-                      },
-                      "MonthlyTotal": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "nullable": true,
-                        "description": "可选月总量（条数）。空字符串或不传时保存为 NULL。",
-                        "example": 120000
-                      },
-                      "Location": {
-                        "type": "string",
-                        "maxLength": 500,
-                        "description": "项目所在地详细描述。",
-                        "example": "山东省菏泽市巨野县"
-                      },
-                      "Province": {
-                        "type": "string",
-                        "maxLength": 50,
-                        "description": "可选。省为空时不查询 City、County。",
-                        "example": "山东省"
-                      },
-                      "City": {
-                        "type": "string",
-                        "maxLength": 50,
-                        "description": "可选。仅 Province 有值时查询 city_code。",
-                        "example": "菏泽市"
-                      },
-                      "County": {
-                        "type": "string",
-                        "maxLength": 50,
-                        "description": "可选。仅 Province、City 均有值时查询 county_code。",
-                        "example": "巨野县"
-                      },
-                      "PublishDate": {
-                        "type": "string",
-                        "format": "date-time",
-                        "description": "发布时间。",
-                        "example": "2025-10-01 00:00:00"
-                      }
-                    }
+                  "City": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "description": "可选。仅 Province 有值时查询 city_code。",
+                    "example": "萍乡市"
                   }
                 }
               },
               "examples": {
                 "default": {
-                  "summary": "采集平台同步记录",
+                  "summary": "采集端新建请求",
                   "value": {
-                    "WashData_Id": 222363496742926,
-                    "Type": 1,
-                    "TraceId": 222363496480784,
-                    "SyncId_LogId": 222363496742924,
-                    "SendUrl": "http://project.api.test.cbmnet.cn/power-station/collect/filing-project/create",
-                    "Notes": "建档立卡光伏项目数据同步",
-                    "DataDict": {
-                      "Title": "巨野县分布式光伏电站项目",
-                      "SiteType": "政府网站",
-                      "Scale": "0.019",
-                      "PublishDate": "2025-10-01 00:00:00",
-                      "Province": "山东省",
-                      "ProjectCode": "PPD2505371724019V",
-                      "MonthlyTotal": "",
-                      "Location": "山东省菏泽市巨野县",
-                      "IfNedTranslate": 0,
-                      "DataType": 1,
-                      "DataSort": "",
-                      "County": "巨野县",
-                      "City": "菏泽市"
-                    }
+                    "Title": "明山隧道萍乡侧隧道广场630kWp光储项目",
+                    "SiteType": "政府网站",
+                    "Scale": "0.63",
+                    "PublishDate": "2026-03-01 00:00:00",
+                    "Province": "江西省",
+                    "ProjectCode": "PPD2412360322001F",
+                    "MonthlyTotal": "",
+                    "Location": "江西省萍乡市上栗县",
+                    "IfNedTranslate": 0,
+                    "DataType": 1,
+                    "DataSort": "",
+                    "County": "上栗县",
+                    "City": "萍乡市"
                   }
                 }
               }
